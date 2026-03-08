@@ -986,145 +986,213 @@ Please edit the profile or choose a different one.</source>
     </message>
 </context>
 <context>
-    <name>SequenceTab</name>
+    <name>SequenceEditorDialog</name>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="47"/>
-        <source>Sequence complete</source>
-        <translation>序列完成</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="15"/>
+        <source>Edit Sequence</source>
+        <translation>编辑序列</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="48"/>
-        <source>Fault: </source>
-        <translation>故障：</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="50"/>
-        <source>Step %1 of %2</source>
-        <translation>步骤 %1 / %2</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="72"/>
-        <source>▶ RUN</source>
-        <translation>▶ 运行</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="72"/>
-        <source>■ STOP</source>
-        <translation>■ 停止</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="103"/>
-        <source>Sequence Program</source>
-        <translation>序列程序</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="128"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="31"/>
         <source>New Sequence</source>
         <translation>新序列</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="157"/>
-        <source>Delete Sequence</source>
-        <translation>删除序列</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <source>Name:</source>
+        <translation>名称：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="160"/>
-        <source>Delete &quot;%1&quot;?</source>
-        <translation>删除 &quot;%1&quot;？</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="173"/>
-        <source>Sequence name</source>
-        <translation>序列名称</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="185"/>
-        <source>Steps</source>
-        <translation>步骤</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="186"/>
-        <source>Total: </source>
-        <translation>总计：</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="210"/>
-        <source>Step %1</source>
-        <translation>步骤 %1</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="247"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="77"/>
         <source>V (V)</source>
         <translation>电压 (V)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="264"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="78"/>
         <source>I (A)</source>
         <translation>电流 (A)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="287"/>
-        <source>Ramp</source>
-        <translation>斜坡</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="300"/>
-        <source>Ramp (ms)</source>
-        <translation>斜坡 (ms)</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="315"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="79"/>
         <source>Hold (ms)</source>
         <translation>保持 (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="335"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="80"/>
+        <source>Ramp</source>
+        <translation>斜坡</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="81"/>
+        <source>Ramp ms</source>
+        <translation>斜坡 ms</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="218"/>
         <source>+ Add Step</source>
         <translation>+ 添加步骤</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="351"/>
-        <source>Save</source>
-        <translation>保存</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="233"/>
+        <source>Import CSV…</source>
+        <translation>导入 CSV…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="362"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="238"/>
+        <source>Export CSV…</source>
+        <translation>导出 CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
+        <source>Export XLSX…</source>
+        <translation>导出 XLSX…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="256"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="410"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="261"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="278"/>
+        <source>Import CSV Sequence</source>
+        <translation>导入 CSV 序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="289"/>
+        <source>Export Sequence as CSV</source>
+        <translation>导出序列为 CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="303"/>
+        <source>Export Sequence as Excel</source>
+        <translation>导出序列为 Excel</translation>
+    </message>
+</context>
+<context>
+    <name>SequenceTab</name>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="33"/>
+        <source>Sequence complete</source>
+        <translation>序列完成</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="34"/>
+        <source>Fault: </source>
+        <translation>故障：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="36"/>
+        <source>Step %1 of %2</source>
+        <translation>步骤 %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="69"/>
+        <source>▶ RUN</source>
+        <translation>▶ 运行</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="69"/>
+        <source>■ STOP</source>
+        <translation>■ 停止</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="100"/>
+        <source>Sequence Program</source>
+        <translation>序列程序</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="164"/>
+        <source>Delete Sequence</source>
+        <translation>删除序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="168"/>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>删除 &quot;%1&quot;？</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="118"/>
+        <source>New sequence</source>
+        <translation>新序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="124"/>
+        <source>Edit sequence</source>
+        <translation>编辑序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="130"/>
+        <source>Delete sequence</source>
+        <translation>删除序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="140"/>
+        <source>Import CSV…</source>
+        <translation>导入 CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="145"/>
+        <source>Export CSV…</source>
+        <translation>导出 CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="151"/>
+        <source>Export XLSX…</source>
+        <translation>导出 XLSX…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="177"/>
+        <source>Import CSV Sequence</source>
+        <translation>导入 CSV 序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="187"/>
+        <source>Export Sequence as CSV</source>
+        <translation>导出序列为 CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="195"/>
+        <source>Export Sequence as Excel</source>
+        <translation>导出序列为 Excel</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="242"/>
         <source>Progress</source>
         <translation>进度</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="415"/>
-        <location filename="../qml/SequenceTab.qml" line="449"/>
+        <location filename="../qml/SequenceTab.qml" line="246"/>
+        <location filename="../qml/SequenceTab.qml" line="278"/>
         <source>Step:</source>
         <translation>步骤：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="428"/>
+        <location filename="../qml/SequenceTab.qml" line="258"/>
         <source>Total:</source>
         <translation>总计：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="442"/>
+        <location filename="../qml/SequenceTab.qml" line="271"/>
         <source>Phase:</source>
         <translation>阶段：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="455"/>
+        <location filename="../qml/SequenceTab.qml" line="283"/>
         <source>Elapsed:</source>
         <translation>已用时间：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="471"/>
+        <location filename="../qml/SequenceTab.qml" line="298"/>
         <source>⚠ Device not connected</source>
         <translation>⚠ 设备未连接</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="489"/>
+        <location filename="../qml/SequenceTab.qml" line="315"/>
         <source>Sequence Chart</source>
         <translation>序列图表</translation>
     </message>

@@ -48,6 +48,12 @@ public:
     Q_INVOKABLE void moveStep(int profileIndex, int from, int to);
     Q_INVOKABLE QVariantMap defaultStep() const;
 
+    // CSV + XLSX import / export
+    Q_INVOKABLE QString toCsv(int index) const;
+    Q_INVOKABLE bool saveToFile(int index, const QString& filePath) const;   // .csv
+    Q_INVOKABLE bool saveToXlsx(int index, const QString& filePath) const;   // .xlsx
+    Q_INVOKABLE bool loadFromFile(const QString& filePath);                  // .csv only
+
     const SequenceProfile& profile(int index) const { return m_profiles.at(index); }
 
 signals:

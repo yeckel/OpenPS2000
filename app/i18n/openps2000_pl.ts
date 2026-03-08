@@ -986,145 +986,213 @@ Edytuj profil lub wybierz inny.</translation>
     </message>
 </context>
 <context>
-    <name>SequenceTab</name>
+    <name>SequenceEditorDialog</name>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="47"/>
-        <source>Sequence complete</source>
-        <translation>Sekwencja zakończona</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="15"/>
+        <source>Edit Sequence</source>
+        <translation>Edytuj sekwencję</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="48"/>
-        <source>Fault: </source>
-        <translation>Błąd: </translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="50"/>
-        <source>Step %1 of %2</source>
-        <translation>Krok %1 z %2</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="72"/>
-        <source>▶ RUN</source>
-        <translation>▶ URUCHOM</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="72"/>
-        <source>■ STOP</source>
-        <translation>■ ZATRZYMAJ</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="103"/>
-        <source>Sequence Program</source>
-        <translation>Program sekwencji</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="128"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="31"/>
         <source>New Sequence</source>
         <translation>Nowa sekwencja</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="157"/>
-        <source>Delete Sequence</source>
-        <translation>Usuń sekwencję</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <source>Name:</source>
+        <translation>Nazwa:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="160"/>
-        <source>Delete &quot;%1&quot;?</source>
-        <translation>Usunąć &quot;%1&quot;?</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="173"/>
-        <source>Sequence name</source>
-        <translation>Nazwa sekwencji</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="185"/>
-        <source>Steps</source>
-        <translation>Kroki</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="186"/>
-        <source>Total: </source>
-        <translation>Łącznie: </translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="210"/>
-        <source>Step %1</source>
-        <translation>Krok %1</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="247"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="77"/>
         <source>V (V)</source>
         <translation>U (V)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="264"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="78"/>
         <source>I (A)</source>
         <translation>I (A)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="287"/>
-        <source>Ramp</source>
-        <translation>Rampa</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="300"/>
-        <source>Ramp (ms)</source>
-        <translation>Rampa (ms)</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="315"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="79"/>
         <source>Hold (ms)</source>
         <translation>Utrzymaj (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="335"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="80"/>
+        <source>Ramp</source>
+        <translation>Rampa</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="81"/>
+        <source>Ramp ms</source>
+        <translation>Rampa ms</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="218"/>
         <source>+ Add Step</source>
         <translation>+ Dodaj krok</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="351"/>
-        <source>Save</source>
-        <translation>Zapisz</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="233"/>
+        <source>Import CSV…</source>
+        <translation>Importuj CSV…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="362"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="238"/>
+        <source>Export CSV…</source>
+        <translation>Eksportuj CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
+        <source>Export XLSX…</source>
+        <translation>Eksportuj XLSX…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="256"/>
         <source>Cancel</source>
         <translation>Anuluj</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="410"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="261"/>
+        <source>Save</source>
+        <translation>Zapisz</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="278"/>
+        <source>Import CSV Sequence</source>
+        <translation>Importuj sekwencję CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="289"/>
+        <source>Export Sequence as CSV</source>
+        <translation>Eksportuj sekwencję jako CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="303"/>
+        <source>Export Sequence as Excel</source>
+        <translation>Eksportuj sekwencję jako Excel</translation>
+    </message>
+</context>
+<context>
+    <name>SequenceTab</name>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="33"/>
+        <source>Sequence complete</source>
+        <translation>Sekwencja zakończona</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="34"/>
+        <source>Fault: </source>
+        <translation>Błąd: </translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="36"/>
+        <source>Step %1 of %2</source>
+        <translation>Krok %1 z %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="69"/>
+        <source>▶ RUN</source>
+        <translation>▶ URUCHOM</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="69"/>
+        <source>■ STOP</source>
+        <translation>■ ZATRZYMAJ</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="100"/>
+        <source>Sequence Program</source>
+        <translation>Program sekwencji</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="164"/>
+        <source>Delete Sequence</source>
+        <translation>Usuń sekwencję</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="168"/>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>Usunąć &quot;%1&quot;?</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="118"/>
+        <source>New sequence</source>
+        <translation>Nowa sekwencja</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="124"/>
+        <source>Edit sequence</source>
+        <translation>Edytuj sekwencję</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="130"/>
+        <source>Delete sequence</source>
+        <translation>Usuń sekwencję</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="140"/>
+        <source>Import CSV…</source>
+        <translation>Importuj CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="145"/>
+        <source>Export CSV…</source>
+        <translation>Eksportuj CSV…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="151"/>
+        <source>Export XLSX…</source>
+        <translation>Eksportuj XLSX…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="177"/>
+        <source>Import CSV Sequence</source>
+        <translation>Importuj sekwencję CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="187"/>
+        <source>Export Sequence as CSV</source>
+        <translation>Eksportuj sekwencję jako CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="195"/>
+        <source>Export Sequence as Excel</source>
+        <translation>Eksportuj sekwencję jako Excel</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="242"/>
         <source>Progress</source>
         <translation>Postęp</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="415"/>
-        <location filename="../qml/SequenceTab.qml" line="449"/>
+        <location filename="../qml/SequenceTab.qml" line="246"/>
+        <location filename="../qml/SequenceTab.qml" line="278"/>
         <source>Step:</source>
         <translation>Krok:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="428"/>
+        <location filename="../qml/SequenceTab.qml" line="258"/>
         <source>Total:</source>
         <translation>Łącznie:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="442"/>
+        <location filename="../qml/SequenceTab.qml" line="271"/>
         <source>Phase:</source>
         <translation>Faza:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="455"/>
+        <location filename="../qml/SequenceTab.qml" line="283"/>
         <source>Elapsed:</source>
         <translation>Upłynęło:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="471"/>
+        <location filename="../qml/SequenceTab.qml" line="298"/>
         <source>⚠ Device not connected</source>
         <translation>⚠ Urządzenie niepodłączone</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="489"/>
+        <location filename="../qml/SequenceTab.qml" line="315"/>
         <source>Sequence Chart</source>
         <translation>Wykres sekwencji</translation>
     </message>

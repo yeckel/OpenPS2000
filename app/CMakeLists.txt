@@ -15,7 +15,7 @@ foreach(_qt_ver 6.9.2 6.9.1 6.9.0 6.8.3 6.8.2 6.8.1 6.8.0 6.7.3 6.7.2 6.7.0)
 endforeach()
 
 find_package(Qt6 6.7 REQUIRED COMPONENTS
-    Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort)
+    Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort LabsPlatform)
 
 qt_standard_project_setup(REQUIRES 6.7)
 
@@ -49,6 +49,7 @@ qt_add_qml_module(openps2000app
         qml/PulseChart.qml
         qml/SequenceTab.qml
         qml/SequenceChart.qml
+        qml/SequenceEditorDialog.qml
 )
 
 target_link_libraries(openps2000app PRIVATE
@@ -60,6 +61,7 @@ target_link_libraries(openps2000app PRIVATE
     Qt6::QuickDialogs2
     Qt6::Widgets
     Qt6::SerialPort
+    Qt6::LabsPlatform
 )
 
 # ── DBus on Linux (Qt serial port may need it transitively) ───────────────
@@ -118,6 +120,7 @@ qt_add_translations(openps2000app
         qml/PulseChart.qml
         qml/SequenceTab.qml
         qml/SequenceChart.qml
+        qml/SequenceEditorDialog.qml
     LUPDATE_OPTIONS
         -no-obsolete
 )

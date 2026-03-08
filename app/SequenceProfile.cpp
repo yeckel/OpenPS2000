@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright © 2026 Libor Tomsik, OK1CHP
 #include "SequenceProfile.h"
+#include "XlsxWriter.h"
 #include <QFile>
 #include <QDir>
+#include <QFileInfo>
+#include <QUrl>
 #include <QStandardPaths>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -140,4 +143,72 @@ void SequenceStore::addDefaults() {
     }
     save();
     emit profilesChanged();
+}
+
+// ── CSV import / export ───────────────────────────────────────────────────────
+QString SequenceStore::toCsv(int index) const {
+    if (index < 0 || index >= m_profiles.size()) return {};
+    QStringList lines;
+    lines << "voltage,current,holdMs,ramp,rampMs";
+    for (auto& s : m_profiles[index].steps)
+        lines << QString("%1,%2,%3,%4,%5")
+                 .arg(s.voltage, 0, 'f', 3)
+                 .arg(s.current, 0, 'f', 3)
+                 .arg(s.holdMs)
+                 .arg(s.ramp ? 1 : 0)
+                 .arg(s.rampMs);
+    return lines.join("\n") + "\n";
+}
+
+bool SequenceStore::saveToFile(int index, const QString& filePath) const {
+    QString csv = toCsv(index);
+    if (csv.isEmpty()) return false;
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    QFile f(localPath);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+    f.write(csv.toUtf8());
+    return true;
+}
+
+bool SequenceStore::saveToXlsx(int index, const QString& filePath) const {
+    if (index < 0 || index >= m_profiles.size()) return false;
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    const auto& p = m_profiles[index];
+
+    XlsxWriter xlsx;
+    xlsx.setTitle(p.name);
+    xlsx.addSheet(p.name.left(31));   // Excel sheet name ≤ 31 chars
+    xlsx.setHeaders({"Voltage (V)", "Current (A)", "Hold (ms)", "Ramp", "Ramp ms"});
+    for (const auto& s : p.steps)
+        xlsx.addRow({s.voltage, s.current, double(s.holdMs), s.ramp ? 1.0 : 0.0, double(s.rampMs)});
+
+    return xlsx.save(localPath);
+}
+
+bool SequenceStore::loadFromFile(const QString& filePath) {
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    QFile f(localPath);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) return false;
+    QString name = QFileInfo(localPath).baseName();
+    QStringList lines = QString::fromUtf8(f.readAll()).split('\n', Qt::SkipEmptyParts);
+    if (lines.size() < 2) return false;
+
+    SequenceProfile p;
+    p.name = name;
+    for (int i = 1; i < lines.size(); ++i) {
+        QStringList c = lines[i].split(',');
+        if (c.size() < 5) continue;
+        SequenceStep s;
+        s.voltage = c[0].trimmed().toDouble();
+        s.current = c[1].trimmed().toDouble();
+        s.holdMs  = c[2].trimmed().toInt();
+        s.ramp    = c[3].trimmed().toInt() != 0;
+        s.rampMs  = c[4].trimmed().toInt();
+        p.steps << s;
+    }
+    if (p.steps.isEmpty()) return false;
+    m_profiles << p;
+    save();
+    emit profilesChanged();
+    return true;
 }
