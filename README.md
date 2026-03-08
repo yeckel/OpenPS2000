@@ -1,29 +1,69 @@
-# OpenPS2000
+# ⚡ OpenPS2000
 
-Open-source Qt 6 / QML desktop application for controlling **EA PS 2000 B** laboratory power supplies over USB.
+Open-source **Qt 6 / QML / C++** desktop application for controlling
+**EA Elektro-Automatik PS 2000 B** laboratory power supplies over USB.
 
-**Author:** Libor Tomsik, OK1CHP
+**Author:** Libor Tomsik, OK1CHP  
+**License:** [GNU GPL v3](LICENSE)
+
+[![Build](https://github.com/yeckel/OpenPS2000/actions/workflows/build.yml/badge.svg)](https://github.com/yeckel/OpenPS2000/actions/workflows/build.yml)
+
+---
+
+![OpenPS2000 main window](screenshots/01_main.png)
 
 ---
 
 ## Features
 
-- **Live monitoring** — voltage, current, power at 4 Hz via the USB virtual COM port
-- **Full remote control** — set voltage, current, OVP threshold, OCP threshold
-- **Output control** — output on/off, remote/manual mode switch, alarm acknowledgement
-- **Live charts** — dual-axis voltage/current chart + power area chart, canvas-based scrolling
-- **Zoom & pan** — scroll wheel to zoom, right-click drag to pan both charts
-- **Range measurement** — drag to select a time window; shows mean/peak V/I/P, energy (Wh/mWh/mAh)
-- **Energy counter** — cumulative energy integration with reset marker
-- **CSV & Excel export** — session data with one click
-- **Dark Material theme**
-- **Cross-platform** — Linux (AppImage), Windows (zip), macOS (dmg)
+### Live Monitor Tab
+- **Real-time measurements** — voltage, current, power at 4 Hz over USB
+- **Live charts** — dual-axis V/I chart and power area chart with smooth scrolling
+- **Zoom & pan** — scroll wheel to zoom the time axis, right-click drag to pan
+- **Range statistics** — drag to select a time window; popup shows min/max/mean V/I/P,
+  energy in Wh and charge in mAh for the selected interval
+- **Energy counter** — cumulative energy integration with per-session reset
+- **CSV & Excel export** — one-click export of the full session log
+
+### Full Remote Control
+- Set **voltage** and **current** setpoints with mouse-wheel-enabled spinboxes
+- Set **OVP** (over-voltage) and **OCP** (over-current) protection limits
+- **Output ON/OFF** toggle with keyboard shortcut
+- **Remote / Manual** mode switch
+- **Emergency stop** — large red button + `Space` key instantly cuts the output
+- **Protection alarm popup** — OVP / OCP / OPP / OTP alarms detected automatically,
+  shown in a modal dialog with clear descriptions and one-click acknowledgement
+
+### Battery Charger Tab *(experimental)*
+- **5 chemistries:** LiPo, LiFe, Pb, NiCd, NiMH
+- **CC/CV** algorithm for Li-ion and lead-acid; **CC + −ΔV termination** for NiCd/NiMH
+- **Float stage** for lead-acid batteries
+- **Profile manager** — create, edit, delete named profiles; 8 built-in defaults
+- **Live charging chart** — dual-axis voltage/current curve with phase markers
+- **Session statistics** — capacity (mAh), energy (Wh), duration, min/max V/I
+- **Safety limits** — maximum voltage, current, time enforced by the state machine
+
+### User Interface
+- **Dark Material theme** throughout
+- **Keyboard shortcuts:**
+
+  | Action | Shortcut |
+  |--------|----------|
+  | Emergency stop | `Space` |
+  | Power on (with confirmation) | `Space` (when off) |
+  | Voltage up / down | `Ctrl+Up` / `Ctrl+Down` |
+  | Current up / down | `Ctrl+Shift+Up` / `Ctrl+Shift+Down` |
+
+- **Internationalization** — UI translated into 🇩🇪 German, 🇪🇸 Spanish, 🇨🇿 Czech,
+  🇵🇱 Polish, 🇨🇳 Chinese (Simplified). Language persisted across restarts.
+- **Port memory** — last used serial port saved and restored on startup
 
 ---
 
 ## Downloads
 
-Pre-built binaries are attached to each [GitHub Release](https://github.com/yeckel/OpenPS2000/releases).
+Pre-built binaries are attached to each
+[GitHub Release](https://github.com/yeckel/OpenPS2000/releases).
 
 | Platform | File |
 |----------|------|
@@ -37,29 +77,34 @@ Pre-built binaries are attached to each [GitHub Release](https://github.com/yeck
 
 | Property | Value |
 |----------|-------|
-| Device   | EA Elektro-Automatik PS 2000 B series |
-| Tested   | EA-PS 2084-05 B (84 V / 5 A / 100 W) |
+| Series   | EA Elektro-Automatik PS 2000 B |
+| Tested   | EA-PS 2084-05 B (84 V / 5 A / 160 W) |
 | Interface | USB → virtual COM port (VCP) |
-| Baud rate | 115200, odd parity, 8N1 |
-| OS port  | `/dev/ttyACM0` (Linux), `COMx` (Windows), `/dev/tty.usbmodem*` (macOS) |
+| Baud rate | 115 200 bps, odd parity, 8 data bits |
+| Linux port | `/dev/ttyACM0` |
+| Windows port | `COMx` (check Device Manager) |
+| macOS port | `/dev/tty.usbmodem*` |
 
-> On Linux, add your user to the `dialout` group:
+> **Linux:** add your user to the `dialout` group, then re-login:
 > ```bash
-> sudo usermod -aG dialout $USER   # re-login after
+> sudo usermod -aG dialout $USER
 > ```
 
 ---
 
 ## Protocol
 
-Binary telegram protocol over the USB VCP.  
-Reference documents in `doc/`:
-- `ps2000b_programming.pdf` — telegram format, value conversion, workflow
-- `object_list_ps2000b_de_en.pdf` — object list with all register definitions
+Binary telegram protocol over the USB VCP as documented in `doc/`:
 
-Telegram structure: `SD DN OBJ [DATA…] CS_HI CS_LO`
+| Document | Contents |
+|----------|----------|
+| `ps2000b_programming.pdf` | Telegram framing, value scaling, workflow |
+| `object_list_ps2000b_de_en.pdf` | Full object register list |
 
-Values are transmitted as percentages of nominal: `raw = 25600 × value / nominal`.
+**Telegram format:** `SD DN OBJ [DATA…] CS_HI CS_LO`
+
+Values are encoded as a fraction of the nominal rating:
+`raw = 25600 × value / nominal`
 
 ---
 
@@ -67,46 +112,43 @@ Values are transmitted as percentages of nominal: `raw = 25600 × value / nomina
 
 ### Requirements
 
-- **Qt 6.7+** with: Core, Gui, Quick, QuickControls2, Qml, Widgets, **SerialPort**
-- CMake 3.28+, C++20 compiler
+| Dependency | Version |
+|------------|---------|
+| Qt         | 6.7 or newer (Core, Gui, Quick, QuickControls2, SerialPort) |
+| CMake      | 3.28+ |
+| Compiler   | C++20 (GCC 12+, Clang 15+, MSVC 2022) |
 
-Install Qt from the [Qt online installer](https://www.qt.io/download).  
-`qtserialport` module is required (included in most Qt distributions).
+Install Qt from the [Qt online installer](https://www.qt.io/download) or your
+distribution's package manager.
 
-### Build
+### Clone and build
 
 ```bash
-cd app
-cmake -B build -DCMAKE_BUILD_TYPE=Release .
+git clone https://github.com/yeckel/OpenPS2000.git
+cd OpenPS2000
+cmake -B build -DCMAKE_BUILD_TYPE=Release app
 cmake --build build --parallel
 ./build/bin/openps2000app
 ```
 
-Linux with Qt in `/opt/Qt`:
+If Qt is installed in a non-standard location (e.g. `/opt/Qt`):
+
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_PREFIX_PATH=/opt/Qt/6.8.3/gcc_64 .
-cmake --build build --parallel
+      -DCMAKE_PREFIX_PATH=/opt/Qt/6.9.2/gcc_64 app
 ```
 
 ---
 
-## Usage
+## Quick Start
 
-1. Connect the power supply via the USB cable
+1. Connect the PS 2000 B via USB
 2. Launch **OpenPS2000**
-3. Select the serial port (usually auto-detected as `/dev/ttyACM0`)
-4. Click **▶ Connect** — device info is read automatically
-5. Toggle **Remote** mode to enable remote control
-6. Set desired voltage and current using the spinboxes
-7. Click **Output ON** to enable the output
-
-### Charts
-
-- **Scroll wheel** — zoom in/out on the time axis
-- **Right-click drag** — pan the time axis
-- **Left-click drag** — select a time range for measurement (shows stats panel)
-- **Double-click** — clear the selection
+3. Select the serial port (auto-detected if only one VCP is present)
+4. Click **▶ Connect** — model name, nominal voltage/current are read back
+5. Enable **Remote** mode
+6. Set voltage and current (spinboxes or `Ctrl+↑/↓`)
+7. Press `Space` or click **Output ON**
 
 ---
 
@@ -114,27 +156,49 @@ cmake --build build --parallel
 
 ```
 OpenPS2000/
-├── doc/                        EA protocol documentation PDFs
+├── doc/                          EA protocol documentation (PDFs)
+├── screenshots/                  Application screenshots
 ├── app/
 │   ├── CMakeLists.txt
-│   ├── main.cpp
-│   ├── PS2000Protocol.h/cpp    Binary telegram encoder/decoder
-│   ├── SerialTransport.h/cpp   QThread serial port worker (4 Hz polling)
-│   ├── DeviceBackend.h/cpp     QML-exposed control backend
-│   ├── DataRecord.h            Measurement sample struct
-│   ├── XlsxWriter.h/cpp        OOXML .xlsx writer (no external deps)
-│   ├── ZipWriter.h/cpp         STORE-only ZIP (used by XlsxWriter)
+│   ├── main.cpp                  App entry point, engine setup, i18n, wiring
+│   ├── PS2000Protocol.h/cpp      Binary telegram encoder/decoder
+│   ├── SerialTransport.h/cpp     QThread serial worker (4 Hz polling)
+│   ├── DeviceBackend.h/cpp       QML-exposed device control + alarm detection
+│   ├── DataRecord.h              Measurement sample struct
+│   ├── BatteryProfile.h/cpp      Charging profile definitions + JSON storage
+│   ├── ChargerEngine.h/cpp       CC/CV/Float/−ΔV charging state machine
+│   ├── XlsxWriter.h/cpp          OOXML .xlsx writer (zero external dependencies)
+│   ├── ZipWriter.h/cpp           STORE-only ZIP (used by XlsxWriter)
 │   └── qml/
-│       ├── Main.qml            Application window + controls
-│       └── LiveChart.qml       Canvas-based scrolling chart
+│       ├── Main.qml              Main window, toolbar, controls, alarm popup
+│       ├── LiveChart.qml         Canvas scrolling dual-axis chart
+│       ├── ChargerTab.qml        Battery charger UI tab
+│       └── ChargingChart.qml     Charging curve canvas chart
 └── .github/workflows/
-    └── build.yml               CI: Linux AppImage, Windows zip, macOS dmg
+    └── build.yml                 CI: Linux AppImage · Windows zip · macOS dmg
 ```
+
+---
+
+## Battery Charger Safety
+
+> ⚠️ **The battery charging feature is experimental.**
+>
+> Always supervise charging sessions. Never leave batteries unattended.
+> Use proper fusing and fire-resistant containers.
+> The author accepts **no liability** for damage caused by use of this software.
+
+---
+
+## Contributing
+
+Pull requests are welcome. Please open an issue first to discuss what you would
+like to change.
 
 ---
 
 ## License
 
-[GNU General Public License v3.0](LICENSE) — see `LICENSE` for full terms.
+[GNU General Public License v3.0](LICENSE)
 
 Copyright © 2026 Libor Tomsik, OK1CHP

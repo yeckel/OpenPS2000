@@ -6,6 +6,7 @@ import QtQuick.Controls.Material
 import QtQuick.Controls
 import QtQuick.Layouts
 import Qt.labs.platform as Platform
+import QtCore
 
 ApplicationWindow {
     id: window
@@ -26,9 +27,12 @@ ApplicationWindow {
     property real sharedViewLeft:   0
     property bool followMode:       true
 
-    // ── Measurement panel state ────────────────────────────────────────────
-    property var   measureData:   null
-    property bool  showMeasure:   false
+    // ── Persistent settings ────────────────────────────────────────────────
+    Settings {
+        id: appSettings
+        category: "ui"
+        property string lastPort: ""
+    }
 
     // ── Status snackbar ────────────────────────────────────────────────────
     property string lastStatus: ""
@@ -46,9 +50,13 @@ ApplicationWindow {
             if (!connected) {
                 vcChart.clearAll()
                 pwChart.clearAll()
-                window.measureData = null
-                window.showMeasure = false
+                statsPopup.clearAndClose()
             }
+        }
+        function onAlarmTriggered(ovp, ocp, opp, otp) {
+            alarmPopup.ovp = ovp; alarmPopup.ocp = ocp
+            alarmPopup.opp = opp; alarmPopup.otp = otp
+            alarmPopup.open()
         }
     }
 
@@ -73,11 +81,20 @@ ApplicationWindow {
                 anchors.leftMargin: 12; anchors.rightMargin: 12
                 spacing: 8
 
-                // App name
+                // App name — click to open About
                 Label {
                     text: "⚡ OpenPS2000"
                     font.pixelSize: 18; font.bold: true
-                    color: Material.accent
+                    color: appNameHover.containsMouse ? "#80ddff" : Material.accent
+                    Behavior on color { ColorAnimation { duration: 100 } }
+                    ToolTip.text: qsTr("About & device info"); ToolTip.visible: appNameHover.containsMouse
+                    MouseArea {
+                        id: appNameHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: aboutPopup.open()
+                    }
                 }
 
                 // Port selector
@@ -87,12 +104,17 @@ ApplicationWindow {
                     model: backend.availablePorts()
                     enabled: !backend.connected
                     Material.background: "#1e2a3e"
-                    onActivated: {}
+                    onActivated: appSettings.lastPort = currentText
                     Component.onCompleted: {
-                        // Pre-select /dev/ttyACM0 or ttyUSB0 if present
+                        // Restore last-used port; fall back to first ttyACM/ttyUSB
+                        var saved = appSettings.lastPort
                         for (var i = 0; i < model.length; i++) {
-                            if (model[i].indexOf("ttyACM") >= 0 || model[i].indexOf("ttyUSB") >= 0) {
-                                currentIndex = i; break
+                            if (model[i] === saved) { currentIndex = i; return }
+                        }
+                        for (var j = 0; j < model.length; j++) {
+                            if (model[j].indexOf("ttyACM") >= 0 || model[j].indexOf("ttyUSB") >= 0
+                                || model[j].indexOf("COM") >= 0) {
+                                currentIndex = j; return
                             }
                         }
                     }
@@ -100,19 +122,22 @@ ApplicationWindow {
 
                 ToolButton {
                     text: "↻"
-                    ToolTip.text: "Refresh port list"; ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Refresh port list"); ToolTip.visible: hovered
                     enabled: !backend.connected
                     onClicked: portCombo.model = backend.availablePorts()
                 }
 
                 // Connect / Disconnect
                 Button {
-                    text: backend.connected ? "⏹ Disconnect" : "▶ Connect"
+                    text: backend.connected ? "⏹ " + qsTr("Disconnect") : "▶ " + qsTr("Connect")
                     highlighted: !backend.connected
                     Material.accent: backend.connected ? Material.Red : Material.Cyan
                     onClicked: {
                         if (backend.connected) backend.disconnectDevice()
-                        else if (portCombo.currentText !== "") backend.connectDevice(portCombo.currentText)
+                        else if (portCombo.currentText !== "") {
+                            appSettings.lastPort = portCombo.currentText
+                            backend.connectDevice(portCombo.currentText)
+                        }
                     }
                 }
 
@@ -122,7 +147,7 @@ ApplicationWindow {
                 RowLayout {
                     spacing: 4
                     enabled: backend.connected
-                    Label { text: "Remote"; color: backend.remoteMode ? Material.accent : "#888"; font.pixelSize: 13 }
+                    Label { text: qsTr("Remote"); color: backend.remoteMode ? Material.accent : "#888"; font.pixelSize: 13 }
                     Switch {
                         id: remoteSwitch
                         checked: backend.remoteMode
@@ -130,13 +155,19 @@ ApplicationWindow {
                     }
                 }
 
-                // Output ON/OFF
+                // Output ON/OFF — confirmation when turning on
                 Button {
-                    text: backend.outputOn ? "Output ON" : "Output OFF"
+                    text: backend.outputOn ? qsTr("Output ON") : qsTr("Output OFF")
                     highlighted: backend.outputOn
                     Material.accent: backend.outputOn ? Material.Green : "#555"
                     enabled: backend.connected && backend.remoteMode
-                    onClicked: backend.setOutputOn(!backend.outputOn)
+                    ToolTip.text: backend.outputOn ? qsTr("Turn off output  [Space]") : qsTr("Turn on output  [Space]")
+                    ToolTip.visible: hovered
+                    onClicked: {
+                        if (backend.outputOn) backend.setOutputOn(false)
+                        else if (window.skipOutputConfirm) backend.setOutputOn(true)
+                        else outputConfirmDialog.open()
+                    }
                 }
 
                 // Alarm indicators
@@ -170,7 +201,7 @@ ApplicationWindow {
                     }
                     ToolButton {
                         text: "✕ Ack"
-                        ToolTip.text: "Acknowledge all alarms"
+                        ToolTip.text: qsTr("Acknowledge all alarms")
                         onClicked: backend.acknowledgeAlarms()
                     }
                 }
@@ -191,7 +222,7 @@ ApplicationWindow {
                 // Export button
                 ToolButton {
                     text: "⬇ Export"
-                    ToolTip.text: "Export session data"
+                    ToolTip.text: qsTr("Export session data")
                     enabled: backend.sampleCount > 0
                     onClicked: exportMenu.open()
                     Menu {
@@ -221,8 +252,9 @@ ApplicationWindow {
                 width: 280
                 color: "#10182a"
 
+                // Scrollable controls — stops above the E-stop button
                 ScrollView {
-                    anchors.fill: parent
+                    anchors { top: parent.top; left: parent.left; right: parent.right; bottom: estopArea.top }
                     contentWidth: parent.width
                     clip: true
 
@@ -292,21 +324,21 @@ ApplicationWindow {
                                 anchors { fill: parent; margins: 10 }
                                 spacing: 2
                                 RowLayout {
-                                    Label { text: "Energy:"; color: "#99aabb"; font.pixelSize: 12 }
+                                    Label { text: qsTr("Energy:"); color: "#99aabb"; font.pixelSize: 12 }
                                     Label {
                                         text: backend.energyWh.toFixed(4) + " Wh"
                                         color: "#ddeecc"; font.pixelSize: 13; font.bold: true
                                     }
                                     ToolButton {
                                         text: "↺"
-                                        ToolTip.text: "Reset energy counter"
+                                        ToolTip.text: qsTr("Reset energy counter")
                                         implicitWidth: 28; implicitHeight: 28
                                         font.pixelSize: 14
                                         onClicked: backend.resetEnergy()
                                     }
                                 }
                                 RowLayout {
-                                    Label { text: "Duration:"; color: "#99aabb"; font.pixelSize: 12 }
+                                    Label { text: qsTr("Duration:"); color: "#99aabb"; font.pixelSize: 12 }
                                     Label {
                                         text: backend.duration
                                         color: "#ccddee"; font.pixelSize: 12; font.family: "monospace"
@@ -318,7 +350,7 @@ ApplicationWindow {
 
                         // ── Section: Set values ────────────────────────────
                         Label {
-                            text: "SET VALUES"
+                            text: qsTr("SET VALUES")
                             font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             color: "#556677"
                             topPadding: 4
@@ -335,7 +367,7 @@ ApplicationWindow {
                                 // Set Voltage
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    Label { text: "Voltage"; color: "#99aabb"; font.pixelSize: 12; Layout.preferredWidth: 56 }
+                                    Label { text: qsTr("Voltage"); color: "#99aabb"; font.pixelSize: 12; Layout.preferredWidth: 56 }
                                     SpinBox {
                                         id: setVSpin
                                         Layout.fillWidth: true
@@ -343,6 +375,7 @@ ApplicationWindow {
                                         stepSize: 100  // 0.1 V steps
                                         value: Math.round(backend.setVoltage * 1000)
                                         editable: true
+                                        wheelEnabled: true
                                         enabled: backend.connected && backend.remoteMode
                                         textFromValue: function(v) { return (v / 1000.0).toFixed(3) + " V" }
                                         valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
@@ -358,7 +391,7 @@ ApplicationWindow {
                                 // Set Current
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    Label { text: "Current"; color: "#99aabb"; font.pixelSize: 12; Layout.preferredWidth: 56 }
+                                    Label { text: qsTr("Current"); color: "#99aabb"; font.pixelSize: 12; Layout.preferredWidth: 56 }
                                     SpinBox {
                                         id: setISpin
                                         Layout.fillWidth: true
@@ -366,6 +399,7 @@ ApplicationWindow {
                                         stepSize: 10  // 0.01 A steps
                                         value: Math.round(backend.setCurrent * 1000)
                                         editable: true
+                                        wheelEnabled: true
                                         enabled: backend.connected && backend.remoteMode
                                         textFromValue: function(v) { return (v / 1000.0).toFixed(3) + " A" }
                                         valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
@@ -382,7 +416,7 @@ ApplicationWindow {
 
                         // ── Section: Protection limits ─────────────────────
                         Label {
-                            text: "PROTECTION LIMITS"
+                            text: qsTr("PROTECTION LIMITS")
                             font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             color: "#556677"
                             topPadding: 4
@@ -407,6 +441,7 @@ ApplicationWindow {
                                         stepSize: 100
                                         value: Math.round(backend.ovpVoltage * 1000)
                                         editable: true
+                                        wheelEnabled: true
                                         enabled: backend.connected && backend.remoteMode
                                         textFromValue: function(v) { return (v / 1000.0).toFixed(3) + " V" }
                                         valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
@@ -429,6 +464,7 @@ ApplicationWindow {
                                         stepSize: 10
                                         value: Math.round(backend.ocpCurrent * 1000)
                                         editable: true
+                                        wheelEnabled: true
                                         enabled: backend.connected && backend.remoteMode
                                         textFromValue: function(v) { return (v / 1000.0).toFixed(3) + " A" }
                                         valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
@@ -444,7 +480,7 @@ ApplicationWindow {
 
                         // ── Device info ────────────────────────────────────
                         Label {
-                            text: "DEVICE INFO"
+                            text: qsTr("DEVICE INFO")
                             font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             color: "#556677"
                             topPadding: 4
@@ -462,9 +498,9 @@ ApplicationWindow {
 
                                 Repeater {
                                     model: [
-                                        ["Model",  backend.deviceType],
-                                        ["Serial", backend.serialNo],
-                                        ["FW",     backend.swVersion],
+                                        [qsTr("Model"),  backend.deviceType],
+                                        [qsTr("Serial"), backend.serialNo],
+                                        [qsTr("FW"),     backend.swVersion],
                                         ["Unom",   backend.nomVoltage.toFixed(1) + " V"],
                                         ["Inom",   backend.nomCurrent.toFixed(2) + " A"],
                                         ["Pnom",   backend.nomPower.toFixed(0) + " W"],
@@ -479,7 +515,7 @@ ApplicationWindow {
 
                         // ── Chart view options ────────────────────────────
                         Label {
-                            text: "CHART"
+                            text: qsTr("CHART")
                             font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             color: "#556677"
                             topPadding: 4
@@ -488,7 +524,7 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             spacing: 4
 
-                            Label { text: "Window:"; color: "#99aabb"; font.pixelSize: 12 }
+                            Label { text: qsTr("Window:"); color: "#99aabb"; font.pixelSize: 12 }
                             ComboBox {
                                 id: windowCombo
                                 model: ["10 s", "30 s", "60 s", "5 min", "15 min", "1 h"]
@@ -500,7 +536,7 @@ ApplicationWindow {
                                 }
                             }
                             Item { Layout.fillWidth: true }
-                            Label { text: "Follow"; color: "#99aabb"; font.pixelSize: 12 }
+                            Label { text: qsTr("Follow"); color: "#99aabb"; font.pixelSize: 12 }
                             Switch {
                                 checked: window.followMode
                                 onCheckedChanged: window.followMode = checked
@@ -508,7 +544,80 @@ ApplicationWindow {
                             }
                         }
 
-                        Item { height: 12 }  // bottom padding
+                        Item { height: 8 }  // bottom padding
+                    }
+                }
+
+                // ── Emergency Stop ────────────────────────────────────────
+                Rectangle {
+                    id: estopArea
+                    anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                    height: 116
+                    color: "#080e1a"
+
+                    Rectangle {
+                        anchors.top: parent.top
+                        width: parent.width; height: 1
+                        color: "#1e2a3e"
+                    }
+
+                    // Outer glow ring (always rendered, opacity changes)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 96; height: 96; radius: 48
+                        color: "transparent"
+                        border.color: "#ff2222"
+                        border.width: estopMa.containsMouse && estopBtn.enabled ? 4 : 2
+                        opacity:      estopBtn.enabled ? (estopMa.containsMouse ? 0.7 : 0.3) : 0.1
+                        Behavior on opacity { NumberAnimation { duration: 120 } }
+                        Behavior on border.width { NumberAnimation { duration: 80 } }
+                    }
+
+                    // Button body
+                    Rectangle {
+                        id: estopBtn
+                        anchors.centerIn: parent
+                        width: 80; height: 80; radius: 40
+                        color: {
+                            if (!enabled) return "#2a0a0a"
+                            if (estopMa.pressed)       return "#881010"
+                            if (estopMa.containsMouse) return "#dd1515"
+                            return "#bb1111"
+                        }
+                        border.color: enabled ? "#ff4444" : "#440000"
+                        border.width: 2
+                        enabled: backend.connected && backend.remoteMode
+
+                        Behavior on color { ColorAnimation { duration: 80 } }
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1
+                            Label {
+                                text: "⏻"
+                                font.pixelSize: 30; font.bold: true
+                                color: estopBtn.enabled ? "white" : "#553333"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            Label {
+                                text: qsTr("E-STOP")
+                                font.pixelSize: 9; font.bold: true; font.letterSpacing: 2
+                                color: estopBtn.enabled ? "#ffaaaa" : "#441111"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: estopMa
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            enabled: parent.enabled
+                            cursorShape: Qt.ForbiddenCursor
+                            onClicked: {
+                                backend.setOutputOn(false)
+                                lastStatus = qsTr("⚠ Emergency stop — output disabled")
+                            }
+                        }
                     }
                 }
             }
@@ -516,15 +625,47 @@ ApplicationWindow {
             // ── Divider ───────────────────────────────────────────────────
             Rectangle { width: 1; Layout.fillHeight: true; color: "#1e2a3e" }
 
-            // ── Right area: charts + measurement panel ────────────────────
+            // ── Right area: tabs (Live Monitor + Battery Charger) ────────────
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 spacing: 0
 
-                // ── V/I chart ─────────────────────────────────────────────
-                LiveChart {
-                    id: vcChart
+                // ── Tab bar ───────────────────────────────────────────────
+                TabBar {
+                    id: mainTabBar
+                    Layout.fillWidth: true
+                    Material.theme: Material.Dark
+                    background: Rectangle { color: "#0a1020" }
+
+                    TabButton {
+                        text: qsTr("⚡ Live Monitor")
+                        Material.theme: Material.Dark
+                        font.pixelSize: 13
+                    }
+                    TabButton {
+                        text: qsTr("🔋 Battery Charger")
+                        Material.theme: Material.Dark
+                        font.pixelSize: 13
+                    }
+                }
+
+                Rectangle { height: 1; Layout.fillWidth: true; color: "#1e2a3e" }
+
+                // ── Tab content ───────────────────────────────────────────
+                StackLayout {
+                    id: mainStack
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    currentIndex: mainTabBar.currentIndex
+
+                    // ── Tab 0: Live Monitor ───────────────────────────────
+                    ColumnLayout {
+                        spacing: 0
+
+                        // ── V/I chart ─────────────────────────────────────────
+                        LiveChart {
+                            id: vcChart
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.minimumHeight: 150
@@ -542,11 +683,14 @@ ApplicationWindow {
                     ]
 
                     onRangeSelected: (t0, t1) => {
-                        measureData = backend.measureRange(t0, t1)
-                        showMeasure = measureData !== null && measureData.sampleCount > 0
+                        statsPopup.openWithData(t0, t1)
                         pwChart.selectionStart = t0
                         pwChart.selectionEnd   = t1
-                        pwChart.canvas.requestPaint()
+                        pwChart.repaint()
+                    }
+                    onSelectionCleared: {
+                        pwChart.selectionStart = -1; pwChart.selectionEnd = -1
+                        pwChart.repaint(); statsPopup.clearAndClose()
                     }
                     onViewChanged: (vl, ws) => {
                         window.sharedViewLeft = vl
@@ -576,11 +720,14 @@ ApplicationWindow {
                     ]
 
                     onRangeSelected: (t0, t1) => {
-                        measureData = backend.measureRange(t0, t1)
-                        showMeasure = measureData !== null && measureData.sampleCount > 0
+                        statsPopup.openWithData(t0, t1)
                         vcChart.selectionStart = t0
                         vcChart.selectionEnd   = t1
-                        vcChart.canvas.requestPaint()
+                        vcChart.repaint()
+                    }
+                    onSelectionCleared: {
+                        vcChart.selectionStart = -1; vcChart.selectionEnd = -1
+                        vcChart.repaint(); statsPopup.clearAndClose()
                     }
                     onViewChanged: (vl, ws) => {
                         window.sharedViewLeft = vl
@@ -588,115 +735,14 @@ ApplicationWindow {
                     }
                 }
 
-                // ── Measurement panel (slides up when range selected) ──────
-                Rectangle {
-                    id: measurePanel
-                    Layout.fillWidth: true
-                    height: showMeasure ? 96 : 0
-                    clip: true
-                    color: "#0e1f38"
-                    border.color: "#1e4070"
+                    } // end Tab 0: Live Monitor ColumnLayout
 
-                    Behavior on height { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-
-                    RowLayout {
-                        anchors { fill: parent; margins: 12 }
-                        spacing: 24
-
-                        // Voltage stats
-                        ColumnLayout {
-                            spacing: 2
-                            Label { text: "VOLTAGE"; color: "#4dc8ff"; font.pixelSize: 10; font.letterSpacing: 1 }
-                            Label {
-                                text: measureData ? (measureData.meanVoltage !== undefined ?
-                                    "Mean: " + measureData.meanVoltage.toFixed(3) + " V" : "—") : "—"
-                                color: "#aaccee"; font.pixelSize: 12
-                            }
-                            Label {
-                                text: measureData ? (measureData.peakVoltage !== undefined ?
-                                    "Peak: " + measureData.peakVoltage.toFixed(3) + " V" : "—") : "—"
-                                color: "#7799bb"; font.pixelSize: 12
-                            }
-                        }
-
-                        // Current stats
-                        ColumnLayout {
-                            spacing: 2
-                            Label { text: "CURRENT"; color: "#ff9940"; font.pixelSize: 10; font.letterSpacing: 1 }
-                            Label {
-                                text: measureData ? (measureData.meanCurrent !== undefined ?
-                                    "Mean: " + measureData.meanCurrent.toFixed(4) + " A" : "—") : "—"
-                                color: "#ddaa77"; font.pixelSize: 12
-                            }
-                            Label {
-                                text: measureData ? (measureData.peakCurrent !== undefined ?
-                                    "Peak: " + measureData.peakCurrent.toFixed(4) + " A" : "—") : "—"
-                                color: "#bb8855"; font.pixelSize: 12
-                            }
-                        }
-
-                        // Power stats
-                        ColumnLayout {
-                            spacing: 2
-                            Label { text: "POWER"; color: "#b068ff"; font.pixelSize: 10; font.letterSpacing: 1 }
-                            Label {
-                                text: measureData ? (measureData.meanPower !== undefined ?
-                                    "Mean: " + measureData.meanPower.toFixed(3) + " W" : "—") : "—"
-                                color: "#cc99ff"; font.pixelSize: 12
-                            }
-                            Label {
-                                text: measureData ? (measureData.peakPower !== undefined ?
-                                    "Peak: " + measureData.peakPower.toFixed(3) + " W" : "—") : "—"
-                                color: "#9966cc"; font.pixelSize: 12
-                            }
-                        }
-
-                        // Energy stats
-                        ColumnLayout {
-                            spacing: 2
-                            Label { text: "ENERGY"; color: "#66ddaa"; font.pixelSize: 10; font.letterSpacing: 1 }
-                            Label {
-                                text: measureData ? (measureData.energyWh !== undefined ?
-                                    "Energy: " + (measureData.energyWh * 1000.0).toFixed(3) + " mWh" : "—") : "—"
-                                color: "#88ccaa"; font.pixelSize: 12
-                            }
-                            Label {
-                                text: measureData ? (measureData.energyMAh !== undefined ?
-                                    "Charge: " + measureData.energyMAh.toFixed(2) + " mAh" : "—") : "—"
-                                color: "#66aa88"; font.pixelSize: 12
-                            }
-                        }
-
-                        // Duration + close
-                        ColumnLayout {
-                            spacing: 2
-                            Label { text: "SELECTION"; color: "#99aabb"; font.pixelSize: 10; font.letterSpacing: 1 }
-                            Label {
-                                text: measureData ? (measureData.duration !== undefined ?
-                                    "Δt: " + measureData.duration.toFixed(1) + " s" : "—") : "—"
-                                color: "#aabbcc"; font.pixelSize: 12
-                            }
-                            Label {
-                                text: measureData ? (measureData.sampleCount !== undefined ?
-                                    "n: " + measureData.sampleCount : "—") : "—"
-                                color: "#778899"; font.pixelSize: 12
-                            }
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        ToolButton {
-                            text: "✕ Clear"
-                            onClicked: {
-                                showMeasure = false
-                                vcChart.selectionStart = -1; vcChart.selectionEnd = -1
-                                pwChart.selectionStart = -1; pwChart.selectionEnd = -1
-                                vcChart.canvas.requestPaint(); pwChart.canvas.requestPaint()
-                            }
-                        }
+                    // ── Tab 1: Battery Charger ────────────────────────────
+                    ChargerTab {
                     }
-                }
-            }
+
+                } // end StackLayout
+            } // end outer right ColumnLayout
         }
 
         // ── Status bar ────────────────────────────────────────────────────
@@ -717,9 +763,509 @@ ApplicationWindow {
                 }
 
                 Label {
-                    text: backend.connected ? ("● " + backend.portName) : "○ Not connected"
+                    text: backend.connected ? ("● " + backend.portName) : qsTr("○ Not connected")
                     color: backend.connected ? "#4eff90" : "#556677"
                     font.pixelSize: 12
+                }
+            }
+        }
+    }
+
+    // ── Output confirmation preference ────────────────────────────────────
+    property bool skipOutputConfirm: false
+
+    // ── Keyboard shortcuts ─────────────────────────────────────────────────
+    Shortcut {
+        sequence: "Escape"
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            // Only act as E-stop when no popup/dialog is consuming Escape
+            if (!aboutPopup.visible && !statsPopup.visible && !outputConfirmDialog.visible) {
+                if (backend.connected && backend.remoteMode && backend.outputOn) {
+                    backend.setOutputOn(false)
+                    window.lastStatus = qsTr("⚠ Emergency stop — output disabled  [Esc]")
+                }
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Space"
+        context: Qt.WindowShortcut
+        onActivated: {
+            if (!backend.connected || !backend.remoteMode) return
+            if (backend.outputOn) backend.setOutputOn(false)
+            else if (window.skipOutputConfirm) backend.setOutputOn(true)
+            else outputConfirmDialog.open()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Up"
+        context: Qt.WindowShortcut
+        onActivated: {
+            if (!backend.connected || !backend.remoteMode) return
+            setVSpin.value = Math.min(setVSpin.to, setVSpin.value + setVSpin.stepSize)
+            applyVTimer.restart()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Down"
+        context: Qt.WindowShortcut
+        onActivated: {
+            if (!backend.connected || !backend.remoteMode) return
+            setVSpin.value = Math.max(setVSpin.from, setVSpin.value - setVSpin.stepSize)
+            applyVTimer.restart()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Right"
+        context: Qt.WindowShortcut
+        onActivated: {
+            if (!backend.connected || !backend.remoteMode) return
+            setISpin.value = Math.min(setISpin.to, setISpin.value + setISpin.stepSize)
+            applyITimer.restart()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Left"
+        context: Qt.WindowShortcut
+        onActivated: {
+            if (!backend.connected || !backend.remoteMode) return
+            setISpin.value = Math.max(setISpin.from, setISpin.value - setISpin.stepSize)
+            applyITimer.restart()
+        }
+    }
+
+    // ── Output-on confirmation dialog ──────────────────────────────────────
+    Dialog {
+        id: outputConfirmDialog
+        title: qsTr("Enable Output?")
+        modal: true
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        standardButtons: Dialog.Yes | Dialog.No
+
+        // Enter / Y confirms; N or Escape cancels
+        Shortcut {
+            sequence: "Return";     enabled: outputConfirmDialog.visible
+            onActivated: outputConfirmDialog.accept()
+        }
+        Shortcut {
+            sequence: "Y";          enabled: outputConfirmDialog.visible
+            onActivated: outputConfirmDialog.accept()
+        }
+        Shortcut {
+            sequence: "N";          enabled: outputConfirmDialog.visible
+            onActivated: outputConfirmDialog.reject()
+        }
+
+        onAccepted: {
+            if (dontShowCheck.checked) window.skipOutputConfirm = true
+            backend.setOutputOn(true)
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 10
+
+            Label {
+                text: qsTr("Turn on output with current setpoints:")
+                color: "#dde8f8"; font.pixelSize: 13
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+                Layout.preferredWidth: 300
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 68; radius: 5
+                color: "#0d1b2e"; border.color: "#2a5090"
+
+                ColumnLayout {
+                    anchors { fill: parent; margins: 10 }
+                    spacing: 4
+                    Label {
+                        text: qsTr("Voltage:  %1 V").arg(backend.setVoltage.toFixed(3))
+                        color: "#4dc8ff"; font.pixelSize: 15; font.family: "monospace"; font.bold: true
+                    }
+                    Label {
+                        text: qsTr("I limit:  %1 A").arg(backend.setCurrent.toFixed(4))
+                        color: "#ff9940"; font.pixelSize: 15; font.family: "monospace"; font.bold: true
+                    }
+                }
+            }
+
+            Label {
+                text: qsTr("⚠  Verify the load can safely handle these settings.")
+                color: "#ffaa44"; font.pixelSize: 11
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+
+            CheckBox {
+                id: dontShowCheck
+                text: qsTr("Don't show again for this session")
+                checked: false
+                Material.accent: Material.Cyan
+                contentItem: Label {
+                    leftPadding: dontShowCheck.indicator.width + dontShowCheck.spacing
+                    text: dontShowCheck.text
+                    color: "#99aabb"; font.pixelSize: 11
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+
+            Label {
+                text: qsTr("Enter / Y = Yes   ·   N / Esc = No")
+                color: "#556677"; font.pixelSize: 10; font.family: "monospace"
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
+    }
+
+    // ── About / Device info popup ──────────────────────────────────────────
+    Popup {
+        id: aboutPopup
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        padding: 0
+        modal: true
+        dim: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: "#0e1f38"; border.color: "#2a5090"; border.width: 1; radius: 8
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 0
+            implicitWidth: 380
+
+            // Title bar
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 4
+                Label {
+                    text: "⚡  OpenPS2000"
+                    color: "#4dc8ff"; font.pixelSize: 16; font.bold: true
+                    leftPadding: 16; topPadding: 14; bottomPadding: 10
+                }
+                Item { Layout.fillWidth: true }
+                ToolButton {
+                    text: "✕"; font.pixelSize: 13
+                    implicitWidth: 32; implicitHeight: 32
+                    onClicked: aboutPopup.close()
+                }
+            }
+
+            Rectangle { height: 1; Layout.fillWidth: true; color: "#1e4070" }
+
+            // App info
+            ColumnLayout {
+                Layout.margins: 16
+                spacing: 4
+
+                Repeater {
+                    model: [
+                        [qsTr("Version"),  "1.0.0"],
+                        [qsTr("License"),  "GNU GPL v3.0"],
+                        [qsTr("Author"),   "Libor Tomsik, OK1CHP"],
+                    ]
+                    RowLayout {
+                        spacing: 8
+                        Label { text: modelData[0] + ":"; color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 70 }
+                        Label { text: modelData[1]; color: "#aabbcc"; font.pixelSize: 12 }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 8
+                    Label { text: qsTr("Source") + ":"; color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 70 }
+                    Label {
+                        text: "github.com/yeckel/OpenPS2000"
+                        color: "#4dc8ff"; font.pixelSize: 12
+                        font.underline: ghLinkHover.containsMouse
+                        MouseArea {
+                            id: ghLinkHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Qt.openUrlExternally("https://github.com/yeckel/OpenPS2000")
+                        }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 8
+                    Layout.topMargin: 4
+                    Label { text: qsTr("Shortcuts") + ":"; color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 70 }
+                    Column {
+                        spacing: 2
+                        Label { text: qsTr("Escape — Emergency stop (output off)"); color: "#8899aa"; font.pixelSize: 11; font.family: "monospace" }
+                        Label { text: qsTr("Space  — Toggle output (with confirmation)"); color: "#8899aa"; font.pixelSize: 11; font.family: "monospace" }
+                        Label { text: qsTr("Ctrl+↑/↓ — Voltage ±0.1 V"); color: "#8899aa"; font.pixelSize: 11; font.family: "monospace" }
+                        Label { text: qsTr("Ctrl+←/→ — Current ±0.01 A"); color: "#8899aa"; font.pixelSize: 11; font.family: "monospace" }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 8
+                    Layout.topMargin: 4
+                    Label { text: qsTr("Language") + ":"; color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 70 }
+                    ComboBox {
+                        model: langChanger.languageDisplayNames()
+                        currentIndex: langChanger.availableLanguages().indexOf(langChanger.currentLanguage)
+                        onActivated: langChanger.setLanguage(langChanger.availableLanguages()[currentIndex])
+                        implicitWidth: 130
+                    }
+                }
+            }
+
+            // Device section (visible when connected)
+            ColumnLayout {
+                visible: backend.connected
+                spacing: 0
+                Layout.fillWidth: true
+
+                Rectangle { height: 1; Layout.fillWidth: true; color: "#1e4070" }
+
+                Label {
+                    text: qsTr("CONNECTED DEVICE")
+                    font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
+                    color: "#556677"
+                    leftPadding: 16; topPadding: 10; bottomPadding: 6
+                }
+
+                GridLayout {
+                    columns: 2
+                    rowSpacing: 4
+                    columnSpacing: 8
+                    Layout.leftMargin: 16
+                    Layout.rightMargin: 16
+                    Layout.bottomMargin: 14
+
+                    Repeater {
+                        model: [
+                            [qsTr("Model"),        backend.deviceType],
+                            [qsTr("Article No."),  backend.articleNo],
+                            [qsTr("Serial No."),   backend.serialNo],
+                            [qsTr("Firmware"),     backend.swVersion],
+                            [qsTr("Nom. Voltage"), backend.nomVoltage.toFixed(1) + " V"],
+                            [qsTr("Nom. Current"), backend.nomCurrent.toFixed(2) + " A"],
+                            [qsTr("Nom. Power"),   backend.nomPower.toFixed(0) + " W"],
+                            [qsTr("Samples"),      backend.sampleCount + "  " + qsTr("(session)")],
+                        ]
+                        Label { text: modelData[0] + ":"; color: "#556677"; font.pixelSize: 12 }
+                        Label { text: modelData[1]; color: "#aabbcc"; font.pixelSize: 12 }
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Range statistics popup ─────────────────────────────────────────────
+    Popup {
+        id: statsPopup
+        parent: Overlay.overlay
+        x: Math.round(window.width  - width  - 20)
+        y: Math.round(54 + 12)
+        padding: 0
+        modal: false
+        dim:   false
+        closePolicy: Popup.CloseOnEscape
+
+        // Simple scalar properties avoid QVariantMap binding pitfalls
+        property int  statsSamples:  0
+        property real statsDuration: 0
+        property real statsMeanV:    0;  property real statsMinV: 0;  property real statsMaxV: 0
+        property real statsMeanI:    0;  property real statsMinI: 0;  property real statsMaxI: 0
+        property real statsMeanP:    0;  property real statsMinP: 0;  property real statsMaxP: 0
+        property real statsEnergyWh: 0
+        property real statsEnergyMAh: 0
+
+        function openWithData(t0, t1) {
+            var r = backend.measureRange(t0, t1)
+            if (!r || r.sampleCount <= 0) return
+            statsSamples   = r.sampleCount
+            statsDuration  = r.duration     || 0
+            statsMeanV     = r.meanVoltage  || 0
+            statsMinV      = r.minVoltage   || 0
+            statsMaxV      = r.peakVoltage  || 0
+            statsMeanI     = r.meanCurrent  || 0
+            statsMinI      = r.minCurrent   || 0
+            statsMaxI      = r.peakCurrent  || 0
+            statsMeanP     = r.meanPower    || 0
+            statsMinP      = r.minPower     || 0
+            statsMaxP      = r.peakPower    || 0
+            statsEnergyWh  = r.energyWh     || 0
+            statsEnergyMAh = r.energyMAh    || 0
+            open()
+        }
+
+        function clearAndClose() {
+            close()
+            vcChart.selectionStart = -1; vcChart.selectionEnd = -1
+            pwChart.selectionStart = -1; pwChart.selectionEnd = -1
+            vcChart.repaint(); pwChart.repaint()
+        }
+
+        background: Rectangle {
+            color: "#0e1f38"
+            border.color: "#2a5090"
+            border.width: 1
+            radius: 6
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 0
+
+            // Title bar
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 4
+                Label {
+                    text: qsTr("📊  Range Analysis")
+                    color: "#dde8f8"; font.pixelSize: 13; font.bold: true
+                    leftPadding: 12; topPadding: 8; bottomPadding: 6
+                }
+                Item { Layout.fillWidth: true }
+                Label {
+                    text: qsTr("Δt %1 s   n = %2").arg(statsPopup.statsDuration.toFixed(1)).arg(statsPopup.statsSamples)
+                    color: "#8899aa"; font.pixelSize: 11
+                    topPadding: 8; rightPadding: 4
+                }
+                ToolButton {
+                    text: "✕"
+                    implicitWidth: 30; implicitHeight: 30
+                    font.pixelSize: 13
+                    onClicked: statsPopup.clearAndClose()
+                }
+            }
+
+            Rectangle { height: 1; Layout.fillWidth: true; color: "#1e4070" }
+
+            // Stats grid
+            GridLayout {
+                columns: 4
+                rowSpacing: 4
+                columnSpacing: 20
+                Layout.margins: 12
+                Layout.topMargin: 8
+                Layout.bottomMargin: 10
+
+                // Column headers
+                Label { text: qsTr("VOLTAGE"); color: "#4dc8ff"; font.pixelSize: 10; font.letterSpacing: 1 }
+                Label { text: qsTr("CURRENT"); color: "#ff9940"; font.pixelSize: 10; font.letterSpacing: 1 }
+                Label { text: qsTr("POWER");   color: "#b068ff"; font.pixelSize: 10; font.letterSpacing: 1 }
+                Label { text: qsTr("ENERGY");  color: "#66ddaa"; font.pixelSize: 10; font.letterSpacing: 1 }
+
+                // Mean row
+                Label { text: qsTr("Mean  %1 V").arg(statsPopup.statsMeanV.toFixed(3)); color: "#aaccee"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Mean  %1 A").arg(statsPopup.statsMeanI.toFixed(4)); color: "#ddaa77"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Mean  %1 W").arg(statsPopup.statsMeanP.toFixed(3)); color: "#cc99ff"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: (statsPopup.statsEnergyWh * 1000.0).toFixed(3) + " mWh"; color: "#88ccaa"; font.pixelSize: 12; font.family: "monospace" }
+
+                // Min row
+                Label { text: qsTr("Min   %1 V").arg(statsPopup.statsMinV.toFixed(3)); color: "#7799bb"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Min   %1 A").arg(statsPopup.statsMinI.toFixed(4)); color: "#bb8855"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Min   %1 W").arg(statsPopup.statsMinP.toFixed(3)); color: "#9966cc"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: statsPopup.statsEnergyMAh.toFixed(3) + " mAh"; color: "#66aa88"; font.pixelSize: 12; font.family: "monospace" }
+
+                // Max row
+                Label { text: qsTr("Max   %1 V").arg(statsPopup.statsMaxV.toFixed(3)); color: "#7799bb"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Max   %1 A").arg(statsPopup.statsMaxI.toFixed(4)); color: "#bb8855"; font.pixelSize: 12; font.family: "monospace" }
+                Label { text: qsTr("Max   %1 W").arg(statsPopup.statsMaxP.toFixed(3)); color: "#9966cc"; font.pixelSize: 12; font.family: "monospace" }
+                Item {}
+            }
+        }
+    }
+
+    // ── Alarm popup ────────────────────────────────────────────────────────
+    Dialog {
+        id: alarmPopup
+        title: qsTr("⚠ Protection Alarm Triggered")
+        modal: true
+        width: 420
+        anchors.centerIn: parent
+        Material.theme: Material.Dark
+        closePolicy: Popup.NoAutoClose   // user must acknowledge
+
+        property bool ovp: false
+        property bool ocp: false
+        property bool opp: false
+        property bool otp: false
+
+        ColumnLayout {
+            spacing: 12
+            width: parent.width
+
+            // Active alarm badges
+            RowLayout {
+                spacing: 8
+                Rectangle {
+                    visible: alarmPopup.ovp
+                    width: 48; height: 28; radius: 5; color: "#cc2200"
+                    Label { anchors.centerIn: parent; text: "OVP"; font.bold: true; color: "white" }
+                }
+                Rectangle {
+                    visible: alarmPopup.ocp
+                    width: 48; height: 28; radius: 5; color: "#cc5500"
+                    Label { anchors.centerIn: parent; text: "OCP"; font.bold: true; color: "white" }
+                }
+                Rectangle {
+                    visible: alarmPopup.opp
+                    width: 48; height: 28; radius: 5; color: "#884400"
+                    Label { anchors.centerIn: parent; text: "OPP"; font.bold: true; color: "white" }
+                }
+                Rectangle {
+                    visible: alarmPopup.otp
+                    width: 48; height: 28; radius: 5; color: "#882200"
+                    Label { anchors.centerIn: parent; text: "OTP"; font.bold: true; color: "white" }
+                }
+            }
+
+            Label {
+                text: {
+                    var msgs = []
+                    if (alarmPopup.ovp) msgs.push(qsTr("OVP — Over-Voltage Protection: output voltage exceeded the set limit."))
+                    if (alarmPopup.ocp) msgs.push(qsTr("OCP — Over-Current Protection: output current exceeded the set limit."))
+                    if (alarmPopup.opp) msgs.push(qsTr("OPP — Over-Power Protection: output power exceeded the set limit."))
+                    if (alarmPopup.otp) msgs.push(qsTr("OTP — Over-Temperature Protection: device is too hot."))
+                    return msgs.join("\n")
+                }
+                color: "#ffcc88"; font.pixelSize: 13
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            Label {
+                text: qsTr("The output has been turned off. Remove the fault condition, then acknowledge the alarm to resume operation.")
+                color: "#8899aa"; font.pixelSize: 12
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            RowLayout {
+                spacing: 12
+                Layout.topMargin: 4
+
+                Button {
+                    text: qsTr("Acknowledge Alarm")
+                    highlighted: true
+                    Material.theme: Material.Dark
+                    Material.accent: Material.Cyan
+                    onClicked: {
+                        backend.acknowledgeAlarms()
+                        alarmPopup.close()
+                    }
+                }
+                Button {
+                    text: qsTr("Close")
+                    Material.theme: Material.Dark
+                    onClicked: alarmPopup.close()
                 }
             }
         }
@@ -728,7 +1274,7 @@ ApplicationWindow {
     // ── File dialogs ───────────────────────────────────────────────────────
     Platform.FileDialog {
         id: csvDialog
-        title: "Save CSV"
+        title: qsTr("Save CSV")
         nameFilters: ["CSV files (*.csv)", "All files (*)"]
         fileMode: Platform.FileDialog.SaveFile
         defaultSuffix: "csv"
@@ -737,7 +1283,7 @@ ApplicationWindow {
 
     Platform.FileDialog {
         id: xlsxDialog
-        title: "Save Excel"
+        title: qsTr("Save Excel")
         nameFilters: ["Excel files (*.xlsx)", "All files (*)"]
         fileMode: Platform.FileDialog.SaveFile
         defaultSuffix: "xlsx"

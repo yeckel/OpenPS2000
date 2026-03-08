@@ -24,12 +24,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 # ── Sources ────────────────────────────────────────────────────────────────
 qt_add_executable(openps2000app
     main.cpp
-    PS2000Protocol.h  PS2000Protocol.cpp
-    SerialTransport.h SerialTransport.cpp
-    DeviceBackend.h   DeviceBackend.cpp
+    PS2000Protocol.h    PS2000Protocol.cpp
+    SerialTransport.h   SerialTransport.cpp
+    DeviceBackend.h     DeviceBackend.cpp
     DataRecord.h
-    ZipWriter.h       ZipWriter.cpp
-    XlsxWriter.h      XlsxWriter.cpp
+    ZipWriter.h         ZipWriter.cpp
+    XlsxWriter.h        XlsxWriter.cpp
+    BatteryProfile.h    BatteryProfile.cpp
+    ChargerEngine.h     ChargerEngine.cpp
 )
 
 qt_add_qml_module(openps2000app
@@ -38,6 +40,8 @@ qt_add_qml_module(openps2000app
     QML_FILES
         qml/Main.qml
         qml/LiveChart.qml
+        qml/ChargingChart.qml
+        qml/ChargerTab.qml
 )
 
 target_link_libraries(openps2000app PRIVATE
@@ -87,3 +91,22 @@ if(DEFINED CMAKE_PREFIX_PATH)
         )
     endif()
 endif()
+
+# ── Translations ───────────────────────────────────────────────────────────
+find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+
+qt_add_translations(openps2000app
+    TS_FILES
+        i18n/openps2000_de.ts
+        i18n/openps2000_es.ts
+        i18n/openps2000_cs.ts
+        i18n/openps2000_pl.ts
+        i18n/openps2000_zh_CN.ts
+    SOURCES
+        qml/Main.qml
+        qml/LiveChart.qml
+        qml/ChargingChart.qml
+        qml/ChargerTab.qml
+    LUPDATE_OPTIONS
+        -no-obsolete
+)

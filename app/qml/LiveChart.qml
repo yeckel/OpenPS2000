@@ -19,6 +19,7 @@ Item {
     property real selectionStart: -1
     property real selectionEnd:   -1
     signal rangeSelected(real tStart, real tEnd)
+    signal selectionCleared
     signal viewChanged(real newViewLeft, real newWindowSecs)
 
     property var  seriesList: []
@@ -54,6 +55,9 @@ Item {
         if (followMode) return Math.max(0, xHead - effectiveWindowSecs + 0.5)
         return Math.max(0, viewLeft)
     }
+
+    // Public repaint request — call this instead of accessing canvas directly.
+    function repaint() { canvas.requestPaint() }
 
     function pixelToTime(px) {
         var w = width - mL - mR
@@ -172,7 +176,7 @@ Item {
                 var xv  = xStart + i2 * (xEnd - xStart) / nGX
                 ctx.fillText(xv.toFixed(0), gx2, pY + pH + 4)
             }
-            ctx.fillText("Time (s)", pX + pW / 2, pY + pH + 20)
+            ctx.fillText(qsTr("Time (s)"), pX + pW / 2, pY + pH + 20)
 
             // Selection time labels
             if (sSt >= 0 && sEn >= 0) {
@@ -229,7 +233,7 @@ Item {
             // Hint
             ctx.fillStyle = "rgba(153,170,187,0.25)"; ctx.font = "10px sans-serif"
             ctx.textAlign = "right"; ctx.textBaseline = "bottom"
-            ctx.fillText("scroll=zoom  RMB=pan  LMB=measure", pX + pW - 4, pY + pH - 4)
+            ctx.fillText(qsTr("scroll=zoom  RMB=pan  LMB=measure"), pX + pW - 4, pY + pH - 4)
         }
     }
 
@@ -287,6 +291,7 @@ Item {
         onDoubleClicked: {
             root.selectionStart = -1; root.selectionEnd = -1
             canvas.requestPaint()
+            root.selectionCleared()
         }
     }
 }

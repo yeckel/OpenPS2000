@@ -127,6 +127,8 @@ signals:
     void setpointsChanged();
     void limitsChanged();
     void statusFlagsChanged();
+    // Emitted once when any protection alarm transitions from off → active
+    void alarmTriggered(bool ovp, bool ocp, bool opp, bool otp);
     void energyChanged(double wh);
     void durationChanged(const QString& hms);
     void sampleCountChanged(int n);
