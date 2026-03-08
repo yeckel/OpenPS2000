@@ -998,79 +998,210 @@ Please edit the profile or choose a different one.</source>
         <translation>新序列</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="74"/>
         <source>Name:</source>
         <translation>名称：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="77"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="58"/>
         <source>V (V)</source>
         <translation>电压 (V)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="78"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="58"/>
+        <source>Target output voltage for this step (Volts).</source>
+        <translation>此步骤的目标输出电压（伏特）。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="59"/>
         <source>I (A)</source>
         <translation>电流 (A)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="79"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="59"/>
+        <source>Maximum output current for this step (Amperes).</source>
+        <translation>此步骤的最大输出电流（安培）。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="60"/>
         <source>Hold (ms)</source>
         <translation>保持 (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="80"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="60"/>
+        <source>How long to hold this setpoint (milliseconds). Example: 5000 = 5 seconds, 60000 = 1 minute.</source>
+        <translation>保持此设定点的时长（毫秒）。例如：5000 = 5秒，60000 = 1分钟。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
         <source>Ramp</source>
         <translation>斜坡</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="81"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <source>When checked, the output smoothly interpolates from the previous step&apos;s values over the ramp duration, rather than switching instantly. Not available on step 1.</source>
+        <translation>勾选后，输出在斜坡时长内从上一步的值平滑过渡，而非瞬间切换。第一步不可用。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="62"/>
         <source>Ramp ms</source>
         <translation>斜坡 ms</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="218"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="62"/>
+        <source>Duration of the smooth transition from the previous step (milliseconds). Only active when Ramp is checked.</source>
+        <translation>从上一步平滑过渡的持续时间（毫秒）。仅在勾选斜坡时有效。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="144"/>
+        <source>Target output voltage (Volts)</source>
+        <translation>目标输出电压（伏特）</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="157"/>
+        <source>Maximum output current (Amperes)</source>
+        <translation>最大输出电流（安培）</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="169"/>
+        <source>How long to hold this setpoint (ms). 1000 = 1 s, 60000 = 1 min.</source>
+        <translation>保持此设定点的时长（毫秒）。1000 = 1秒，60000 = 1分钟。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="184"/>
+        <source>Ramp is not available on the first step — there is no previous setpoint to ramp from.</source>
+        <translation>第一步不可用斜坡功能 — 没有上一个设定点可供过渡。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="185"/>
+        <source>Smoothly interpolate from the previous step&apos;s voltage and current instead of switching instantly.</source>
+        <translation>从上一步的电压和电流平滑插值，而非瞬间切换。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="199"/>
+        <source>Duration of the smooth ramp from the previous step (ms). Only used when Ramp is checked.</source>
+        <translation>从上一步平滑斜坡的持续时间（毫秒）。仅在勾选斜坡时使用。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
         <source>+ Add Step</source>
         <translation>+ 添加步骤</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="233"/>
-        <source>Import CSV…</source>
-        <translation>导入 CSV…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="259"/>
+        <source>Import…</source>
+        <translation>导入…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="238"/>
-        <source>Export CSV…</source>
-        <translation>导出 CSV…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="262"/>
+        <source>Import steps from a CSV file (replaces current steps).</source>
+        <translation>从CSV文件导入步骤（替换当前步骤）。</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
-        <source>Export XLSX…</source>
-        <translation>导出 XLSX…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="266"/>
+        <source>Export…</source>
+        <translation>导出…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="256"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="270"/>
+        <source>Export steps to CSV, Excel (.xlsx) or ODF Spreadsheet (.ods). Choose the format via the file-type filter in the save dialog.</source>
+        <translation>将步骤导出为CSV、Excel（.xlsx）或ODF电子表格（.ods）。在保存对话框中通过文件类型筛选器选择格式。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="302"/>
+        <source>Import Sequence</source>
+        <translation>导入序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="305"/>
+        <source>All supported (*.csv *.xlsx *.ods)</source>
+        <translation>所有支持的格式 (*.csv *.xlsx *.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="325"/>
+        <source>Import Failed</source>
+        <translation>导入失败</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="346"/>
+        <source>Export Sequence</source>
+        <translation>导出序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="306"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="350"/>
+        <source>CSV spreadsheet (*.csv)</source>
+        <translation>CSV 电子表格 (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="307"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="351"/>
+        <source>Excel spreadsheet (*.xlsx)</source>
+        <translation>Excel 电子表格 (*.xlsx)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="308"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="352"/>
+        <source>ODF Spreadsheet (*.ods)</source>
+        <translation>ODF 电子表格 (*.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="280"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="261"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="285"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
+</context>
+<context>
+    <name>SequenceStore</name>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="278"/>
-        <source>Import CSV Sequence</source>
-        <translation>导入 CSV 序列</translation>
+        <location filename="../SequenceProfile.cpp" line="211"/>
+        <source>Cannot open file: %1</source>
+        <translation>无法打开文件：%1</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="289"/>
-        <source>Export Sequence as CSV</source>
-        <translation>导出序列为 CSV</translation>
+        <location filename="../SequenceProfile.cpp" line="215"/>
+        <source>File is empty or has no data rows.</source>
+        <translation>文件为空或没有数据行。</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="303"/>
-        <source>Export Sequence as Excel</source>
-        <translation>导出序列为 Excel</translation>
+        <location filename="../SequenceProfile.cpp" line="230"/>
+        <source>No valid rows found. Expected columns: Voltage,Current,Hold ms,Ramp,Ramp ms</source>
+        <translation>未找到有效行。期望列：电压,电流,保持ms,斜坡,斜坡ms</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="247"/>
+        <source>Cannot read XLSX: %1</source>
+        <translation>无法读取XLSX：%1</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="274"/>
+        <source>No worksheet found in XLSX file.</source>
+        <translation>XLSX文件中未找到工作表。</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="314"/>
+        <source>No data rows found in XLSX. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms</source>
+        <translation>XLSX中未找到数据行。期望列：电压(V)、电流(A)、保持(ms)、斜坡(0/1)、斜坡ms</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="332"/>
+        <source>Cannot read ODS: %1</source>
+        <translation>无法读取ODS：%1</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="335"/>
+        <source>Not a valid ODS file (missing content.xml).</source>
+        <translation>无效的ODS文件（缺少content.xml）。</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="381"/>
+        <source>No data rows found in ODS. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms</source>
+        <translation>ODS中未找到数据行。期望列：电压(V)、电流(A)、保持(ms)、斜坡(0/1)、斜坡ms</translation>
     </message>
 </context>
 <context>
@@ -1106,14 +1237,72 @@ Please edit the profile or choose a different one.</source>
         <translation>序列程序</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="164"/>
+        <location filename="../qml/SequenceTab.qml" line="140"/>
+        <source>Import…</source>
+        <translation>导入…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="143"/>
+        <source>Import steps from a CSV file</source>
+        <translation>从CSV文件导入步骤</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="147"/>
+        <source>Export…</source>
+        <translation>导出…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="151"/>
+        <source>Export to CSV, Excel or ODF Spreadsheet — choose format via the file-type filter.</source>
+        <translation>导出为CSV、Excel或ODF电子表格 — 通过文件类型筛选器选择格式。</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="162"/>
         <source>Delete Sequence</source>
         <translation>删除序列</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="168"/>
+        <location filename="../qml/SequenceTab.qml" line="166"/>
         <source>Delete &quot;%1&quot;?</source>
         <translation>删除 &quot;%1&quot;？</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="175"/>
+        <source>Import Sequence</source>
+        <translation>导入序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="178"/>
+        <source>All supported (*.csv *.xlsx *.ods)</source>
+        <translation>所有支持的格式 (*.csv *.xlsx *.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="198"/>
+        <source>Import Failed</source>
+        <translation>导入失败</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="215"/>
+        <source>Export Sequence</source>
+        <translation>导出序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="179"/>
+        <location filename="../qml/SequenceTab.qml" line="219"/>
+        <source>CSV spreadsheet (*.csv)</source>
+        <translation>CSV 电子表格 (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="180"/>
+        <location filename="../qml/SequenceTab.qml" line="220"/>
+        <source>Excel spreadsheet (*.xlsx)</source>
+        <translation>Excel 电子表格 (*.xlsx)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="181"/>
+        <location filename="../qml/SequenceTab.qml" line="221"/>
+        <source>ODF Spreadsheet (*.ods)</source>
+        <translation>ODF 电子表格 (*.ods)</translation>
     </message>
     <message>
         <location filename="../qml/SequenceTab.qml" line="118"/>
@@ -1131,68 +1320,38 @@ Please edit the profile or choose a different one.</source>
         <translation>删除序列</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="140"/>
-        <source>Import CSV…</source>
-        <translation>导入 CSV…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="145"/>
-        <source>Export CSV…</source>
-        <translation>导出 CSV…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="151"/>
-        <source>Export XLSX…</source>
-        <translation>导出 XLSX…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="177"/>
-        <source>Import CSV Sequence</source>
-        <translation>导入 CSV 序列</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="187"/>
-        <source>Export Sequence as CSV</source>
-        <translation>导出序列为 CSV</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="195"/>
-        <source>Export Sequence as Excel</source>
-        <translation>导出序列为 Excel</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="242"/>
+        <location filename="../qml/SequenceTab.qml" line="272"/>
         <source>Progress</source>
         <translation>进度</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="246"/>
-        <location filename="../qml/SequenceTab.qml" line="278"/>
+        <location filename="../qml/SequenceTab.qml" line="276"/>
+        <location filename="../qml/SequenceTab.qml" line="308"/>
         <source>Step:</source>
         <translation>步骤：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="258"/>
+        <location filename="../qml/SequenceTab.qml" line="288"/>
         <source>Total:</source>
         <translation>总计：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="271"/>
+        <location filename="../qml/SequenceTab.qml" line="301"/>
         <source>Phase:</source>
         <translation>阶段：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="283"/>
+        <location filename="../qml/SequenceTab.qml" line="313"/>
         <source>Elapsed:</source>
         <translation>已用时间：</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="298"/>
+        <location filename="../qml/SequenceTab.qml" line="328"/>
         <source>⚠ Device not connected</source>
         <translation>⚠ 设备未连接</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="315"/>
+        <location filename="../qml/SequenceTab.qml" line="345"/>
         <source>Sequence Chart</source>
         <translation>序列图表</translation>
     </message>

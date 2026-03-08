@@ -998,79 +998,210 @@ Edite el perfil o elija otro.</translation>
         <translation>Nueva secuencia</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="74"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="77"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="58"/>
         <source>V (V)</source>
         <translation>V (V)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="78"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="58"/>
+        <source>Target output voltage for this step (Volts).</source>
+        <translation>Tensión de salida objetivo para este paso (Voltios).</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="59"/>
         <source>I (A)</source>
         <translation>I (A)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="79"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="59"/>
+        <source>Maximum output current for this step (Amperes).</source>
+        <translation>Corriente de salida máxima para este paso (Amperios).</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="60"/>
         <source>Hold (ms)</source>
         <translation>Mantener (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="80"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="60"/>
+        <source>How long to hold this setpoint (milliseconds). Example: 5000 = 5 seconds, 60000 = 1 minute.</source>
+        <translation>Tiempo de mantenimiento (ms). Ejemplo: 5000 = 5 seg., 60000 = 1 min.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
         <source>Ramp</source>
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="81"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="61"/>
+        <source>When checked, the output smoothly interpolates from the previous step&apos;s values over the ramp duration, rather than switching instantly. Not available on step 1.</source>
+        <translation>Si está marcado, la salida interpola suavemente desde los valores del paso anterior durante la rampa en vez de cambiar instantáneamente. No disponible en el paso 1.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="62"/>
         <source>Ramp ms</source>
         <translation>Rampa ms</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="218"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="62"/>
+        <source>Duration of the smooth transition from the previous step (milliseconds). Only active when Ramp is checked.</source>
+        <translation>Duración de la transición suave desde el paso anterior (ms). Solo activo cuando la rampa está activada.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="144"/>
+        <source>Target output voltage (Volts)</source>
+        <translation>Tensión de salida objetivo (Voltios)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="157"/>
+        <source>Maximum output current (Amperes)</source>
+        <translation>Corriente de salida máxima (Amperios)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="169"/>
+        <source>How long to hold this setpoint (ms). 1000 = 1 s, 60000 = 1 min.</source>
+        <translation>Tiempo de mantenimiento (ms). 1000 = 1 s, 60000 = 1 min.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="184"/>
+        <source>Ramp is not available on the first step — there is no previous setpoint to ramp from.</source>
+        <translation>La rampa no está disponible en el primer paso: no hay punto de ajuste anterior.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="185"/>
+        <source>Smoothly interpolate from the previous step&apos;s voltage and current instead of switching instantly.</source>
+        <translation>Interpolar suavemente desde la tensión y corriente del paso anterior en vez de cambiar instantáneamente.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="199"/>
+        <source>Duration of the smooth ramp from the previous step (ms). Only used when Ramp is checked.</source>
+        <translation>Duración de la rampa suave desde el paso anterior (ms). Solo se usa cuando la rampa está activada.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
         <source>+ Add Step</source>
         <translation>+ Agregar paso</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="233"/>
-        <source>Import CSV…</source>
-        <translation>Importar CSV…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="259"/>
+        <source>Import…</source>
+        <translation>Importar…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="238"/>
-        <source>Export CSV…</source>
-        <translation>Exportar CSV…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="262"/>
+        <source>Import steps from a CSV file (replaces current steps).</source>
+        <translation>Importar pasos desde un archivo CSV (reemplaza los pasos actuales).</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="244"/>
-        <source>Export XLSX…</source>
-        <translation>Exportar XLSX…</translation>
+        <location filename="../qml/SequenceEditorDialog.qml" line="266"/>
+        <source>Export…</source>
+        <translation>Exportar…</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="256"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="270"/>
+        <source>Export steps to CSV, Excel (.xlsx) or ODF Spreadsheet (.ods). Choose the format via the file-type filter in the save dialog.</source>
+        <translation>Exportar pasos a CSV, Excel (.xlsx) u ODF (.ods). Elija el formato con el filtro de tipo de archivo.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="302"/>
+        <source>Import Sequence</source>
+        <translation>Importar secuencia</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="305"/>
+        <source>All supported (*.csv *.xlsx *.ods)</source>
+        <translation>Todos los admitidos (*.csv *.xlsx *.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="325"/>
+        <source>Import Failed</source>
+        <translation>Error al importar</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="346"/>
+        <source>Export Sequence</source>
+        <translation>Exportar secuencia</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="306"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="350"/>
+        <source>CSV spreadsheet (*.csv)</source>
+        <translation>Hoja de cálculo CSV (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="307"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="351"/>
+        <source>Excel spreadsheet (*.xlsx)</source>
+        <translation>Hoja de cálculo Excel (*.xlsx)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="308"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="352"/>
+        <source>ODF Spreadsheet (*.ods)</source>
+        <translation>Hoja de cálculo ODF (*.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceEditorDialog.qml" line="280"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="261"/>
+        <location filename="../qml/SequenceEditorDialog.qml" line="285"/>
         <source>Save</source>
         <translation>Guardar</translation>
     </message>
+</context>
+<context>
+    <name>SequenceStore</name>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="278"/>
-        <source>Import CSV Sequence</source>
-        <translation>Importar secuencia CSV</translation>
+        <location filename="../SequenceProfile.cpp" line="211"/>
+        <source>Cannot open file: %1</source>
+        <translation>No se puede abrir el archivo: %1</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="289"/>
-        <source>Export Sequence as CSV</source>
-        <translation>Exportar secuencia como CSV</translation>
+        <location filename="../SequenceProfile.cpp" line="215"/>
+        <source>File is empty or has no data rows.</source>
+        <translation>El archivo está vacío o no tiene filas de datos.</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceEditorDialog.qml" line="303"/>
-        <source>Export Sequence as Excel</source>
-        <translation>Exportar secuencia como Excel</translation>
+        <location filename="../SequenceProfile.cpp" line="230"/>
+        <source>No valid rows found. Expected columns: Voltage,Current,Hold ms,Ramp,Ramp ms</source>
+        <translation>No se encontraron filas válidas. Columnas esperadas: Tensión,Corriente,Mantener ms,Rampa,Rampa ms</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="247"/>
+        <source>Cannot read XLSX: %1</source>
+        <translation>No se puede leer el XLSX: %1</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="274"/>
+        <source>No worksheet found in XLSX file.</source>
+        <translation>No se encontró ninguna hoja en el archivo XLSX.</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="314"/>
+        <source>No data rows found in XLSX. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms</source>
+        <translation>No se encontraron filas de datos en XLSX. Columnas esperadas: Tensión (V), Corriente (A), Mantener (ms), Rampa (0/1), Rampa ms</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="332"/>
+        <source>Cannot read ODS: %1</source>
+        <translation>No se puede leer el ODS: %1</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="335"/>
+        <source>Not a valid ODS file (missing content.xml).</source>
+        <translation>Archivo ODS no válido (falta content.xml).</translation>
+    </message>
+    <message>
+        <location filename="../SequenceProfile.cpp" line="381"/>
+        <source>No data rows found in ODS. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms</source>
+        <translation>No se encontraron filas de datos en ODS. Columnas esperadas: Tensión (V), Corriente (A), Mantener (ms), Rampa (0/1), Rampa ms</translation>
     </message>
 </context>
 <context>
@@ -1106,14 +1237,72 @@ Edite el perfil o elija otro.</translation>
         <translation>Programa de secuencia</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="164"/>
+        <location filename="../qml/SequenceTab.qml" line="140"/>
+        <source>Import…</source>
+        <translation>Importar…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="143"/>
+        <source>Import steps from a CSV file</source>
+        <translation>Importar pasos desde un archivo CSV</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="147"/>
+        <source>Export…</source>
+        <translation>Exportar…</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="151"/>
+        <source>Export to CSV, Excel or ODF Spreadsheet — choose format via the file-type filter.</source>
+        <translation>Exportar a CSV, Excel u ODF — elija el formato con el filtro de tipo de archivo.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="162"/>
         <source>Delete Sequence</source>
         <translation>Eliminar secuencia</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="168"/>
+        <location filename="../qml/SequenceTab.qml" line="166"/>
         <source>Delete &quot;%1&quot;?</source>
         <translation>¿Eliminar &quot;%1&quot;?</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="175"/>
+        <source>Import Sequence</source>
+        <translation>Importar secuencia</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="178"/>
+        <source>All supported (*.csv *.xlsx *.ods)</source>
+        <translation>Todos los admitidos (*.csv *.xlsx *.ods)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="198"/>
+        <source>Import Failed</source>
+        <translation>Error al importar</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="215"/>
+        <source>Export Sequence</source>
+        <translation>Exportar secuencia</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="179"/>
+        <location filename="../qml/SequenceTab.qml" line="219"/>
+        <source>CSV spreadsheet (*.csv)</source>
+        <translation>Hoja de cálculo CSV (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="180"/>
+        <location filename="../qml/SequenceTab.qml" line="220"/>
+        <source>Excel spreadsheet (*.xlsx)</source>
+        <translation>Hoja de cálculo Excel (*.xlsx)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="181"/>
+        <location filename="../qml/SequenceTab.qml" line="221"/>
+        <source>ODF Spreadsheet (*.ods)</source>
+        <translation>Hoja de cálculo ODF (*.ods)</translation>
     </message>
     <message>
         <location filename="../qml/SequenceTab.qml" line="118"/>
@@ -1131,68 +1320,38 @@ Edite el perfil o elija otro.</translation>
         <translation>Eliminar secuencia</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="140"/>
-        <source>Import CSV…</source>
-        <translation>Importar CSV…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="145"/>
-        <source>Export CSV…</source>
-        <translation>Exportar CSV…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="151"/>
-        <source>Export XLSX…</source>
-        <translation>Exportar XLSX…</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="177"/>
-        <source>Import CSV Sequence</source>
-        <translation>Importar secuencia CSV</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="187"/>
-        <source>Export Sequence as CSV</source>
-        <translation>Exportar secuencia como CSV</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="195"/>
-        <source>Export Sequence as Excel</source>
-        <translation>Exportar secuencia como Excel</translation>
-    </message>
-    <message>
-        <location filename="../qml/SequenceTab.qml" line="242"/>
+        <location filename="../qml/SequenceTab.qml" line="272"/>
         <source>Progress</source>
         <translation>Progreso</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="246"/>
-        <location filename="../qml/SequenceTab.qml" line="278"/>
+        <location filename="../qml/SequenceTab.qml" line="276"/>
+        <location filename="../qml/SequenceTab.qml" line="308"/>
         <source>Step:</source>
         <translation>Paso:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="258"/>
+        <location filename="../qml/SequenceTab.qml" line="288"/>
         <source>Total:</source>
         <translation>Total:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="271"/>
+        <location filename="../qml/SequenceTab.qml" line="301"/>
         <source>Phase:</source>
         <translation>Fase:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="283"/>
+        <location filename="../qml/SequenceTab.qml" line="313"/>
         <source>Elapsed:</source>
         <translation>Transcurrido:</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="298"/>
+        <location filename="../qml/SequenceTab.qml" line="328"/>
         <source>⚠ Device not connected</source>
         <translation>⚠ Dispositivo no conectado</translation>
     </message>
     <message>
-        <location filename="../qml/SequenceTab.qml" line="315"/>
+        <location filename="../qml/SequenceTab.qml" line="345"/>
         <source>Sequence Chart</source>
         <translation>Gráfico de secuencia</translation>
     </message>

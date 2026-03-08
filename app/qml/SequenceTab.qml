@@ -137,21 +137,19 @@ Rectangle {
                         Layout.fillWidth: true; Layout.leftMargin: 12; Layout.rightMargin: 12
                         Layout.topMargin: 4; spacing: 6
                         Button {
-                            Layout.fillWidth: true; text: qsTr("Import CSV…")
+                            Layout.fillWidth: true; text: qsTr("Import…")
                             font.pixelSize: 11; Material.theme: Material.Dark
                             onClicked: importOnlyDlg.open()
+                            ToolTip.text: qsTr("Import steps from a CSV file")
+                            ToolTip.delay: 600; ToolTip.timeout: 5000; ToolTip.visible: hovered
                         }
                         Button {
-                            Layout.fillWidth: true; text: qsTr("Export CSV…")
+                            Layout.fillWidth: true; text: qsTr("Export…")
                             font.pixelSize: 11; Material.theme: Material.Dark
                             enabled: seqCombo.currentIndex >= 0
                             onClicked: exportOnlyDlg.open()
-                        }
-                        Button {
-                            Layout.fillWidth: true; text: qsTr("Export XLSX…")
-                            font.pixelSize: 11; Material.theme: Material.Dark
-                            enabled: seqCombo.currentIndex >= 0
-                            onClicked: exportXlsxOnlyDlg.open()
+                            ToolTip.text: qsTr("Export to CSV, Excel or ODF Spreadsheet — choose format via the file-type filter.")
+                            ToolTip.delay: 600; ToolTip.timeout: 6000; ToolTip.visible: hovered
                         }
                     }
 
@@ -174,29 +172,61 @@ Rectangle {
                     // ── File dialogs (native via Qt.labs.platform) ────────────
                     Platform.FileDialog {
                         id: importOnlyDlg
-                        title: qsTr("Import CSV Sequence")
+                        title: qsTr("Import Sequence")
                         fileMode: Platform.FileDialog.OpenFile
-                        nameFilters: ["CSV files (*.csv)", "All files (*)"]
+                        nameFilters: [
+                            qsTr("All supported (*.csv *.xlsx *.ods)"),
+                            qsTr("CSV spreadsheet (*.csv)"),
+                            qsTr("Excel spreadsheet (*.xlsx)"),
+                            qsTr("ODF Spreadsheet (*.ods)"),
+                            "All files (*)"
+                        ]
                         onAccepted: {
-                            if (!seqStore.loadFromFile(file))
-                                console.warn("CSV import failed:", file)
+                            var path = file.toString()
+                            var ext  = path.split('.').pop().toLowerCase()
+                            var ok
+                            if      (ext === "xlsx") ok = seqStore.loadFromXlsx(file)
+                            else if (ext === "ods")  ok = seqStore.loadFromOds(file)
+                            else                     ok = seqStore.loadFromFile(file)
+                            if (!ok) tabImportErrorDialog.show(seqStore.lastImportError())
+                        }
+                    }
+
+                    // Import error popup
+                    Dialog {
+                        id: tabImportErrorDialog
+                        title: qsTr("Import Failed")
+                        modal: true; width: 400
+                        parent: Overlay.overlay
+                        anchors.centerIn: parent
+                        Material.theme: Material.Dark
+                        standardButtons: Dialog.Ok
+                        property alias message: tabErrorLabel.text
+                        function show(msg) { message = msg; open() }
+                        Label {
+                            id: tabErrorLabel
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            color: "#ff7070"
                         }
                     }
                     Platform.FileDialog {
                         id: exportOnlyDlg
-                        title: qsTr("Export Sequence as CSV")
+                        title: qsTr("Export Sequence")
                         fileMode: Platform.FileDialog.SaveFile
                         defaultSuffix: "csv"
-                        nameFilters: ["CSV files (*.csv)", "All files (*)"]
-                        onAccepted: seqStore.saveToFile(seqCombo.currentIndex, file)
-                    }
-                    Platform.FileDialog {
-                        id: exportXlsxOnlyDlg
-                        title: qsTr("Export Sequence as Excel")
-                        fileMode: Platform.FileDialog.SaveFile
-                        defaultSuffix: "xlsx"
-                        nameFilters: ["Excel files (*.xlsx)", "All files (*)"]
-                        onAccepted: seqStore.saveToXlsx(seqCombo.currentIndex, file)
+                        nameFilters: [
+                            qsTr("CSV spreadsheet (*.csv)"),
+                            qsTr("Excel spreadsheet (*.xlsx)"),
+                            qsTr("ODF Spreadsheet (*.ods)")
+                        ]
+                        onAccepted: {
+                            var path = file.toString()
+                            var ext  = path.split('.').pop().toLowerCase()
+                            if      (ext === "xlsx") seqStore.saveToXlsx(seqCombo.currentIndex, file)
+                            else if (ext === "ods")  seqStore.saveToOds(seqCombo.currentIndex, file)
+                            else                     seqStore.saveToFile(seqCombo.currentIndex, file)
+                        }
                     }
 
                     // ── Step summary list ──────────────────────────────────

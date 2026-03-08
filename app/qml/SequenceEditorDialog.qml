@@ -14,7 +14,7 @@ Dialog {
 
     title: qsTr("Edit Sequence")
     modal: true
-    width: 710; height: 560
+    width: 860; height: 580
     parent: Overlay.overlay
     anchors.centerIn: parent
     Material.theme: Material.Dark
@@ -41,14 +41,27 @@ Dialog {
         open()
     }
 
-    // ── Column widths (must sum ≤ 670 to fit content margins) ────────────────
-    readonly property int cIdx:    30
-    readonly property int cV:      92
-    readonly property int cI:      92
-    readonly property int cHold:   112
-    readonly property int cRamp:   52
-    readonly property int cRampMs: 112
-    readonly property int cAct:    78
+    // ── Column widths ─────────────────────────────────────────────────────────
+    // SpinBox in Material style: buttons ~36px each → input area = width−72.
+    // At font 12px, "3600000" ≈ 7 chars × 8px = 56px → need SpinBox ≥ 140px.
+    readonly property int cIdx:    32
+    readonly property int cV:      108
+    readonly property int cI:      108
+    readonly property int cHold:   158   // SpinBox width = 154, input area = 82px ✓
+    readonly property int cRamp:   60
+    readonly property int cRampMs: 158
+    readonly property int cAct:    82
+
+    // ── Column header tooltips ────────────────────────────────────────────────
+    readonly property var headerModel: [
+        {lbl: "#",                 w: root.cIdx,    tip: ""},
+        {lbl: qsTr("V (V)"),      w: root.cV,     tip: qsTr("Target output voltage for this step (Volts).")},
+        {lbl: qsTr("I (A)"),      w: root.cI,     tip: qsTr("Maximum output current for this step (Amperes).")},
+        {lbl: qsTr("Hold (ms)"),  w: root.cHold,  tip: qsTr("How long to hold this setpoint (milliseconds). Example: 5000 = 5 seconds, 60000 = 1 minute.")},
+        {lbl: qsTr("Ramp"),       w: root.cRamp,  tip: qsTr("When checked, the output smoothly interpolates from the previous step's values over the ramp duration, rather than switching instantly. Not available on step 1.")},
+        {lbl: qsTr("Ramp ms"),    w: root.cRampMs,tip: qsTr("Duration of the smooth transition from the previous step (milliseconds). Only active when Ramp is checked.")},
+        {lbl: "",                  w: root.cAct,   tip: ""}
+    ]
 
     // ── Content ───────────────────────────────────────────────────────────────
     contentItem: ColumnLayout {
@@ -72,18 +85,18 @@ Dialog {
                 anchors { fill: parent; leftMargin: 6 }
                 spacing: 0
                 Repeater {
-                    model: [
-                        {lbl: "#",          w: root.cIdx},
-                        {lbl: qsTr("V (V)"),   w: root.cV},
-                        {lbl: qsTr("I (A)"),   w: root.cI},
-                        {lbl: qsTr("Hold (ms)"),w: root.cHold},
-                        {lbl: qsTr("Ramp"),    w: root.cRamp},
-                        {lbl: qsTr("Ramp ms"), w: root.cRampMs},
-                        {lbl: "",           w: root.cAct},
-                    ]
+                    model: root.headerModel
                     Label {
                         width: modelData.w; text: modelData.lbl
                         color: "#64b5f6"; font.pixelSize: 11; font.bold: true
+                        verticalAlignment: Text.AlignVCenter; height: parent.height
+
+                        ToolTip.text: modelData.tip
+                        ToolTip.delay: 500
+                        ToolTip.timeout: 8000
+                        ToolTip.visible: modelData.tip.length > 0 && hdrHover.hovered
+
+                        HoverHandler { id: hdrHover }
                     }
                 }
             }
@@ -128,6 +141,8 @@ Dialog {
                             validator: RegularExpressionValidator { regularExpression: /[0-9]*\.?[0-9]*/ }
                             Component.onCompleted: text = root.steps[index].voltage.toFixed(2)
                             onTextChanged: { var v = parseFloat(text); if (!isNaN(v)) root.steps[index].voltage = v }
+                            ToolTip.text: qsTr("Target output voltage (Volts)")
+                            ToolTip.delay: 600; ToolTip.timeout: 5000; ToolTip.visible: hovered
                         }
                         Item { width: 4; height: 1 }
 
@@ -139,6 +154,8 @@ Dialog {
                             validator: RegularExpressionValidator { regularExpression: /[0-9]*\.?[0-9]*/ }
                             Component.onCompleted: text = root.steps[index].current.toFixed(2)
                             onTextChanged: { var v = parseFloat(text); if (!isNaN(v)) root.steps[index].current = v }
+                            ToolTip.text: qsTr("Maximum output current (Amperes)")
+                            ToolTip.delay: 600; ToolTip.timeout: 5000; ToolTip.visible: hovered
                         }
                         Item { width: 4; height: 1 }
 
@@ -149,6 +166,8 @@ Dialog {
                             Material.theme: Material.Dark; wheelEnabled: true
                             Component.onCompleted: value = root.steps[index].holdMs
                             onValueModified: root.steps[index].holdMs = value
+                            ToolTip.text: qsTr("How long to hold this setpoint (ms). 1000 = 1 s, 60000 = 1 min.")
+                            ToolTip.delay: 600; ToolTip.timeout: 6000; ToolTip.visible: hovered
                         }
                         Item { width: 4; height: 1 }
 
@@ -161,6 +180,11 @@ Dialog {
                             opacity: index > 0 ? 1 : 0.3
                             Material.theme: Material.Dark
                             onToggled: root.steps[index].ramp = checked
+                            ToolTip.text: index === 0
+                                ? qsTr("Ramp is not available on the first step — there is no previous setpoint to ramp from.")
+                                : qsTr("Smoothly interpolate from the previous step's voltage and current instead of switching instantly.")
+                            ToolTip.delay: 500; ToolTip.timeout: 8000; ToolTip.visible: rampHover.hovered
+                            HoverHandler { id: rampHover }
                         }
 
                         // Ramp ms
@@ -172,6 +196,8 @@ Dialog {
                             Material.theme: Material.Dark; wheelEnabled: true
                             Component.onCompleted: value = root.steps[index].rampMs
                             onValueModified: root.steps[index].rampMs = value
+                            ToolTip.text: qsTr("Duration of the smooth ramp from the previous step (ms). Only used when Ramp is checked.")
+                            ToolTip.delay: 600; ToolTip.timeout: 6000; ToolTip.visible: hovered
                         }
                         Item { width: 4; height: 1 }
 
@@ -211,7 +237,7 @@ Dialog {
             }
         }
 
-        // Bottom row: Add step + CSV
+        // Bottom row: Add step + Import / Export
         RowLayout {
             Layout.fillWidth: true; spacing: 8
             Button {
@@ -230,21 +256,19 @@ Dialog {
             }
             Item { Layout.fillWidth: true }
             Button {
-                text: qsTr("Import CSV…")
+                text: qsTr("Import…")
                 Material.theme: Material.Dark
                 onClicked: importDlg.open()
+                ToolTip.text: qsTr("Import steps from a CSV file (replaces current steps).")
+                ToolTip.delay: 600; ToolTip.timeout: 5000; ToolTip.visible: hovered
             }
             Button {
-                text: qsTr("Export CSV…")
+                text: qsTr("Export…")
                 Material.theme: Material.Dark
                 enabled: root.steps.length > 0
                 onClicked: exportDlg.open()
-            }
-            Button {
-                text: qsTr("Export XLSX…")
-                Material.theme: Material.Dark
-                enabled: root.steps.length > 0
-                onClicked: exportXlsxDlg.open()
+                ToolTip.text: qsTr("Export steps to CSV, Excel (.xlsx) or ODF Spreadsheet (.ods). Choose the format via the file-type filter in the save dialog.")
+                ToolTip.delay: 600; ToolTip.timeout: 7000; ToolTip.visible: hovered
             }
         }
 
@@ -275,40 +299,68 @@ Dialog {
     // ── File dialogs (native via Qt.labs.platform) ────────────────────────────
     Platform.FileDialog {
         id: importDlg
-        title: qsTr("Import CSV Sequence")
+        title: qsTr("Import Sequence")
         fileMode: Platform.FileDialog.OpenFile
-        nameFilters: ["CSV files (*.csv)", "All files (*)"]
+        nameFilters: [
+            qsTr("All supported (*.csv *.xlsx *.ods)"),
+            qsTr("CSV spreadsheet (*.csv)"),
+            qsTr("Excel spreadsheet (*.xlsx)"),
+            qsTr("ODF Spreadsheet (*.ods)"),
+            "All files (*)"
+        ]
         onAccepted: {
-            if (!seqStore.loadFromFile(file))
-                console.warn("CSV import failed:", file)
+            var path = file.toString()
+            var ext  = path.split('.').pop().toLowerCase()
+            var ok
+            if      (ext === "xlsx") ok = seqStore.loadFromXlsx(file)
+            else if (ext === "ods")  ok = seqStore.loadFromOds(file)
+            else                     ok = seqStore.loadFromFile(file)
+            if (!ok) importErrorDialog.show(seqStore.lastImportError())
         }
     }
 
+    // ── Import error popup ────────────────────────────────────────────────────
+    Dialog {
+        id: importErrorDialog
+        title: qsTr("Import Failed")
+        modal: true; width: 400
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        Material.theme: Material.Dark
+        standardButtons: Dialog.Ok
+
+        property alias message: errorLabel.text
+        function show(msg) { message = msg; open() }
+
+        Label {
+            id: errorLabel
+            width: parent.width
+            wrapMode: Text.WordWrap
+            color: "#ff7070"
+        }
+    }
+
+    // Single export dialog — format chosen by extension the user types/selects.
     Platform.FileDialog {
         id: exportDlg
-        title: qsTr("Export Sequence as CSV")
+        title: qsTr("Export Sequence")
         fileMode: Platform.FileDialog.SaveFile
         defaultSuffix: "csv"
-        nameFilters: ["CSV files (*.csv)", "All files (*)"]
+        nameFilters: [
+            qsTr("CSV spreadsheet (*.csv)"),
+            qsTr("Excel spreadsheet (*.xlsx)"),
+            qsTr("ODF Spreadsheet (*.ods)")
+        ]
         onAccepted: {
+            // Ensure the working copy is saved first
             seqStore.saveProfile({name: nameField.text, steps: root.steps}, root.profileIndex)
             var exportIdx = (root.profileIndex >= 0) ? root.profileIndex : (seqStore.count - 1)
-            if (!seqStore.saveToFile(exportIdx, file))
-                console.warn("CSV export failed:", file)
-        }
-    }
-
-    Platform.FileDialog {
-        id: exportXlsxDlg
-        title: qsTr("Export Sequence as Excel")
-        fileMode: Platform.FileDialog.SaveFile
-        defaultSuffix: "xlsx"
-        nameFilters: ["Excel files (*.xlsx)", "All files (*)"]
-        onAccepted: {
-            seqStore.saveProfile({name: nameField.text, steps: root.steps}, root.profileIndex)
-            var exportIdx = (root.profileIndex >= 0) ? root.profileIndex : (seqStore.count - 1)
-            if (!seqStore.saveToXlsx(exportIdx, file))
-                console.warn("XLSX export failed:", file)
+            var path = file.toString()
+            var ext  = path.split('.').pop().toLowerCase()
+            if      (ext === "xlsx") seqStore.saveToXlsx(exportIdx, file)
+            else if (ext === "ods")  seqStore.saveToOds(exportIdx, file)
+            else                     seqStore.saveToFile(exportIdx, file)
         }
     }
 }
+

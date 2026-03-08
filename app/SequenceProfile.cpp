@@ -2,6 +2,9 @@
 // Copyright © 2026 Libor Tomsik, OK1CHP
 #include "SequenceProfile.h"
 #include "XlsxWriter.h"
+#include "OdsWriter.h"
+#include "ZipReader.h"
+#include <QXmlStreamReader>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -185,13 +188,31 @@ bool SequenceStore::saveToXlsx(int index, const QString& filePath) const {
     return xlsx.save(localPath);
 }
 
+bool SequenceStore::saveToOds(int index, const QString& filePath) const {
+    if (index < 0 || index >= m_profiles.size()) return false;
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    const auto& p = m_profiles[index];
+
+    OdsWriter ods;
+    ods.setTitle(p.name);
+    ods.addSheet(p.name.left(31));
+    ods.setHeaders({"Voltage (V)", "Current (A)", "Hold (ms)", "Ramp", "Ramp ms"});
+    for (const auto& s : p.steps)
+        ods.addRow({s.voltage, s.current, double(s.holdMs), s.ramp ? 1.0 : 0.0, double(s.rampMs)});
+
+    return ods.save(localPath);
+}
+
 bool SequenceStore::loadFromFile(const QString& filePath) {
+    m_importError.clear();
     QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
     QFile f(localPath);
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) return false;
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        m_importError = tr("Cannot open file: %1").arg(f.errorString()); return false;
+    }
     QString name = QFileInfo(localPath).baseName();
     QStringList lines = QString::fromUtf8(f.readAll()).split('\n', Qt::SkipEmptyParts);
-    if (lines.size() < 2) return false;
+    if (lines.size() < 2) { m_importError = tr("File is empty or has no data rows."); return false; }
 
     SequenceProfile p;
     p.name = name;
@@ -206,7 +227,160 @@ bool SequenceStore::loadFromFile(const QString& filePath) {
         s.rampMs  = c[4].trimmed().toInt();
         p.steps << s;
     }
-    if (p.steps.isEmpty()) return false;
+    if (p.steps.isEmpty()) { m_importError = tr("No valid rows found. Expected columns: Voltage,Current,Hold ms,Ramp,Ramp ms"); return false; }
+    m_profiles << p;
+    save();
+    emit profilesChanged();
+    return true;
+}
+
+// ── XLSX import ───────────────────────────────────────────────────────────────
+// Reads the first worksheet from a .xlsx file. Both our own exports (method 0)
+// and files from Excel/LibreOffice (method 8 deflate) are supported.
+// Column order must match what we export: V, I, Hold, Ramp, RampMs.
+bool SequenceStore::loadFromXlsx(const QString& filePath)
+{
+    m_importError.clear();
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    ZipReader zip;
+    if (!zip.open(localPath)) {
+        m_importError = tr("Cannot read XLSX: %1").arg(zip.lastError()); return false;
+    }
+
+    // Build shared strings table
+    QStringList sharedStrings;
+    if (zip.hasFile("xl/sharedStrings.xml")) {
+        QXmlStreamReader x(zip.fileData("xl/sharedStrings.xml"));
+        QString cur;
+        while (!x.atEnd()) {
+            x.readNext();
+            if (x.isStartElement() && x.name() == QLatin1String("t"))
+                cur += x.readElementText();
+            else if (x.isStartElement() && x.name() == QLatin1String("si"))
+                cur.clear();
+            else if (x.isEndElement() && x.name() == QLatin1String("si"))
+                sharedStrings << cur;
+        }
+    }
+
+    // Find first sheet file
+    QString sheetPath = "xl/worksheets/sheet1.xml";
+    if (!zip.hasFile(sheetPath)) {
+        for (const auto& n : zip.fileNames())
+            if (n.startsWith("xl/worksheets/") && n.endsWith(".xml"))
+                { sheetPath = n; break; }
+    }
+    if (!zip.hasFile(sheetPath)) {
+        m_importError = tr("No worksheet found in XLSX file."); return false;
+    }
+
+    QXmlStreamReader x(zip.fileData(sheetPath));
+    QString name = QFileInfo(localPath).baseName();
+    SequenceProfile p; p.name = name;
+    int rowNum = 0;
+    QList<double> rowVals;
+    QString cellType;
+
+    while (!x.atEnd()) {
+        x.readNext();
+        if (x.isStartElement()) {
+            if (x.name() == QLatin1String("row")) {
+                rowNum = x.attributes().value("r").toInt();
+                rowVals.clear();
+            } else if (x.name() == QLatin1String("c")) {
+                cellType = x.attributes().value("t").toString();
+            } else if (x.name() == QLatin1String("v") && rowNum > 1) {
+                QString val = x.readElementText();
+                if (cellType == "s") {
+                    int idx = val.toInt();
+                    rowVals << (idx < sharedStrings.size() ? sharedStrings[idx].toDouble() : 0.0);
+                } else {
+                    rowVals << val.toDouble();
+                }
+                cellType.clear();
+            }
+        } else if (x.isEndElement() && x.name() == QLatin1String("row") && rowNum > 1) {
+            if (rowVals.size() >= 5) {
+                SequenceStep s;
+                s.voltage = rowVals[0]; s.current = rowVals[1];
+                s.holdMs  = static_cast<int>(rowVals[2]);
+                s.ramp    = rowVals[3] != 0.0;
+                s.rampMs  = static_cast<int>(rowVals[4]);
+                p.steps << s;
+            }
+        }
+    }
+    if (p.steps.isEmpty()) {
+        m_importError = tr("No data rows found in XLSX. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms");
+        return false;
+    }
+    m_profiles << p;
+    save();
+    emit profilesChanged();
+    return true;
+}
+
+// ── ODS import ────────────────────────────────────────────────────────────────
+// Reads the first table from a .ods file. Both stored (our exports) and
+// deflate-compressed (LibreOffice) archives are supported.
+bool SequenceStore::loadFromOds(const QString& filePath)
+{
+    m_importError.clear();
+    QString localPath = QUrl(filePath).isLocalFile() ? QUrl(filePath).toLocalFile() : filePath;
+    ZipReader zip;
+    if (!zip.open(localPath)) {
+        m_importError = tr("Cannot read ODS: %1").arg(zip.lastError()); return false;
+    }
+    if (!zip.hasFile("content.xml")) {
+        m_importError = tr("Not a valid ODS file (missing content.xml)."); return false;
+    }
+
+    QXmlStreamReader x(zip.fileData("content.xml"));
+    QString name = QFileInfo(localPath).baseName();
+    SequenceProfile p; p.name = name;
+    int rowNum = 0;
+    QList<double> rowVals;
+    bool inTable = false;
+
+    while (!x.atEnd()) {
+        x.readNext();
+        if (x.isStartElement()) {
+            const auto ln = x.name();
+            if (ln == QLatin1String("table") && !inTable)
+                inTable = true;
+            else if (ln == QLatin1String("table-row") && inTable) {
+                ++rowNum; rowVals.clear();
+            } else if (ln == QLatin1String("table-cell") && rowNum > 1 && inTable) {
+                QString vtype = x.attributes().value("value-type").toString();
+                if (vtype == "float") {
+                    rowVals << x.attributes().value("value").toDouble();
+                } else if (vtype.isEmpty()) {
+                    int repeat = x.attributes().value("number-columns-repeated").toInt();
+                    if (repeat < 1) repeat = 1;
+                    for (int i = 0; i < repeat && rowVals.size() < 5; ++i)
+                        rowVals << 0.0;
+                }
+            }
+        } else if (x.isEndElement()) {
+            const auto ln = x.name();
+            if (ln == QLatin1String("table-row") && rowNum > 1 && inTable) {
+                if (rowVals.size() >= 5) {
+                    SequenceStep s;
+                    s.voltage = rowVals[0]; s.current = rowVals[1];
+                    s.holdMs  = static_cast<int>(rowVals[2]);
+                    s.ramp    = rowVals[3] != 0.0;
+                    s.rampMs  = static_cast<int>(rowVals[4]);
+                    p.steps << s;
+                }
+            } else if (ln == QLatin1String("table") && inTable) {
+                break;
+            }
+        }
+    }
+    if (p.steps.isEmpty()) {
+        m_importError = tr("No data rows found in ODS. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms");
+        return false;
+    }
     m_profiles << p;
     save();
     emit profilesChanged();

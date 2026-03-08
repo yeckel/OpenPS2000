@@ -16,6 +16,7 @@ endforeach()
 
 find_package(Qt6 6.7 REQUIRED COMPONENTS
     Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort LabsPlatform)
+find_package(ZLIB REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.7)
 
@@ -29,7 +30,9 @@ qt_add_executable(openps2000app
     DeviceBackend.h     DeviceBackend.cpp
     DataRecord.h
     ZipWriter.h         ZipWriter.cpp
+    ZipReader.h         ZipReader.cpp
     XlsxWriter.h        XlsxWriter.cpp
+    OdsWriter.h         OdsWriter.cpp
     BatteryProfile.h    BatteryProfile.cpp
     ChargerEngine.h     ChargerEngine.cpp
     PulseEngine.h       PulseEngine.cpp
@@ -62,6 +65,7 @@ target_link_libraries(openps2000app PRIVATE
     Qt6::Widgets
     Qt6::SerialPort
     Qt6::LabsPlatform
+    ZLIB::ZLIB
 )
 
 # ── DBus on Linux (Qt serial port may need it transitively) ───────────────
