@@ -10,7 +10,13 @@ Open-source **Qt 6 / QML / C++** desktop application for controlling
 
 ---
 
-![OpenPS2000 main window](screenshots/01_main.png)
+| Monitor | Battery Charger |
+|---------|----------------|
+| ![Monitor tab](screenshots/01_main.png) | ![Charger tab](screenshots/02_charger.png) |
+
+| Pulse Generator | Sequence Editor |
+|----------------|----------------|
+| ![Pulse tab](screenshots/03_pulse.png) | ![Sequence tab](screenshots/04_sequence.png) |
 
 ---
 
@@ -57,6 +63,19 @@ can either hold a lower setpoint or fully disable the output.
 > (a newer setpoint for the same object replaces any queued older one) so the queue
 > never grows unbounded. Emergency stop (`Space`) always bypasses the queue.
 
+### Sequence / Sweep Tab
+Program a multi-step voltage/current profile and execute it on the PSU.
+
+- **Step editor** — add, remove, reorder steps; each step has voltage, current,
+  hold time, and an optional ramp (linear interpolation from the previous step)
+- **Popup table editor** — edit the full sequence in a resizable dialog with
+  tooltips on every column explaining each parameter
+- **Import / Export** — CSV, XLSX (Excel), and ODS (LibreOffice Calc) supported;
+  files saved by third-party apps are fully compatible
+- **Named profiles** — save and reload multiple sequences by name;
+  importing a file replaces any existing profile with the same name
+- **Live execution** — real-time progress display; stops automatically on disconnect
+
 ### User Interface
 - **Dark Material theme** throughout
 - **Keyboard shortcuts:**
@@ -71,6 +90,8 @@ can either hold a lower setpoint or fully disable the output.
 - **Internationalization** — UI translated into 🇩🇪 German, 🇪🇸 Spanish, 🇨🇿 Czech,
   🇵🇱 Polish, 🇨🇳 Chinese (Simplified). Language persisted across restarts.
 - **Port memory** — last used serial port saved and restored on startup
+- **Disconnect detection** — USB cable removal detected within ~1 s; all running
+  operations (charger, pulser, sequencer) stop automatically
 
 ---
 
@@ -131,6 +152,9 @@ Values are encoded as a fraction of the nominal rating:
 | Qt         | 6.7 or newer (Core, Gui, Quick, QuickControls2, SerialPort) |
 | CMake      | 3.28+ |
 | Compiler   | C++20 (GCC 12+, Clang 15+, MSVC 2022) |
+| zlib       | system zlib (for XLSX/ODS import) |
+
+On Debian/Ubuntu: `sudo apt install zlib1g-dev`
 
 Install Qt from the [Qt online installer](https://www.qt.io/download) or your
 distribution's package manager.
@@ -176,18 +200,24 @@ OpenPS2000/
 │   ├── CMakeLists.txt
 │   ├── main.cpp                  App entry point, engine setup, i18n, wiring
 │   ├── PS2000Protocol.h/cpp      Binary telegram encoder/decoder
-│   ├── SerialTransport.h/cpp     QThread serial worker (4 Hz polling)
+│   ├── SerialTransport.h/cpp     QThread serial worker (4 Hz polling, disconnect detection)
 │   ├── DeviceBackend.h/cpp       QML-exposed device control + alarm detection
 │   ├── DataRecord.h              Measurement sample struct
 │   ├── BatteryProfile.h/cpp      Charging profile definitions + JSON storage
 │   ├── ChargerEngine.h/cpp       CC/CV/Float/−ΔV charging state machine
+│   ├── SequenceProfile.h/cpp     Sequence profile storage + CSV/XLSX/ODS import/export
+│   ├── SequencerEngine.h/cpp     Step-by-step voltage/current sequence executor
 │   ├── XlsxWriter.h/cpp          OOXML .xlsx writer (zero external dependencies)
-│   ├── ZipWriter.h/cpp           STORE-only ZIP (used by XlsxWriter)
+│   ├── OdsWriter.h/cpp           ODF Spreadsheet .ods writer
+│   ├── ZipWriter.h/cpp           STORE-only ZIP (used by XlsxWriter + OdsWriter)
+│   ├── ZipReader.h/cpp           ZIP reader (stored + deflate; reads LibreOffice/Excel files)
 │   └── qml/
 │       ├── Main.qml              Main window, toolbar, controls, alarm popup
 │       ├── LiveChart.qml         Canvas scrolling dual-axis chart
 │       ├── ChargerTab.qml        Battery charger UI tab
-│       └── ChargingChart.qml     Charging curve canvas chart
+│       ├── ChargingChart.qml     Charging curve canvas chart
+│       ├── SequenceTab.qml       Sequence management panel
+│       └── SequenceEditorDialog.qml  Popup table editor with import/export
 └── .github/workflows/
     └── build.yml                 CI: Linux AppImage · Windows zip · macOS dmg
 ```
