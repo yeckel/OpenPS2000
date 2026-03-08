@@ -95,8 +95,24 @@ void SerialTransport::run()
 
     // ── Main loop ─────────────────────────────────────────────────────────
     int loopCnt = 0;
+    int failStreak = 0;              // consecutive poll failures
+    static constexpr int MAX_FAILS = 4; // ~1 s without response → disconnect
+
+    // QSerialPort signals ResourceError immediately on USB removal.
+    // We can't use a slot (port is a local), so set a flag via a direct lambda.
+    bool portError = false;
+    QObject::connect(&port, &QSerialPort::errorOccurred,
+                     [&portError](QSerialPort::SerialPortError e) {
+                         if (e != QSerialPort::NoError)
+                             portError = true;
+                     });
+
     while(!m_stopFlag.loadAcquire())
     {
+        if (portError) {
+            emit error(tr("Device disconnected (port error)"));
+            break;
+        }
 
         // Dequeue next command: urgent slot first, then coalesced map.
         QByteArray cmd;
@@ -116,7 +132,12 @@ void SerialTransport::run()
             bool ok = sendAndAck(static_cast<void*>(&port), cmd);
             if(!ok)
             {
-                emit statusMessage("Command error or timeout");
+                emit statusMessage(tr("Command error or timeout"));
+                ++failStreak;
+            }
+            else
+            {
+                failStreak = 0;
             }
 
             // After any setpoint command, re-read set values from obj 72.
@@ -136,9 +157,14 @@ void SerialTransport::run()
             QByteArray d71 = queryObject(static_cast<void*>(&port), PS2000::OBJ_STATUS_ACTUAL, 6);
             if(d71.size() == 6)
             {
+                failStreak = 0;
                 PS2000::DeviceStatus st = PS2000::parseStatus(
                                               d71, m_deviceInfo.nomVoltage, m_deviceInfo.nomCurrent);
                 emit statusUpdated(st);
+            }
+            else
+            {
+                ++failStreak;
             }
 
             // Poll limits every 10 cycles (~2.5 s).
@@ -155,6 +181,11 @@ void SerialTransport::run()
                     emit limitsUpdated(ovpV, ocpA);
                 }
             }
+        }
+
+        if (failStreak >= MAX_FAILS) {
+            emit error(tr("Device not responding — cable disconnected?"));
+            break;
         }
 
         ++loopCnt;
