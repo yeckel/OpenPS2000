@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <rect width="256" height="256" rx="32" fill="#141c2b"/>
+  <rect x="20" y="80" width="216" height="140" rx="16" fill="#1a2a44" stroke="#2a4a7a" stroke-width="3"/>
+  <text x="128" y="136" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="32" fill="#4dc8ff">PSU</text>
+  <text x="128" y="176" text-anchor="middle" font-family="monospace" font-size="20" fill="#ff9940">84V / 5A</text>
+  <circle cx="128" cy="44" r="22" fill="none" stroke="#4dc8ff" stroke-width="4"/>
+  <line x1="128" y1="26" x2="128" y2="62" stroke="#4dc8ff" stroke-width="4" stroke-linecap="round"/>
+  <line x1="110" y1="44" x2="146" y2="44" stroke="#4dc8ff" stroke-width="4" stroke-linecap="round"/>
+</svg>

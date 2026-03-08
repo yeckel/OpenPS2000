@@ -1,0 +1,11 @@
+build/
+.cache/
+*.user
+CMakeLists.txt.user
+*.orig
+*.swp
+.DS_Store
+Thumbs.db
+AppDir/
+*.AppImage
+linuxdeploy*.AppImage

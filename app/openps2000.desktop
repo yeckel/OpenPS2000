@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=OpenPS2000
+Comment=EA PS 2000 B Power Supply Controller
+Exec=openps2000app
+Icon=openps2000
+Type=Application
+Categories=Science;Electronics;
