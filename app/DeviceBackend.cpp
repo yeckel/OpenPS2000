@@ -171,6 +171,16 @@ void DeviceBackend::setOutputOn(bool on)
     }
 }
 
+void DeviceBackend::setOutputOnQueued(bool on)
+{
+    // Always use the normal coalescing queue — safe for pulse-cycle transitions
+    // where we must not flush pending setpoint commands.
+    sendCommand(PS2000::buildControl(
+                    0,
+                    PS2000::CTRL_OUTPUT_MASK,
+                    on ? PS2000::CTRL_OUTPUT_ON : PS2000::CTRL_OUTPUT_OFF));
+}
+
 void DeviceBackend::sendSetVoltage(double voltage)
 {
     if(m_deviceInfo.nomVoltage <= 0)

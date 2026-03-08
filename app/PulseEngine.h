@@ -58,7 +58,8 @@ signals:
     // Routed to DeviceBackend slots
     void setVoltageRequested(double v);
     void setCurrentRequested(double a);
-    void setOutputRequested(bool on);
+    void setOutputRequested(bool on);       // urgent (emergency stop / final stop)
+    void setOutputQueuedRequested(bool on); // queued (normal pulse-cycle transition)
 
     // Emitted for the live chart: (elapsed_s, voltage, current)
     void newPoint(double t, double v, double i);

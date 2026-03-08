@@ -107,7 +107,8 @@ public slots:
 
     // Control (requires remote mode)
     void setRemoteMode(bool remote);
-    void setOutputOn(bool on);
+    void setOutputOn(bool on);       // urgent (emergency stop / user button)
+    void setOutputOnQueued(bool on); // normal queue (pulse-cycle transitions)
     void sendSetVoltage(double voltage);
     void sendSetCurrent(double current);
     void sendOvpVoltage(double voltage);

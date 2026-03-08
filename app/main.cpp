@@ -148,9 +148,10 @@ int main(int argc, char* argv[])
     });
 
     // Wire pulse engine control signals → device backend slots
-    QObject::connect(&pulser, &PulseEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
-    QObject::connect(&pulser, &PulseEngine::setCurrentRequested, &backend, &DeviceBackend::sendSetCurrent);
-    QObject::connect(&pulser, &PulseEngine::setOutputRequested,  &backend, &DeviceBackend::setOutputOn);
+    QObject::connect(&pulser, &PulseEngine::setVoltageRequested,      &backend, &DeviceBackend::sendSetVoltage);
+    QObject::connect(&pulser, &PulseEngine::setCurrentRequested,      &backend, &DeviceBackend::sendSetCurrent);
+    QObject::connect(&pulser, &PulseEngine::setOutputRequested,       &backend, &DeviceBackend::setOutputOn);       // urgent (stop)
+    QObject::connect(&pulser, &PulseEngine::setOutputQueuedRequested, &backend, &DeviceBackend::setOutputOnQueued); // queued (cycle transitions)
     // Feed live measurements into pulse engine
     QObject::connect(&backend, &DeviceBackend::newSample,
                      &pulser, &PulseEngine::onSample);

@@ -63,7 +63,8 @@ void PulseEngine::applyOn()
 {
     emit setVoltageRequested(m_onVoltage);
     emit setCurrentRequested(m_onCurrent);
-    emit setOutputRequested(true);
+    // Use queued (non-urgent) output ON so it doesn't race with pending V/I commands.
+    emit setOutputQueuedRequested(true);
 
     m_state = OnPhase;
     emit stateChanged();
@@ -77,11 +78,12 @@ void PulseEngine::applyOn()
 void PulseEngine::applyOff()
 {
     if (m_offDisable) {
-        emit setOutputRequested(false);
+        // Use queued off so we don't flush pending setpoint commands.
+        emit setOutputQueuedRequested(false);
     } else {
         emit setVoltageRequested(m_offVoltage);
         emit setCurrentRequested(m_offCurrent);
-        emit setOutputRequested(true);
+        emit setOutputQueuedRequested(true);
     }
 
     m_state = OffPhase;
