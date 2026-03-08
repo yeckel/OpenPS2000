@@ -95,12 +95,21 @@ QVariantMap SequenceStore::defaultStep() const {
             {"ramp", false}, {"rampMs", 2000}};
 }
 
+// Replace an existing profile with the same name, or append as new.
+static void upsertProfile(QList<SequenceProfile>& list, const SequenceProfile& p)
+{
+    for (int i = 0; i < list.size(); ++i) {
+        if (list[i].name == p.name) { list[i] = p; return; }
+    }
+    list << p;
+}
+
 void SequenceStore::load() {
     QFile f(filePath());
     if (!f.open(QIODevice::ReadOnly)) return;
     QJsonArray arr = QJsonDocument::fromJson(f.readAll()).array();
     for (auto v : arr)
-        m_profiles << SequenceProfile::fromVariant(v.toObject().toVariantMap());
+        upsertProfile(m_profiles, SequenceProfile::fromVariant(v.toObject().toVariantMap()));
 }
 
 void SequenceStore::save() const {
@@ -228,7 +237,7 @@ bool SequenceStore::loadFromFile(const QString& filePath) {
         p.steps << s;
     }
     if (p.steps.isEmpty()) { m_importError = tr("No valid rows found. Expected columns: Voltage,Current,Hold ms,Ramp,Ramp ms"); return false; }
-    m_profiles << p;
+    upsertProfile(m_profiles, p);
     save();
     emit profilesChanged();
     return true;
@@ -314,7 +323,7 @@ bool SequenceStore::loadFromXlsx(const QString& filePath)
         m_importError = tr("No data rows found in XLSX. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms");
         return false;
     }
-    m_profiles << p;
+    upsertProfile(m_profiles, p);
     save();
     emit profilesChanged();
     return true;
@@ -381,7 +390,7 @@ bool SequenceStore::loadFromOds(const QString& filePath)
         m_importError = tr("No data rows found in ODS. Expected columns: Voltage (V), Current (A), Hold (ms), Ramp (0/1), Ramp ms");
         return false;
     }
-    m_profiles << p;
+    upsertProfile(m_profiles, p);
     save();
     emit profilesChanged();
     return true;

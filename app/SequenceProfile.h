@@ -35,6 +35,7 @@ class SequenceStore : public QObject
     QML_UNCREATABLE("")
 
     Q_PROPERTY(QStringList names READ names NOTIFY profilesChanged)
+    Q_PROPERTY(int count READ count NOTIFY profilesChanged)
 
 public:
     explicit SequenceStore(QObject* parent = nullptr);
