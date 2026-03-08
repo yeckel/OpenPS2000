@@ -88,6 +88,7 @@ private:
     bool   m_offDisable = false;
     int    m_onTimeMs   = 500;
     int    m_offTimeMs  = 500;
+    bool   m_setpointsSent = false; // true after first applyOn() sends V+I
 
     double m_lastV = 0.0;
     double m_lastI = 0.0;

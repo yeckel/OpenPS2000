@@ -30,6 +30,7 @@ void PulseEngine::start(double onVoltage, double onCurrent,
     m_offTimeMs   = qMax(500, offTimeMs);
     m_totalCycles = totalCycles;
     m_cyclesDone  = 0;
+    m_setpointsSent = false;
 
     m_elapsed.restart();
     m_tickTimer.start();
@@ -61,9 +62,16 @@ void PulseEngine::onSample(double /*t*/, double v, double i, double /*p*/)
 
 void PulseEngine::applyOn()
 {
-    emit setVoltageRequested(m_onVoltage);
-    emit setCurrentRequested(m_onCurrent);
-    // Use queued (non-urgent) output ON so it doesn't race with pending V/I commands.
+    // When offDisable=true, V and I setpoints don't change between cycles —
+    // only the output enable toggles. After the first cycle, send only
+    // output-ON (1 command = 250ms) so it always executes before the 500ms
+    // phase timer fires. Sending all 3 commands (750ms) causes outputON to
+    // still be pending when applyOff() fires and overwrites it with outputOFF.
+    if (!m_offDisable || !m_setpointsSent) {
+        emit setVoltageRequested(m_onVoltage);
+        emit setCurrentRequested(m_onCurrent);
+        m_setpointsSent = true;
+    }
     emit setOutputQueuedRequested(true);
 
     m_state = OnPhase;
