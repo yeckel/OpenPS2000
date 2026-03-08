@@ -648,6 +648,11 @@ ApplicationWindow {
                         Material.theme: Material.Dark
                         font.pixelSize: 13
                     }
+                    TabButton {
+                        text: qsTr("〰 Pulse / Cycle")
+                        Material.theme: Material.Dark
+                        font.pixelSize: 13
+                    }
                 }
 
                 Rectangle { height: 1; Layout.fillWidth: true; color: "#1e2a3e" }
@@ -739,6 +744,10 @@ ApplicationWindow {
 
                     // ── Tab 1: Battery Charger ────────────────────────────
                     ChargerTab {
+                    }
+
+                    // ── Tab 2: Pulse / Cycle Generator ────────────────────
+                    PulseTab {
                     }
 
                 } // end StackLayout

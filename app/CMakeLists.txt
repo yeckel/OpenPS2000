@@ -32,6 +32,7 @@ qt_add_executable(openps2000app
     XlsxWriter.h        XlsxWriter.cpp
     BatteryProfile.h    BatteryProfile.cpp
     ChargerEngine.h     ChargerEngine.cpp
+    PulseEngine.h       PulseEngine.cpp
 )
 
 qt_add_qml_module(openps2000app
@@ -42,6 +43,8 @@ qt_add_qml_module(openps2000app
         qml/LiveChart.qml
         qml/ChargingChart.qml
         qml/ChargerTab.qml
+        qml/PulseTab.qml
+        qml/PulseChart.qml
 )
 
 target_link_libraries(openps2000app PRIVATE
@@ -107,6 +110,8 @@ qt_add_translations(openps2000app
         qml/LiveChart.qml
         qml/ChargingChart.qml
         qml/ChargerTab.qml
+        qml/PulseTab.qml
+        qml/PulseChart.qml
     LUPDATE_OPTIONS
         -no-obsolete
 )

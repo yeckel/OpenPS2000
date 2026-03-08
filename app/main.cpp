@@ -10,6 +10,7 @@
 #include <QSettings>
 #include "DeviceBackend.h"
 #include "ChargerEngine.h"
+#include "PulseEngine.h"
 
 class LanguageChanger : public QObject
 {
@@ -121,6 +122,7 @@ int main(int argc, char* argv[])
 
     DeviceBackend backend;
     ChargerEngine charger;
+    PulseEngine   pulser;
 
     // Wire charger control signals → device backend slots
     QObject::connect(&charger, &ChargerEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
@@ -138,9 +140,21 @@ int main(int argc, char* argv[])
     QObject::connect(&backend, &DeviceBackend::connectedChanged, &charger, [&]()
     {
         if(!backend.connected())
-        {
             charger.stopCharging();
-        }
+    });
+
+    // Wire pulse engine control signals → device backend slots
+    QObject::connect(&pulser, &PulseEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
+    QObject::connect(&pulser, &PulseEngine::setCurrentRequested, &backend, &DeviceBackend::sendSetCurrent);
+    QObject::connect(&pulser, &PulseEngine::setOutputRequested,  &backend, &DeviceBackend::setOutputOn);
+    // Feed live measurements into pulse engine
+    QObject::connect(&backend, &DeviceBackend::newSample,
+                     &pulser, &PulseEngine::onSample);
+    // Stop pulser if device disconnects
+    QObject::connect(&backend, &DeviceBackend::connectedChanged, &pulser, [&]()
+    {
+        if(!backend.connected())
+            pulser.stop();
     });
 
     QQmlApplicationEngine engine;
@@ -150,6 +164,7 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("backend", &backend);
     engine.rootContext()->setContextProperty("langChanger", &langChanger);
     engine.rootContext()->setContextProperty("charger", &charger);
+    engine.rootContext()->setContextProperty("pulser", &pulser);
 
     engine.loadFromModule("openps2000app", "Main");
 

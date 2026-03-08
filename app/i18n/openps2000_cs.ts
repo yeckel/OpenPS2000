@@ -471,7 +471,7 @@ Upravte profil nebo zvolte jiný.</translation>
     </message>
     <message>
         <location filename="../qml/Main.qml" line="501"/>
-        <location filename="../qml/Main.qml" line="1052"/>
+        <location filename="../qml/Main.qml" line="1061"/>
         <source>Model</source>
         <translation>Model</translation>
     </message>
@@ -521,269 +521,432 @@ Upravte profil nebo zvolte jiný.</translation>
         <translation>🔋 Nabíječka baterií</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="766"/>
+        <location filename="../qml/Main.qml" line="652"/>
+        <source>〰 Pulse / Cycle</source>
+        <translation>〰 Puls / Cyklus</translation>
+    </message>
+    <message>
+        <location filename="../qml/Main.qml" line="775"/>
         <source>○ Not connected</source>
         <translation>○ Nepřipojeno</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="786"/>
+        <location filename="../qml/Main.qml" line="795"/>
         <source>⚠ Emergency stop — output disabled  [Esc]</source>
         <translation>⚠ Nouzové zastavení — výstup deaktivován  [Esc]</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="846"/>
+        <location filename="../qml/Main.qml" line="855"/>
         <source>Enable Output?</source>
         <translation>Zapnout výstup?</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="875"/>
+        <location filename="../qml/Main.qml" line="884"/>
         <source>Turn on output with current setpoints:</source>
         <translation>Zapnout výstup s aktuálními nastaveními:</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="891"/>
+        <location filename="../qml/Main.qml" line="900"/>
         <source>Voltage:  %1 V</source>
         <translation>Napětí:  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="895"/>
+        <location filename="../qml/Main.qml" line="904"/>
         <source>I limit:  %1 A</source>
         <translation>Limit I:  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="902"/>
+        <location filename="../qml/Main.qml" line="911"/>
         <source>⚠  Verify the load can safely handle these settings.</source>
         <translation>⚠  Ověřte, že zátěž tyto nastavení bezpečně zvládne.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="910"/>
+        <location filename="../qml/Main.qml" line="919"/>
         <source>Don&apos;t show again for this session</source>
         <translation>Nezobrazovat znovu v této relaci</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="922"/>
+        <location filename="../qml/Main.qml" line="931"/>
         <source>Enter / Y = Yes   ·   N / Esc = No</source>
         <translation>Enter / A = Ano   ·   N / Esc = Ne</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="973"/>
+        <location filename="../qml/Main.qml" line="982"/>
         <source>Version</source>
         <translation>Verze</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="974"/>
+        <location filename="../qml/Main.qml" line="983"/>
         <source>License</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="975"/>
+        <location filename="../qml/Main.qml" line="984"/>
         <source>Author</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="986"/>
+        <location filename="../qml/Main.qml" line="995"/>
         <source>Source</source>
         <translation>Zdroj</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1004"/>
+        <location filename="../qml/Main.qml" line="1013"/>
         <source>Shortcuts</source>
         <translation>Klávesové zkratky</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1007"/>
+        <location filename="../qml/Main.qml" line="1016"/>
         <source>Escape — Emergency stop (output off)</source>
         <translation>Escape — Nouzové zastavení (výstup vyp.)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1008"/>
+        <location filename="../qml/Main.qml" line="1017"/>
         <source>Space  — Toggle output (with confirmation)</source>
         <translation>Mezerník — Přepínání výstupu (s potvrzením)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1009"/>
+        <location filename="../qml/Main.qml" line="1018"/>
         <source>Ctrl+↑/↓ — Voltage ±0.1 V</source>
         <translation>Ctrl+↑/↓ — Napětí ±0,1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1010"/>
+        <location filename="../qml/Main.qml" line="1019"/>
         <source>Ctrl+←/→ — Current ±0.01 A</source>
         <translation>Ctrl+←/→ — Proud ±0,01 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1017"/>
+        <location filename="../qml/Main.qml" line="1026"/>
         <source>Language</source>
         <translation>Jazyk</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1036"/>
+        <location filename="../qml/Main.qml" line="1045"/>
         <source>CONNECTED DEVICE</source>
         <translation>PŘIPOJENÉ ZAŘÍZENÍ</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1053"/>
+        <location filename="../qml/Main.qml" line="1062"/>
         <source>Article No.</source>
         <translation>Číslo artiklu</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1054"/>
+        <location filename="../qml/Main.qml" line="1063"/>
         <source>Serial No.</source>
         <translation>Výrobní číslo</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1055"/>
+        <location filename="../qml/Main.qml" line="1064"/>
         <source>Firmware</source>
         <translation>Firmware</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1056"/>
+        <location filename="../qml/Main.qml" line="1065"/>
         <source>Nom. Voltage</source>
         <translation>Jmenovité napětí</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1057"/>
+        <location filename="../qml/Main.qml" line="1066"/>
         <source>Nom. Current</source>
         <translation>Jmenovitý proud</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1058"/>
+        <location filename="../qml/Main.qml" line="1067"/>
         <source>Nom. Power</source>
         <translation>Jmenovitý výkon</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1059"/>
+        <location filename="../qml/Main.qml" line="1068"/>
         <source>Samples</source>
         <translation>Vzorky</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1059"/>
+        <location filename="../qml/Main.qml" line="1068"/>
         <source>(session)</source>
         <translation>(relace)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1130"/>
+        <location filename="../qml/Main.qml" line="1139"/>
         <source>📊  Range Analysis</source>
         <translation>📊  Analýza rozsahu</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1136"/>
+        <location filename="../qml/Main.qml" line="1145"/>
         <source>Δt %1 s   n = %2</source>
         <translation>Δt %1 s   n = %2</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1160"/>
+        <location filename="../qml/Main.qml" line="1169"/>
         <source>VOLTAGE</source>
         <translation>NAPĚTÍ</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1161"/>
+        <location filename="../qml/Main.qml" line="1170"/>
         <source>CURRENT</source>
         <translation>PROUD</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1162"/>
+        <location filename="../qml/Main.qml" line="1171"/>
         <source>POWER</source>
         <translation>VÝKON</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1163"/>
+        <location filename="../qml/Main.qml" line="1172"/>
         <source>ENERGY</source>
         <translation>ENERGIE</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1166"/>
+        <location filename="../qml/Main.qml" line="1175"/>
         <source>Mean  %1 V</source>
         <translation>Průměr  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1167"/>
+        <location filename="../qml/Main.qml" line="1176"/>
         <source>Mean  %1 A</source>
         <translation>Průměr  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1168"/>
+        <location filename="../qml/Main.qml" line="1177"/>
         <source>Mean  %1 W</source>
         <translation>Průměr  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1172"/>
+        <location filename="../qml/Main.qml" line="1181"/>
         <source>Min   %1 V</source>
         <translation>Min.  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1173"/>
+        <location filename="../qml/Main.qml" line="1182"/>
         <source>Min   %1 A</source>
         <translation>Min.  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1174"/>
+        <location filename="../qml/Main.qml" line="1183"/>
         <source>Min   %1 W</source>
         <translation>Min.  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1178"/>
+        <location filename="../qml/Main.qml" line="1187"/>
         <source>Max   %1 V</source>
         <translation>Max.  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1179"/>
+        <location filename="../qml/Main.qml" line="1188"/>
         <source>Max   %1 A</source>
         <translation>Max.  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1180"/>
+        <location filename="../qml/Main.qml" line="1189"/>
         <source>Max   %1 W</source>
         <translation>Max.  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1189"/>
+        <location filename="../qml/Main.qml" line="1198"/>
         <source>⚠ Protection Alarm Triggered</source>
         <translation>⚠ Spuštěn ochranný alarm</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1233"/>
+        <location filename="../qml/Main.qml" line="1242"/>
         <source>OVP — Over-Voltage Protection: output voltage exceeded the set limit.</source>
         <translation>OVP — Ochrana před přepětím: výstupní napětí překročilo nastavenou mez.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1234"/>
+        <location filename="../qml/Main.qml" line="1243"/>
         <source>OCP — Over-Current Protection: output current exceeded the set limit.</source>
         <translation>OCP — Ochrana před proudovým přetížením: výstupní proud překročil nastavenou mez.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1235"/>
+        <location filename="../qml/Main.qml" line="1244"/>
         <source>OPP — Over-Power Protection: output power exceeded the set limit.</source>
         <translation>OPP — Ochrana před výkonovým přetížením: výstupní výkon překročil nastavenou mez.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1236"/>
+        <location filename="../qml/Main.qml" line="1245"/>
         <source>OTP — Over-Temperature Protection: device is too hot.</source>
         <translation>OTP — Ochrana před přehřátím: zařízení je příliš horké.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1245"/>
+        <location filename="../qml/Main.qml" line="1254"/>
         <source>The output has been turned off. Remove the fault condition, then acknowledge the alarm to resume operation.</source>
         <translation>Výstup byl vypnut. Odstraňte příčinu poruchy a potvrďte alarm pro obnovení provozu.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1256"/>
+        <location filename="../qml/Main.qml" line="1265"/>
         <source>Acknowledge Alarm</source>
         <translation>Potvrdit alarm</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1266"/>
+        <location filename="../qml/Main.qml" line="1275"/>
         <source>Close</source>
         <translation>Zavřít</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1277"/>
+        <location filename="../qml/Main.qml" line="1286"/>
         <source>Save CSV</source>
         <translation>Uložit CSV</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1286"/>
+        <location filename="../qml/Main.qml" line="1295"/>
         <source>Save Excel</source>
         <translation>Uložit Excel</translation>
+    </message>
+</context>
+<context>
+    <name>PulseChart</name>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="42"/>
+        <source>Start the generator to see the waveform</source>
+        <translation>Spusťte generátor pro zobrazení průběhu</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="136"/>
+        <source>Voltage</source>
+        <translation>Napětí</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="138"/>
+        <source>Current</source>
+        <translation>Proud</translation>
+    </message>
+</context>
+<context>
+    <name>PulseTab</name>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="35"/>
+        <source>Done — %1 cycles completed</source>
+        <translation>Hotovo — %1 cyklů dokončeno</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="62"/>
+        <source>▶ START</source>
+        <translation>▶ START</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="62"/>
+        <source>■ STOP</source>
+        <translation>■ STOP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="103"/>
+        <source>Pulse / Cycle Generator</source>
+        <translation>Generátor pulsů / cyklů</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="113"/>
+        <source>ON setpoint</source>
+        <translation>Žádaná hodnota ZAP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="123"/>
+        <location filename="../qml/PulseTab.qml" line="183"/>
+        <source>Voltage (V)</source>
+        <translation>Napětí (V)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="138"/>
+        <location filename="../qml/PulseTab.qml" line="197"/>
+        <source>Current (A)</source>
+        <translation>Proud (A)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="160"/>
+        <source>OFF setpoint</source>
+        <translation>Žádaná hodnota VYP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="170"/>
+        <source>Disable output during OFF</source>
+        <translation>Vypnout výstup během VYP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="218"/>
+        <source>Timing</source>
+        <translation>Časování</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="231"/>
+        <source>Period: %1 ms  |  Freq: %2 Hz  |  Duty: %3 %</source>
+        <translation>Perioda: %1 ms  |  Freq: %2 Hz  |  Střída: %3 %</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="242"/>
+        <source>ON time (ms)</source>
+        <translation>Čas ZAP (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="253"/>
+        <source>OFF time (ms)</source>
+        <translation>Čas VYP (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="271"/>
+        <source>Cycles (0 = infinite)</source>
+        <translation>Cykly (0 = nekonečno)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="281"/>
+        <source>∞</source>
+        <translation>∞</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="293"/>
+        <source>Status</source>
+        <translation>Stav</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="303"/>
+        <source>State:</source>
+        <translation>Stav:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="309"/>
+        <source>Idle</source>
+        <translation>Nečinný</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="310"/>
+        <source>ON</source>
+        <translation>ZAP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="311"/>
+        <source>OFF</source>
+        <translation>VYP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="312"/>
+        <source>Done</source>
+        <translation>Hotovo</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="315"/>
+        <source>Elapsed:</source>
+        <translation>Uplynulo:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="323"/>
+        <source>Cycles done:</source>
+        <translation>Dokončené cykly:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="334"/>
+        <source>Actual V:</source>
+        <translation>Skutečné U:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="341"/>
+        <source>Actual I:</source>
+        <translation>Skutečný I:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="363"/>
+        <source>⚠ Device not connected</source>
+        <translation>⚠ Zařízení není připojeno</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="386"/>
+        <source>Pulse Waveform</source>
+        <translation>Průběh pulsů</translation>
     </message>
 </context>
 </TS>

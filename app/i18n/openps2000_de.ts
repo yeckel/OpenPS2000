@@ -471,7 +471,7 @@ Bitte Profil bearbeiten oder ein anderes wählen.</translation>
     </message>
     <message>
         <location filename="../qml/Main.qml" line="501"/>
-        <location filename="../qml/Main.qml" line="1052"/>
+        <location filename="../qml/Main.qml" line="1061"/>
         <source>Model</source>
         <translation>Modell</translation>
     </message>
@@ -521,269 +521,432 @@ Bitte Profil bearbeiten oder ein anderes wählen.</translation>
         <translation>🔋 Akku-Lader</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="766"/>
+        <location filename="../qml/Main.qml" line="652"/>
+        <source>〰 Pulse / Cycle</source>
+        <translation>〰 Puls / Zyklus</translation>
+    </message>
+    <message>
+        <location filename="../qml/Main.qml" line="775"/>
         <source>○ Not connected</source>
         <translation>○ Nicht verbunden</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="786"/>
+        <location filename="../qml/Main.qml" line="795"/>
         <source>⚠ Emergency stop — output disabled  [Esc]</source>
         <translation>⚠ Notaus — Ausgang deaktiviert  [Esc]</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="846"/>
+        <location filename="../qml/Main.qml" line="855"/>
         <source>Enable Output?</source>
         <translation>Ausgang aktivieren?</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="875"/>
+        <location filename="../qml/Main.qml" line="884"/>
         <source>Turn on output with current setpoints:</source>
         <translation>Ausgang mit aktuellen Sollwerten einschalten:</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="891"/>
+        <location filename="../qml/Main.qml" line="900"/>
         <source>Voltage:  %1 V</source>
         <translation>Spannung:  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="895"/>
+        <location filename="../qml/Main.qml" line="904"/>
         <source>I limit:  %1 A</source>
         <translation>I-Grenze:  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="902"/>
+        <location filename="../qml/Main.qml" line="911"/>
         <source>⚠  Verify the load can safely handle these settings.</source>
         <translation>⚠  Überprüfen Sie, ob die Last diese Einstellungen sicher handhaben kann.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="910"/>
+        <location filename="../qml/Main.qml" line="919"/>
         <source>Don&apos;t show again for this session</source>
         <translation>Diese Sitzung nicht mehr anzeigen</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="922"/>
+        <location filename="../qml/Main.qml" line="931"/>
         <source>Enter / Y = Yes   ·   N / Esc = No</source>
         <translation>Eingabe / J = Ja   ·   N / Esc = Nein</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="973"/>
+        <location filename="../qml/Main.qml" line="982"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="974"/>
+        <location filename="../qml/Main.qml" line="983"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="975"/>
+        <location filename="../qml/Main.qml" line="984"/>
         <source>Author</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="986"/>
+        <location filename="../qml/Main.qml" line="995"/>
         <source>Source</source>
         <translation>Quellcode</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1004"/>
+        <location filename="../qml/Main.qml" line="1013"/>
         <source>Shortcuts</source>
         <translation>Tastenkürzel</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1007"/>
+        <location filename="../qml/Main.qml" line="1016"/>
         <source>Escape — Emergency stop (output off)</source>
         <translation>Escape — Notaus (Ausgang aus)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1008"/>
+        <location filename="../qml/Main.qml" line="1017"/>
         <source>Space  — Toggle output (with confirmation)</source>
         <translation>Leertaste — Ausgang umschalten (mit Bestätigung)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1009"/>
+        <location filename="../qml/Main.qml" line="1018"/>
         <source>Ctrl+↑/↓ — Voltage ±0.1 V</source>
         <translation>Strg+↑/↓ — Spannung ±0,1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1010"/>
+        <location filename="../qml/Main.qml" line="1019"/>
         <source>Ctrl+←/→ — Current ±0.01 A</source>
         <translation>Strg+←/→ — Strom ±0,01 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1017"/>
+        <location filename="../qml/Main.qml" line="1026"/>
         <source>Language</source>
         <translation>Sprache</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1036"/>
+        <location filename="../qml/Main.qml" line="1045"/>
         <source>CONNECTED DEVICE</source>
         <translation>VERBUNDENES GERÄT</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1053"/>
+        <location filename="../qml/Main.qml" line="1062"/>
         <source>Article No.</source>
         <translation>Artikelnr.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1054"/>
+        <location filename="../qml/Main.qml" line="1063"/>
         <source>Serial No.</source>
         <translation>Seriennr.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1055"/>
+        <location filename="../qml/Main.qml" line="1064"/>
         <source>Firmware</source>
         <translation>Firmware</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1056"/>
+        <location filename="../qml/Main.qml" line="1065"/>
         <source>Nom. Voltage</source>
         <translation>Nenn-Spannung</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1057"/>
+        <location filename="../qml/Main.qml" line="1066"/>
         <source>Nom. Current</source>
         <translation>Nenn-Strom</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1058"/>
+        <location filename="../qml/Main.qml" line="1067"/>
         <source>Nom. Power</source>
         <translation>Nenn-Leistung</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1059"/>
+        <location filename="../qml/Main.qml" line="1068"/>
         <source>Samples</source>
         <translation>Messungen</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1059"/>
+        <location filename="../qml/Main.qml" line="1068"/>
         <source>(session)</source>
         <translation>(Sitzung)</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1130"/>
+        <location filename="../qml/Main.qml" line="1139"/>
         <source>📊  Range Analysis</source>
         <translation>📊  Bereichsanalyse</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1136"/>
+        <location filename="../qml/Main.qml" line="1145"/>
         <source>Δt %1 s   n = %2</source>
         <translation>Δt %1 s   n = %2</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1160"/>
+        <location filename="../qml/Main.qml" line="1169"/>
         <source>VOLTAGE</source>
         <translation>SPANNUNG</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1161"/>
+        <location filename="../qml/Main.qml" line="1170"/>
         <source>CURRENT</source>
         <translation>STROM</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1162"/>
+        <location filename="../qml/Main.qml" line="1171"/>
         <source>POWER</source>
         <translation>LEISTUNG</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1163"/>
+        <location filename="../qml/Main.qml" line="1172"/>
         <source>ENERGY</source>
         <translation>ENERGIE</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1166"/>
+        <location filename="../qml/Main.qml" line="1175"/>
         <source>Mean  %1 V</source>
         <translation>Mittelw.  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1167"/>
+        <location filename="../qml/Main.qml" line="1176"/>
         <source>Mean  %1 A</source>
         <translation>Mittelw.  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1168"/>
+        <location filename="../qml/Main.qml" line="1177"/>
         <source>Mean  %1 W</source>
         <translation>Mittelw.  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1172"/>
+        <location filename="../qml/Main.qml" line="1181"/>
         <source>Min   %1 V</source>
         <translation>Min.  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1173"/>
+        <location filename="../qml/Main.qml" line="1182"/>
         <source>Min   %1 A</source>
         <translation>Min.  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1174"/>
+        <location filename="../qml/Main.qml" line="1183"/>
         <source>Min   %1 W</source>
         <translation>Min.  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1178"/>
+        <location filename="../qml/Main.qml" line="1187"/>
         <source>Max   %1 V</source>
         <translation>Max.  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1179"/>
+        <location filename="../qml/Main.qml" line="1188"/>
         <source>Max   %1 A</source>
         <translation>Max.  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1180"/>
+        <location filename="../qml/Main.qml" line="1189"/>
         <source>Max   %1 W</source>
         <translation>Max.  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1189"/>
+        <location filename="../qml/Main.qml" line="1198"/>
         <source>⚠ Protection Alarm Triggered</source>
         <translation>⚠ Schutzalarm ausgelöst</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1233"/>
+        <location filename="../qml/Main.qml" line="1242"/>
         <source>OVP — Over-Voltage Protection: output voltage exceeded the set limit.</source>
         <translation>OVP — Überspannungsschutz: Ausgangsspannung hat den eingestellten Grenzwert überschritten.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1234"/>
+        <location filename="../qml/Main.qml" line="1243"/>
         <source>OCP — Over-Current Protection: output current exceeded the set limit.</source>
         <translation>OCP — Überstromschutz: Ausgangsstrom hat den eingestellten Grenzwert überschritten.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1235"/>
+        <location filename="../qml/Main.qml" line="1244"/>
         <source>OPP — Over-Power Protection: output power exceeded the set limit.</source>
         <translation>OPP — Überleistungsschutz: Ausgangsleistung hat den eingestellten Grenzwert überschritten.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1236"/>
+        <location filename="../qml/Main.qml" line="1245"/>
         <source>OTP — Over-Temperature Protection: device is too hot.</source>
         <translation>OTP — Übertemperaturschutz: Gerät ist zu heiß.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1245"/>
+        <location filename="../qml/Main.qml" line="1254"/>
         <source>The output has been turned off. Remove the fault condition, then acknowledge the alarm to resume operation.</source>
         <translation>Der Ausgang wurde abgeschaltet. Beheben Sie den Fehler und bestätigen Sie den Alarm, um den Betrieb fortzusetzen.</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1256"/>
+        <location filename="../qml/Main.qml" line="1265"/>
         <source>Acknowledge Alarm</source>
         <translation>Alarm quittieren</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1266"/>
+        <location filename="../qml/Main.qml" line="1275"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1277"/>
+        <location filename="../qml/Main.qml" line="1286"/>
         <source>Save CSV</source>
         <translation>CSV speichern</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1286"/>
+        <location filename="../qml/Main.qml" line="1295"/>
         <source>Save Excel</source>
         <translation>Excel speichern</translation>
+    </message>
+</context>
+<context>
+    <name>PulseChart</name>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="42"/>
+        <source>Start the generator to see the waveform</source>
+        <translation>Generator starten, um die Wellenform zu sehen</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="136"/>
+        <source>Voltage</source>
+        <translation>Spannung</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseChart.qml" line="138"/>
+        <source>Current</source>
+        <translation>Strom</translation>
+    </message>
+</context>
+<context>
+    <name>PulseTab</name>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="35"/>
+        <source>Done — %1 cycles completed</source>
+        <translation>Fertig — %1 Zyklen abgeschlossen</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="62"/>
+        <source>▶ START</source>
+        <translation>▶ START</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="62"/>
+        <source>■ STOP</source>
+        <translation>■ STOP</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="103"/>
+        <source>Pulse / Cycle Generator</source>
+        <translation>Puls- / Zyklusgenerator</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="113"/>
+        <source>ON setpoint</source>
+        <translation>EIN-Sollwert</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="123"/>
+        <location filename="../qml/PulseTab.qml" line="183"/>
+        <source>Voltage (V)</source>
+        <translation>Spannung (V)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="138"/>
+        <location filename="../qml/PulseTab.qml" line="197"/>
+        <source>Current (A)</source>
+        <translation>Strom (A)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="160"/>
+        <source>OFF setpoint</source>
+        <translation>AUS-Sollwert</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="170"/>
+        <source>Disable output during OFF</source>
+        <translation>Ausgang während AUS deaktivieren</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="218"/>
+        <source>Timing</source>
+        <translation>Zeitsteuerung</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="231"/>
+        <source>Period: %1 ms  |  Freq: %2 Hz  |  Duty: %3 %</source>
+        <translation>Periode: %1 ms  |  Freq: %2 Hz  |  Tastgrad: %3 %</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="242"/>
+        <source>ON time (ms)</source>
+        <translation>EIN-Zeit (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="253"/>
+        <source>OFF time (ms)</source>
+        <translation>AUS-Zeit (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="271"/>
+        <source>Cycles (0 = infinite)</source>
+        <translation>Zyklen (0 = unendlich)</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="281"/>
+        <source>∞</source>
+        <translation>∞</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="293"/>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="303"/>
+        <source>State:</source>
+        <translation>Zustand:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="309"/>
+        <source>Idle</source>
+        <translation>Inaktiv</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="310"/>
+        <source>ON</source>
+        <translation>EIN</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="311"/>
+        <source>OFF</source>
+        <translation>AUS</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="312"/>
+        <source>Done</source>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="315"/>
+        <source>Elapsed:</source>
+        <translation>Vergangen:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="323"/>
+        <source>Cycles done:</source>
+        <translation>Zyklen abgeschlossen:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="334"/>
+        <source>Actual V:</source>
+        <translation>Ist-Spannung:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="341"/>
+        <source>Actual I:</source>
+        <translation>Ist-Strom:</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="363"/>
+        <source>⚠ Device not connected</source>
+        <translation>⚠ Gerät nicht verbunden</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="386"/>
+        <source>Pulse Waveform</source>
+        <translation>Puls-Wellenform</translation>
     </message>
 </context>
 </TS>
