@@ -26,11 +26,7 @@ Rectangle {
     // ── Connections ──────────────────────────────────────────────────────────
     Connections {
         target: pulser
-        function onNewPoint(t, v, i)    { pulseChart.addPoint(t, v, i) }
-        function onStateChanged()       {
-            if (pulser.state === 0) pulseChart.clearVertical()  // Idle: just mark
-            if (pulser.state === 1) pulseChart.clearAll()       // new run starts
-        }
+        function onNewPoint(t, v, i) { pulseChart.addPoint(t, v, i) }
         function onFinished(cycles) {
             statusLabel.text = qsTr("Done — %1 cycles completed").arg(cycles)
         }
@@ -43,7 +39,7 @@ Rectangle {
 
         // ── Left: settings panel ─────────────────────────────────────────────
         Rectangle {
-            Layout.preferredWidth: 300
+            Layout.preferredWidth: 340
             Layout.fillHeight: true
             color: "#111820"
             radius: 0
@@ -70,14 +66,14 @@ Rectangle {
                         if (pulser.state === 0 || pulser.state === 3) {
                             pulseChart.clearAll()
                             pulser.start(
-                                onVoltSpin.value,
-                                onCurrSpin.value,
-                                offDisableCheck.checked ? 0.0 : offVoltSpin.value,
-                                offDisableCheck.checked ? 0.0 : offCurrSpin.value,
+                                backend.setVoltage,
+                                backend.setCurrent,
+                                offDisableCheck.checked ? 0.0 : offVoltSpin.value / 1000.0,
+                                offDisableCheck.checked ? 0.0 : offCurrSpin.value / 1000.0,
                                 offDisableCheck.checked,
                                 onTimeSpin.value,
                                 offTimeSpin.value,
-                                cyclesSpin.value   // 0 = infinite
+                                cyclesSpin.value
                             )
                         } else {
                             pulser.stop()
@@ -115,37 +111,22 @@ Rectangle {
                     }
                     Item { Layout.fillWidth: true; height: 4 }
 
-                    RowLayout {
+                    // ON state uses the main panel setpoints — no duplicate input needed
+                    Rectangle {
                         Layout.fillWidth: true; Layout.leftMargin: 12; Layout.rightMargin: 12
-                        spacing: 8
-                        ColumnLayout {
-                            spacing: 2; Layout.fillWidth: true
-                            Label { text: qsTr("Voltage (V)"); color: "#8899aa"; font.pixelSize: 11 }
-                            SpinBox {
-                                id: onVoltSpin
-                                Layout.fillWidth: true
-                                from: 0; to: Math.round(backend.nominalVoltage * 100)
-                                stepSize: 10; value: 500
-                                Material.theme: Material.Dark; wheelEnabled: true
-                                property real realValue: value / 100.0
-                                textFromValue: function(v) { return (v / 100).toFixed(2) }
-                                valueFromText: function(t) { return Math.round(parseFloat(t) * 100) }
-                                onValueModified: {}
+                        height: 44; radius: 6; color: "#0d1f0d"
+                        border.color: "#2e7d32"; border.width: 1
+                        RowLayout {
+                            anchors { fill: parent; leftMargin: 10; rightMargin: 10 }
+                            Label {
+                                text: qsTr("Uses main setpoint:")
+                                font.pixelSize: 11; color: "#8899aa"
                             }
-                        }
-                        ColumnLayout {
-                            spacing: 2; Layout.fillWidth: true
-                            Label { text: qsTr("Current (A)"); color: "#8899aa"; font.pixelSize: 11 }
-                            SpinBox {
-                                id: onCurrSpin
-                                Layout.fillWidth: true
-                                from: 0; to: Math.round(backend.nominalCurrent * 1000)
-                                stepSize: 50; value: 500
-                                Material.theme: Material.Dark; wheelEnabled: true
-                                property real realValue: value / 1000.0
-                                textFromValue: function(v) { return (v / 1000).toFixed(3) }
-                                valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
-                                onValueModified: {}
+                            Item { Layout.fillWidth: true }
+                            Label {
+                                font.pixelSize: 12; font.bold: true; color: "#81c784"
+                                text: backend.setVoltage.toFixed(2) + " V  /  " +
+                                      backend.setCurrent.toFixed(3) + " A"
                             }
                         }
                     }
@@ -183,13 +164,14 @@ Rectangle {
                             Label { text: qsTr("Voltage (V)"); color: "#8899aa"; font.pixelSize: 11 }
                             SpinBox {
                                 id: offVoltSpin
-                                Layout.fillWidth: true
-                                from: 0; to: Math.round(backend.nominalVoltage * 100)
-                                stepSize: 10; value: 0
+                                Layout.fillWidth: true; Layout.minimumWidth: 120
+                                // stored in mV (integer)
+                                from: 0; to: Math.round(backend.nominalVoltage * 1000)
+                                stepSize: 100; value: 0
                                 Material.theme: Material.Dark; wheelEnabled: true
-                                textFromValue: function(v) { return (v / 100).toFixed(2) }
-                                valueFromText: function(t) { return Math.round(parseFloat(t) * 100) }
-                                onValueModified: {}
+                                textFromValue: function(v) { return (v / 1000).toFixed(2) }
+                                valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]*\.?[0-9]*/ }
                             }
                         }
                         ColumnLayout {
@@ -197,13 +179,14 @@ Rectangle {
                             Label { text: qsTr("Current (A)"); color: "#8899aa"; font.pixelSize: 11 }
                             SpinBox {
                                 id: offCurrSpin
-                                Layout.fillWidth: true
+                                Layout.fillWidth: true; Layout.minimumWidth: 120
+                                // stored in mA (integer)
                                 from: 0; to: Math.round(backend.nominalCurrent * 1000)
-                                stepSize: 50; value: 0
+                                stepSize: 10; value: 0
                                 Material.theme: Material.Dark; wheelEnabled: true
                                 textFromValue: function(v) { return (v / 1000).toFixed(3) }
                                 valueFromText: function(t) { return Math.round(parseFloat(t) * 1000) }
-                                onValueModified: {}
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]*\.?[0-9]*/ }
                             }
                         }
                     }
@@ -242,8 +225,8 @@ Rectangle {
                             Label { text: qsTr("ON time (ms)"); color: "#8899aa"; font.pixelSize: 11 }
                             SpinBox {
                                 id: onTimeSpin
-                                Layout.fillWidth: true
-                                from: 50; to: 3600000; stepSize: 50; value: 500
+                                Layout.fillWidth: true; Layout.minimumWidth: 140
+                                from: 500; to: 3600000; stepSize: 100; value: 500
                                 Material.theme: Material.Dark; wheelEnabled: true
                                 onValueModified: {}
                             }
@@ -253,8 +236,8 @@ Rectangle {
                             Label { text: qsTr("OFF time (ms)"); color: "#8899aa"; font.pixelSize: 11 }
                             SpinBox {
                                 id: offTimeSpin
-                                Layout.fillWidth: true
-                                from: 50; to: 3600000; stepSize: 50; value: 500
+                                Layout.fillWidth: true; Layout.minimumWidth: 140
+                                from: 500; to: 3600000; stepSize: 100; value: 500
                                 Material.theme: Material.Dark; wheelEnabled: true
                                 onValueModified: {}
                             }

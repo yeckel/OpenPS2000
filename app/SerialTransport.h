@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QQueue>
+#include <QMap>
 #include <QAtomicInt>
 #include <QByteArray>
 #include <QString>
@@ -20,8 +21,13 @@ class SerialTransport : public QThread
 public:
     explicit SerialTransport(const QString& portName, QObject* parent = nullptr);
 
-    // Thread-safe; may be called from any thread to enqueue a command telegram.
+    // Thread-safe. Enqueues a command with coalescing: if a pending command
+    // for the same object already exists it is replaced by the newer one.
     void enqueueCommand(const QByteArray& telegram);
+
+    // Thread-safe. Clears all queued commands and prepends this one at the
+    // front of the queue. Used for emergency stop so it is never delayed.
+    void enqueueUrgent(const QByteArray& telegram);
 
     // Request graceful stop (thread-safe).
     void requestStop();
@@ -48,23 +54,21 @@ protected:
     void run() override;
 
 private:
-    // Read exactly `expected` bytes from serial port with timeout.
-    // Returns the bytes read; may be fewer on timeout.
     QByteArray readBytes(void* port, int expected, int timeoutMs = 300) const;
-
-    // Send telegram and read ACK (error response, 6 bytes).
-    // Returns true if acknowledged without error.
     bool sendAndAck(void* port, const QByteArray& telegram) const;
-
-    // Query an object and return the data bytes.
     QByteArray queryObject(void* port, uint8_t obj, int dataLen) const;
-
-    // Read all device info strings and nominal values.
     void readDeviceInfo(void* port);
 
     QString            m_portName;
     QAtomicInt         m_stopFlag{0};
     mutable QMutex     m_cmdMutex;
-    QQueue<QByteArray> m_cmdQueue;
+
+    // Coalescing queue: object-key → telegram, insertion-ordered via m_cmdOrder.
+    QMap<quint16, QByteArray> m_cmdMap;
+    QQueue<quint16>           m_cmdOrder;
+
+    // Urgent slot — always dequeued before m_cmdMap entries.
+    QByteArray m_urgentCmd;
+
     PS2000::DeviceInfo m_deviceInfo;
 };

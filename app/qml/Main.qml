@@ -653,6 +653,11 @@ ApplicationWindow {
                         Material.theme: Material.Dark
                         font.pixelSize: 13
                     }
+                    TabButton {
+                        text: qsTr("📋 Sequence")
+                        Material.theme: Material.Dark
+                        font.pixelSize: 13
+                    }
                 }
 
                 Rectangle { height: 1; Layout.fillWidth: true; color: "#1e2a3e" }
@@ -748,6 +753,10 @@ ApplicationWindow {
 
                     // ── Tab 2: Pulse / Cycle Generator ────────────────────
                     PulseTab {
+                    }
+
+                    // ── Tab 3: Sequence Program ───────────────────────────
+                    SequenceTab {
                     }
 
                 } // end StackLayout

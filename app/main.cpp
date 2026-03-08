@@ -11,6 +11,8 @@
 #include "DeviceBackend.h"
 #include "ChargerEngine.h"
 #include "PulseEngine.h"
+#include "SequenceEngine.h"
+#include "SequenceProfile.h"
 
 class LanguageChanger : public QObject
 {
@@ -120,9 +122,11 @@ int main(int argc, char* argv[])
         langChanger.setLanguage(chosen, /*save=*/false);
     }
 
-    DeviceBackend backend;
-    ChargerEngine charger;
-    PulseEngine   pulser;
+    DeviceBackend  backend;
+    ChargerEngine  charger;
+    PulseEngine    pulser;
+    SequenceEngine sequencer;
+    SequenceStore  seqStore;
 
     // Wire charger control signals → device backend slots
     QObject::connect(&charger, &ChargerEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
@@ -157,6 +161,19 @@ int main(int argc, char* argv[])
             pulser.stop();
     });
 
+    // Wire sequence engine control signals → device backend slots
+    QObject::connect(&sequencer, &SequenceEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
+    QObject::connect(&sequencer, &SequenceEngine::setCurrentRequested, &backend, &DeviceBackend::sendSetCurrent);
+    QObject::connect(&sequencer, &SequenceEngine::setOutputRequested,  &backend, &DeviceBackend::setOutputOn);
+    // Feed live measurements into sequence engine
+    QObject::connect(&backend, &DeviceBackend::newSample, &sequencer, &SequenceEngine::onSample);
+    // Stop sequencer if device disconnects
+    QObject::connect(&backend, &DeviceBackend::connectedChanged, &sequencer, [&]()
+    {
+        if(!backend.connected())
+            sequencer.stop();
+    });
+
     QQmlApplicationEngine engine;
     // Wire engine so setLanguage() can call retranslate() immediately
     langChanger.setEngine(&engine);
@@ -165,6 +182,8 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("langChanger", &langChanger);
     engine.rootContext()->setContextProperty("charger", &charger);
     engine.rootContext()->setContextProperty("pulser", &pulser);
+    engine.rootContext()->setContextProperty("sequencer", &sequencer);
+    engine.rootContext()->setContextProperty("seqStore", &seqStore);
 
     engine.loadFromModule("openps2000app", "Main");
 

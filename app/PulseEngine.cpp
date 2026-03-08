@@ -26,8 +26,8 @@ void PulseEngine::start(double onVoltage, double onCurrent,
     m_offVoltage  = offVoltage;
     m_offCurrent  = offCurrent;
     m_offDisable  = outputOffDuringOff;
-    m_onTimeMs    = qMax(50, onTimeMs);
-    m_offTimeMs   = qMax(50, offTimeMs);
+    m_onTimeMs    = qMax(500, onTimeMs);
+    m_offTimeMs   = qMax(500, offTimeMs);
     m_totalCycles = totalCycles;
     m_cyclesDone  = 0;
 

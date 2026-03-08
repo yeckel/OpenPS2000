@@ -43,6 +43,20 @@ Open-source **Qt 6 / QML / C++** desktop application for controlling
 - **Session statistics** — capacity (mAh), energy (Wh), duration, min/max V/I
 - **Safety limits** — maximum voltage, current, time enforced by the state machine
 
+### Pulse / Cycle Generator Tab
+Software-timed square-wave generator. ON phase uses the main-panel setpoint; OFF phase
+can either hold a lower setpoint or fully disable the output.
+
+| Parameter | Limit | Reason |
+|-----------|-------|--------|
+| Minimum ON or OFF time | **500 ms** | One command per transition; coalescing queue prevents pile-up |
+| Maximum practical frequency | **≈ 1 Hz** (500 ms + 500 ms) | Output-only mode (disable during OFF) |
+| Emergency stop latency | **≤ 250 ms** | Output-OFF is always prioritised; flushes any queued commands |
+
+> **Note:** The PSU processes one USB command per ~250 ms. Commands are coalesced
+> (a newer setpoint for the same object replaces any queued older one) so the queue
+> never grows unbounded. Emergency stop (`Space`) always bypasses the queue.
+
 ### User Interface
 - **Dark Material theme** throughout
 - **Keyboard shortcuts:**

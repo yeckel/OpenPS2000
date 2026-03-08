@@ -19,8 +19,22 @@ void SerialTransport::requestStop()
 
 void SerialTransport::enqueueCommand(const QByteArray& telegram)
 {
+    if (telegram.size() < 3) return;
+    // Key = (device_node << 8) | object — coalesce commands for the same object.
+    quint16 key = (quint8(telegram[1]) << 8) | quint8(telegram[2]);
     QMutexLocker lock(&m_cmdMutex);
-    m_cmdQueue.enqueue(telegram);
+    if (!m_cmdMap.contains(key))
+        m_cmdOrder.enqueue(key);   // preserve insertion order for new objects
+    m_cmdMap[key] = telegram;      // overwrite any older command for this object
+}
+
+void SerialTransport::enqueueUrgent(const QByteArray& telegram)
+{
+    QMutexLocker lock(&m_cmdMutex);
+    // Clear any pending normal commands — urgent takes over immediately.
+    m_cmdMap.clear();
+    m_cmdOrder.clear();
+    m_urgentCmd = telegram;
 }
 
 // ── Thread entry point ────────────────────────────────────────────────────
@@ -84,13 +98,16 @@ void SerialTransport::run()
     while(!m_stopFlag.loadAcquire())
     {
 
-        // Process one queued command if any.
+        // Dequeue next command: urgent slot first, then coalesced map.
         QByteArray cmd;
         {
             QMutexLocker lock(&m_cmdMutex);
-            if(!m_cmdQueue.isEmpty())
-            {
-                cmd = m_cmdQueue.dequeue();
+            if (!m_urgentCmd.isEmpty()) {
+                cmd = m_urgentCmd;
+                m_urgentCmd.clear();
+            } else if (!m_cmdOrder.isEmpty()) {
+                quint16 key = m_cmdOrder.dequeue();
+                cmd = m_cmdMap.take(key);
             }
         }
 

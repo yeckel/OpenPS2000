@@ -33,6 +33,8 @@ qt_add_executable(openps2000app
     BatteryProfile.h    BatteryProfile.cpp
     ChargerEngine.h     ChargerEngine.cpp
     PulseEngine.h       PulseEngine.cpp
+    SequenceProfile.h   SequenceProfile.cpp
+    SequenceEngine.h    SequenceEngine.cpp
 )
 
 qt_add_qml_module(openps2000app
@@ -45,6 +47,8 @@ qt_add_qml_module(openps2000app
         qml/ChargerTab.qml
         qml/PulseTab.qml
         qml/PulseChart.qml
+        qml/SequenceTab.qml
+        qml/SequenceChart.qml
 )
 
 target_link_libraries(openps2000app PRIVATE
@@ -112,6 +116,8 @@ qt_add_translations(openps2000app
         qml/ChargerTab.qml
         qml/PulseTab.qml
         qml/PulseChart.qml
+        qml/SequenceTab.qml
+        qml/SequenceChart.qml
     LUPDATE_OPTIONS
         -no-obsolete
 )

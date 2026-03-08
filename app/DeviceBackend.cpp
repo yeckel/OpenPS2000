@@ -159,10 +159,16 @@ void DeviceBackend::setRemoteMode(bool remote)
 
 void DeviceBackend::setOutputOn(bool on)
 {
-    sendCommand(PS2000::buildControl(
+    QByteArray telegram = PS2000::buildControl(
                     0,
                     PS2000::CTRL_OUTPUT_MASK,
-                    on ? PS2000::CTRL_OUTPUT_ON : PS2000::CTRL_OUTPUT_OFF));
+                    on ? PS2000::CTRL_OUTPUT_ON : PS2000::CTRL_OUTPUT_OFF);
+    if (!on && m_transport) {
+        // Output OFF is safety-critical — bypass and flush the command queue.
+        m_transport->enqueueUrgent(telegram);
+    } else {
+        sendCommand(telegram);
+    }
 }
 
 void DeviceBackend::sendSetVoltage(double voltage)

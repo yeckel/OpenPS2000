@@ -471,7 +471,7 @@ Please edit the profile or choose a different one.</source>
     </message>
     <message>
         <location filename="../qml/Main.qml" line="501"/>
-        <location filename="../qml/Main.qml" line="1061"/>
+        <location filename="../qml/Main.qml" line="1070"/>
         <source>Model</source>
         <translation>型号</translation>
     </message>
@@ -526,267 +526,272 @@ Please edit the profile or choose a different one.</source>
         <translation>〰 脉冲 / 循环</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="775"/>
+        <location filename="../qml/Main.qml" line="657"/>
+        <source>📋 Sequence</source>
+        <translation>📋 序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/Main.qml" line="784"/>
         <source>○ Not connected</source>
         <translation>○ 未连接</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="795"/>
+        <location filename="../qml/Main.qml" line="804"/>
         <source>⚠ Emergency stop — output disabled  [Esc]</source>
         <translation>⚠ 紧急停止 — 输出已禁用  [Esc]</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="855"/>
+        <location filename="../qml/Main.qml" line="864"/>
         <source>Enable Output?</source>
         <translation>启用输出？</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="884"/>
+        <location filename="../qml/Main.qml" line="893"/>
         <source>Turn on output with current setpoints:</source>
         <translation>使用当前设定值开启输出：</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="900"/>
+        <location filename="../qml/Main.qml" line="909"/>
         <source>Voltage:  %1 V</source>
         <translation>电压：%1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="904"/>
+        <location filename="../qml/Main.qml" line="913"/>
         <source>I limit:  %1 A</source>
         <translation>限流：%1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="911"/>
+        <location filename="../qml/Main.qml" line="920"/>
         <source>⚠  Verify the load can safely handle these settings.</source>
         <translation>⚠  请验证负载能安全处理这些设置。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="919"/>
+        <location filename="../qml/Main.qml" line="928"/>
         <source>Don&apos;t show again for this session</source>
         <translation>本次会话不再显示</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="931"/>
+        <location filename="../qml/Main.qml" line="940"/>
         <source>Enter / Y = Yes   ·   N / Esc = No</source>
         <translation>回车/Y=是  ·  N/Esc=否</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="982"/>
+        <location filename="../qml/Main.qml" line="991"/>
         <source>Version</source>
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="983"/>
+        <location filename="../qml/Main.qml" line="992"/>
         <source>License</source>
         <translation>许可证</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="984"/>
+        <location filename="../qml/Main.qml" line="993"/>
         <source>Author</source>
         <translation>作者</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="995"/>
+        <location filename="../qml/Main.qml" line="1004"/>
         <source>Source</source>
         <translation>源代码</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1013"/>
+        <location filename="../qml/Main.qml" line="1022"/>
         <source>Shortcuts</source>
         <translation>快捷键</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1016"/>
+        <location filename="../qml/Main.qml" line="1025"/>
         <source>Escape — Emergency stop (output off)</source>
         <translation>Escape — 紧急停止（关闭输出）</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1017"/>
+        <location filename="../qml/Main.qml" line="1026"/>
         <source>Space  — Toggle output (with confirmation)</source>
         <translation>空格 — 切换输出（需确认）</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1018"/>
+        <location filename="../qml/Main.qml" line="1027"/>
         <source>Ctrl+↑/↓ — Voltage ±0.1 V</source>
         <translation>Ctrl+↑/↓ — 电压 ±0.1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1019"/>
+        <location filename="../qml/Main.qml" line="1028"/>
         <source>Ctrl+←/→ — Current ±0.01 A</source>
         <translation>Ctrl+←/→ — 电流 ±0.01 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1026"/>
+        <location filename="../qml/Main.qml" line="1035"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1045"/>
+        <location filename="../qml/Main.qml" line="1054"/>
         <source>CONNECTED DEVICE</source>
         <translation>已连接设备</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1062"/>
+        <location filename="../qml/Main.qml" line="1071"/>
         <source>Article No.</source>
         <translation>货号</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1063"/>
+        <location filename="../qml/Main.qml" line="1072"/>
         <source>Serial No.</source>
         <translation>序列号</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1064"/>
+        <location filename="../qml/Main.qml" line="1073"/>
         <source>Firmware</source>
         <translation>固件</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1065"/>
+        <location filename="../qml/Main.qml" line="1074"/>
         <source>Nom. Voltage</source>
         <translation>额定电压</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1066"/>
+        <location filename="../qml/Main.qml" line="1075"/>
         <source>Nom. Current</source>
         <translation>额定电流</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1067"/>
+        <location filename="../qml/Main.qml" line="1076"/>
         <source>Nom. Power</source>
         <translation>额定功率</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1068"/>
+        <location filename="../qml/Main.qml" line="1077"/>
         <source>Samples</source>
         <translation>采样数</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1068"/>
+        <location filename="../qml/Main.qml" line="1077"/>
         <source>(session)</source>
         <translation>（本次会话）</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1139"/>
+        <location filename="../qml/Main.qml" line="1148"/>
         <source>📊  Range Analysis</source>
         <translation>📊  范围分析</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1145"/>
+        <location filename="../qml/Main.qml" line="1154"/>
         <source>Δt %1 s   n = %2</source>
         <translation>Δt %1 s   n = %2</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1169"/>
+        <location filename="../qml/Main.qml" line="1178"/>
         <source>VOLTAGE</source>
         <translation>电压</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1170"/>
+        <location filename="../qml/Main.qml" line="1179"/>
         <source>CURRENT</source>
         <translation>电流</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1171"/>
+        <location filename="../qml/Main.qml" line="1180"/>
         <source>POWER</source>
         <translation>功率</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1172"/>
+        <location filename="../qml/Main.qml" line="1181"/>
         <source>ENERGY</source>
         <translation>能量</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1175"/>
+        <location filename="../qml/Main.qml" line="1184"/>
         <source>Mean  %1 V</source>
         <translation>均值  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1176"/>
+        <location filename="../qml/Main.qml" line="1185"/>
         <source>Mean  %1 A</source>
         <translation>均值  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1177"/>
+        <location filename="../qml/Main.qml" line="1186"/>
         <source>Mean  %1 W</source>
         <translation>均值  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1181"/>
+        <location filename="../qml/Main.qml" line="1190"/>
         <source>Min   %1 V</source>
         <translation>最小  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1182"/>
+        <location filename="../qml/Main.qml" line="1191"/>
         <source>Min   %1 A</source>
         <translation>最小  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1183"/>
+        <location filename="../qml/Main.qml" line="1192"/>
         <source>Min   %1 W</source>
         <translation>最小  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1187"/>
+        <location filename="../qml/Main.qml" line="1196"/>
         <source>Max   %1 V</source>
         <translation>最大  %1 V</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1188"/>
+        <location filename="../qml/Main.qml" line="1197"/>
         <source>Max   %1 A</source>
         <translation>最大  %1 A</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1189"/>
+        <location filename="../qml/Main.qml" line="1198"/>
         <source>Max   %1 W</source>
         <translation>最大  %1 W</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1198"/>
+        <location filename="../qml/Main.qml" line="1207"/>
         <source>⚠ Protection Alarm Triggered</source>
         <translation>⚠ 保护报警已触发</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1242"/>
+        <location filename="../qml/Main.qml" line="1251"/>
         <source>OVP — Over-Voltage Protection: output voltage exceeded the set limit.</source>
         <translation>OVP — 过压保护：输出电压超过设定限值。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1243"/>
+        <location filename="../qml/Main.qml" line="1252"/>
         <source>OCP — Over-Current Protection: output current exceeded the set limit.</source>
         <translation>OCP — 过流保护：输出电流超过设定限值。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1244"/>
+        <location filename="../qml/Main.qml" line="1253"/>
         <source>OPP — Over-Power Protection: output power exceeded the set limit.</source>
         <translation>OPP — 过功率保护：输出功率超过设定限值。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1245"/>
+        <location filename="../qml/Main.qml" line="1254"/>
         <source>OTP — Over-Temperature Protection: device is too hot.</source>
         <translation>OTP — 过温保护：设备过热。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1254"/>
+        <location filename="../qml/Main.qml" line="1263"/>
         <source>The output has been turned off. Remove the fault condition, then acknowledge the alarm to resume operation.</source>
         <translation>输出已关闭。请排除故障条件，然后确认报警以恢复运行。</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1265"/>
+        <location filename="../qml/Main.qml" line="1274"/>
         <source>Acknowledge Alarm</source>
         <translation>确认报警</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1275"/>
+        <location filename="../qml/Main.qml" line="1284"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1286"/>
+        <location filename="../qml/Main.qml" line="1295"/>
         <source>Save CSV</source>
         <translation>保存 CSV</translation>
     </message>
     <message>
-        <location filename="../qml/Main.qml" line="1295"/>
+        <location filename="../qml/Main.qml" line="1304"/>
         <source>Save Excel</source>
         <translation>保存 Excel</translation>
     </message>
@@ -812,141 +817,316 @@ Please edit the profile or choose a different one.</source>
 <context>
     <name>PulseTab</name>
     <message>
-        <location filename="../qml/PulseTab.qml" line="35"/>
+        <location filename="../qml/PulseTab.qml" line="31"/>
         <source>Done — %1 cycles completed</source>
         <translation>完成 — 已完成 %1 个循环</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="62"/>
+        <location filename="../qml/PulseTab.qml" line="58"/>
         <source>▶ START</source>
         <translation>▶ 启动</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="62"/>
+        <location filename="../qml/PulseTab.qml" line="58"/>
         <source>■ STOP</source>
         <translation>■ 停止</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="103"/>
+        <location filename="../qml/PulseTab.qml" line="99"/>
         <source>Pulse / Cycle Generator</source>
         <translation>脉冲 / 循环发生器</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="113"/>
+        <location filename="../qml/PulseTab.qml" line="109"/>
         <source>ON setpoint</source>
         <translation>导通设定值</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="123"/>
-        <location filename="../qml/PulseTab.qml" line="183"/>
+        <location filename="../qml/PulseTab.qml" line="164"/>
         <source>Voltage (V)</source>
         <translation>电压 (V)</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="138"/>
-        <location filename="../qml/PulseTab.qml" line="197"/>
+        <location filename="../qml/PulseTab.qml" line="179"/>
         <source>Current (A)</source>
         <translation>电流 (A)</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="160"/>
+        <location filename="../qml/PulseTab.qml" line="141"/>
         <source>OFF setpoint</source>
         <translation>截止设定值</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="170"/>
+        <location filename="../qml/PulseTab.qml" line="122"/>
+        <source>Uses main setpoint:</source>
+        <translation>使用主设定值：</translation>
+    </message>
+    <message>
+        <location filename="../qml/PulseTab.qml" line="151"/>
         <source>Disable output during OFF</source>
         <translation>截止期间禁用输出</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="218"/>
+        <location filename="../qml/PulseTab.qml" line="201"/>
         <source>Timing</source>
         <translation>时序</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="231"/>
+        <location filename="../qml/PulseTab.qml" line="214"/>
         <source>Period: %1 ms  |  Freq: %2 Hz  |  Duty: %3 %</source>
         <translation>周期: %1 ms  |  频率: %2 Hz  |  占空比: %3 %</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="242"/>
+        <location filename="../qml/PulseTab.qml" line="225"/>
         <source>ON time (ms)</source>
         <translation>导通时间 (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="253"/>
+        <location filename="../qml/PulseTab.qml" line="236"/>
         <source>OFF time (ms)</source>
         <translation>截止时间 (ms)</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="271"/>
+        <location filename="../qml/PulseTab.qml" line="254"/>
         <source>Cycles (0 = infinite)</source>
         <translation>循环次数 (0 = 无限)</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="281"/>
+        <location filename="../qml/PulseTab.qml" line="264"/>
         <source>∞</source>
         <translation>∞</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="293"/>
+        <location filename="../qml/PulseTab.qml" line="276"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="303"/>
+        <location filename="../qml/PulseTab.qml" line="286"/>
         <source>State:</source>
         <translation>状态:</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="309"/>
+        <location filename="../qml/PulseTab.qml" line="292"/>
         <source>Idle</source>
         <translation>空闲</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="310"/>
+        <location filename="../qml/PulseTab.qml" line="293"/>
         <source>ON</source>
         <translation>导通</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="311"/>
+        <location filename="../qml/PulseTab.qml" line="294"/>
         <source>OFF</source>
         <translation>截止</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="312"/>
+        <location filename="../qml/PulseTab.qml" line="295"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="315"/>
+        <location filename="../qml/PulseTab.qml" line="298"/>
         <source>Elapsed:</source>
         <translation>已用时:</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="323"/>
+        <location filename="../qml/PulseTab.qml" line="306"/>
         <source>Cycles done:</source>
         <translation>已完成循环:</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="334"/>
+        <location filename="../qml/PulseTab.qml" line="317"/>
         <source>Actual V:</source>
         <translation>实际电压:</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="341"/>
+        <location filename="../qml/PulseTab.qml" line="324"/>
         <source>Actual I:</source>
         <translation>实际电流:</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="363"/>
+        <location filename="../qml/PulseTab.qml" line="346"/>
         <source>⚠ Device not connected</source>
         <translation>⚠ 设备未连接</translation>
     </message>
     <message>
-        <location filename="../qml/PulseTab.qml" line="386"/>
+        <location filename="../qml/PulseTab.qml" line="369"/>
         <source>Pulse Waveform</source>
         <translation>脉冲波形</translation>
+    </message>
+</context>
+<context>
+    <name>SequenceChart</name>
+    <message>
+        <location filename="../qml/SequenceChart.qml" line="30"/>
+        <source>Start the sequence to see the chart</source>
+        <translation>启动序列以查看图表</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceChart.qml" line="117"/>
+        <source>V actual</source>
+        <translation>实际电压</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceChart.qml" line="119"/>
+        <source>I actual</source>
+        <translation>实际电流</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceChart.qml" line="121"/>
+        <source>V planned</source>
+        <translation>计划电压</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceChart.qml" line="123"/>
+        <source>I planned</source>
+        <translation>计划电流</translation>
+    </message>
+</context>
+<context>
+    <name>SequenceTab</name>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="47"/>
+        <source>Sequence complete</source>
+        <translation>序列完成</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="48"/>
+        <source>Fault: </source>
+        <translation>故障：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="50"/>
+        <source>Step %1 of %2</source>
+        <translation>步骤 %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="72"/>
+        <source>▶ RUN</source>
+        <translation>▶ 运行</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="72"/>
+        <source>■ STOP</source>
+        <translation>■ 停止</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="103"/>
+        <source>Sequence Program</source>
+        <translation>序列程序</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="128"/>
+        <source>New Sequence</source>
+        <translation>新序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="157"/>
+        <source>Delete Sequence</source>
+        <translation>删除序列</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="160"/>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>删除 &quot;%1&quot;？</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="173"/>
+        <source>Sequence name</source>
+        <translation>序列名称</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="185"/>
+        <source>Steps</source>
+        <translation>步骤</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="186"/>
+        <source>Total: </source>
+        <translation>总计：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="210"/>
+        <source>Step %1</source>
+        <translation>步骤 %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="247"/>
+        <source>V (V)</source>
+        <translation>电压 (V)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="264"/>
+        <source>I (A)</source>
+        <translation>电流 (A)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="287"/>
+        <source>Ramp</source>
+        <translation>斜坡</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="300"/>
+        <source>Ramp (ms)</source>
+        <translation>斜坡 (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="315"/>
+        <source>Hold (ms)</source>
+        <translation>保持 (ms)</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="335"/>
+        <source>+ Add Step</source>
+        <translation>+ 添加步骤</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="351"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="362"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="410"/>
+        <source>Progress</source>
+        <translation>进度</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="415"/>
+        <location filename="../qml/SequenceTab.qml" line="449"/>
+        <source>Step:</source>
+        <translation>步骤：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="428"/>
+        <source>Total:</source>
+        <translation>总计：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="442"/>
+        <source>Phase:</source>
+        <translation>阶段：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="455"/>
+        <source>Elapsed:</source>
+        <translation>已用时间：</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="471"/>
+        <source>⚠ Device not connected</source>
+        <translation>⚠ 设备未连接</translation>
+    </message>
+    <message>
+        <location filename="../qml/SequenceTab.qml" line="489"/>
+        <source>Sequence Chart</source>
+        <translation>序列图表</translation>
     </message>
 </context>
 </TS>
