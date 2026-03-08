@@ -315,7 +315,8 @@ Dialog {
             if      (ext === "xlsx") ok = seqStore.loadFromXlsx(file)
             else if (ext === "ods")  ok = seqStore.loadFromOds(file)
             else                     ok = seqStore.loadFromFile(file)
-            if (!ok) importErrorDialog.show(seqStore.lastImportError())
+            if (ok) { root.close(); root.saved() }
+            else importErrorDialog.show(seqStore.lastImportError())
         }
     }
 

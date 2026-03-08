@@ -188,7 +188,8 @@ Rectangle {
                             if      (ext === "xlsx") ok = seqStore.loadFromXlsx(file)
                             else if (ext === "ods")  ok = seqStore.loadFromOds(file)
                             else                     ok = seqStore.loadFromFile(file)
-                            if (!ok) tabImportErrorDialog.show(seqStore.lastImportError())
+                            if (ok) seqCombo.currentIndex = seqStore.count - 1
+                            else tabImportErrorDialog.show(seqStore.lastImportError())
                         }
                     }
 
