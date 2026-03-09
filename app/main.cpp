@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
         langChanger.setLanguage(chosen, /*save=*/false);
     }
 
-    // ── Engines (always created; wiring only when using local backend) ─────────
+    // ── Engines (always created; wired to whichever backend is active) ────────
     ChargerEngine   chargerObj;
     PulseEngine     pulserObj;
     SequenceEngine  sequencerObj;
@@ -205,10 +205,6 @@ int main(int argc, char* argv[])
         QObject::connect(charger, &ChargerEngine::setOutputRequested,  localBackend, &DeviceBackend::setOutputOn);
         QObject::connect(localBackend, &DeviceBackend::newSample,      charger,      &ChargerEngine::onSample);
         QObject::connect(charger,      &ChargerEngine::statusMessage,  localBackend, &DeviceBackend::statusMessage);
-        QObject::connect(localBackend, &DeviceBackend::connectedChanged, charger, [charger]() {
-            if (!charger->parent()) return; // guard
-            // property check done via lambda capture
-        });
         QObject::connect(localBackend, &DeviceBackend::connectedChanged, charger, [localBackend, charger]() {
             if (!localBackend->connected()) charger->stopCharging();
         });
@@ -230,6 +226,38 @@ int main(int argc, char* argv[])
         QObject::connect(localBackend, &DeviceBackend::newSample,          sequencer,    &SequenceEngine::onSample);
         QObject::connect(localBackend, &DeviceBackend::connectedChanged, sequencer, [localBackend, sequencer]() {
             if (!localBackend->connected()) sequencer->stop();
+        });
+
+    } else if (remoteBackend) {
+
+        // Wire charger → RemoteBackend (forwards commands as REST PUT requests)
+        QObject::connect(charger, &ChargerEngine::setVoltageRequested, remoteBackend, &RemoteBackend::sendSetVoltage);
+        QObject::connect(charger, &ChargerEngine::setCurrentRequested, remoteBackend, &RemoteBackend::sendSetCurrent);
+        QObject::connect(charger, &ChargerEngine::setOvpRequested,     remoteBackend, &RemoteBackend::sendOvpVoltage);
+        QObject::connect(charger, &ChargerEngine::setOcpRequested,     remoteBackend, &RemoteBackend::sendOcpCurrent);
+        QObject::connect(charger, &ChargerEngine::setOutputRequested,  remoteBackend, &RemoteBackend::setOutputOn);
+        QObject::connect(remoteBackend, &RemoteBackend::newSample,     charger,       &ChargerEngine::onSample);
+        QObject::connect(remoteBackend, &RemoteBackend::connectedChanged, charger, [remoteBackend, charger]() {
+            if (!remoteBackend->connected()) charger->stopCharging();
+        });
+
+        // Wire pulser → RemoteBackend
+        QObject::connect(pulser, &PulseEngine::setVoltageRequested,      remoteBackend, &RemoteBackend::sendSetVoltage);
+        QObject::connect(pulser, &PulseEngine::setCurrentRequested,      remoteBackend, &RemoteBackend::sendSetCurrent);
+        QObject::connect(pulser, &PulseEngine::setOutputRequested,       remoteBackend, &RemoteBackend::setOutputOn);
+        QObject::connect(pulser, &PulseEngine::setOutputQueuedRequested, remoteBackend, &RemoteBackend::setOutputOnQueued);
+        QObject::connect(remoteBackend, &RemoteBackend::newSample,        pulser,        &PulseEngine::onSample);
+        QObject::connect(remoteBackend, &RemoteBackend::connectedChanged, pulser, [remoteBackend, pulser]() {
+            if (!remoteBackend->connected()) pulser->stop();
+        });
+
+        // Wire sequencer → RemoteBackend
+        QObject::connect(sequencer, &SequenceEngine::setVoltageRequested, remoteBackend, &RemoteBackend::sendSetVoltage);
+        QObject::connect(sequencer, &SequenceEngine::setCurrentRequested, remoteBackend, &RemoteBackend::sendSetCurrent);
+        QObject::connect(sequencer, &SequenceEngine::setOutputRequested,  remoteBackend, &RemoteBackend::setOutputOn);
+        QObject::connect(remoteBackend, &RemoteBackend::newSample,         sequencer,     &SequenceEngine::onSample);
+        QObject::connect(remoteBackend, &RemoteBackend::connectedChanged, sequencer, [remoteBackend, sequencer]() {
+            if (!remoteBackend->connected()) sequencer->stop();
         });
     }
 
