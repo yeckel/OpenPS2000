@@ -116,8 +116,12 @@ void RemoteBackend::poll()
         if (flagsChanged) emit statusFlagsChanged();
         emit energyChanged(m_energyWh);
 
-        const double t = QDateTime::currentMSecsSinceEpoch() / 1000.0;
-        if (m_lastT < 0) m_lastT = t;
+        // Use session-relative time (seconds since first sample) so the chart
+        // X-axis shows small elapsed values identical to local-backend behaviour.
+        const double epoch = QDateTime::currentMSecsSinceEpoch() / 1000.0;
+        if (m_startTime < 0) m_startTime = epoch;
+        const double t = epoch - m_startTime;
+
         DataRecord rec;
         rec.timestamp = t;
         rec.voltage   = v;
@@ -167,6 +171,9 @@ void RemoteBackend::connectDevice(const QString& /*portName*/)
 void RemoteBackend::disconnectDevice()
 {
     m_pollTimer->stop();
+    m_startTime = -1.0;
+    m_lastT     = -1.0;
+    m_readings.clear();
     if (m_connected) {
         m_connected = false;
         emit connectedChanged(false);

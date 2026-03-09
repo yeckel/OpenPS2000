@@ -165,7 +165,8 @@ private:
     bool m_otpActive  = false;
 
     QVector<DataRecord> m_readings;
-    double  m_energyWh = 0.0;
-    double  m_lastT    = -1.0;
-    QString m_duration = "00:00:00";
+    double  m_energyWh  = 0.0;
+    double  m_startTime = -1.0;   // epoch seconds of first sample — used to make t relative
+    double  m_lastT     = -1.0;
+    QString m_duration  = "00:00:00";
 };
