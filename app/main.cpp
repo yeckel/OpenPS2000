@@ -173,16 +173,18 @@ int main(int argc, char* argv[])
         langChanger.setLanguage(chosen, /*save=*/false);
     }
 
-    // ── Engines (local only) ───────────────────────────────────────────────
-    ChargerEngine*  charger   = nullptr;
-    PulseEngine*    pulser    = nullptr;
-    SequenceEngine* sequencer = nullptr;
-    SequenceStore*  seqStore  = new SequenceStore();
+    // ── Engines (always created; wiring only when using local backend) ─────────
+    ChargerEngine   chargerObj;
+    PulseEngine     pulserObj;
+    SequenceEngine  sequencerObj;
+    SequenceStore   seqStoreObj;
+
+    ChargerEngine*  charger   = &chargerObj;
+    PulseEngine*    pulser    = &pulserObj;
+    SequenceEngine* sequencer = &sequencerObj;
+    SequenceStore*  seqStore  = &seqStoreObj;
 
     if (localBackend) {
-        charger   = new ChargerEngine();
-        pulser    = new PulseEngine();
-        sequencer = new SequenceEngine();
 
         // Wire charger
         QObject::connect(charger, &ChargerEngine::setVoltageRequested, localBackend, &DeviceBackend::sendSetVoltage);
@@ -290,23 +292,14 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("langChanger",  &langChanger);
     engine.rootContext()->setContextProperty("trayManager",  &trayMgr);
     engine.rootContext()->setContextProperty("isRemoteMode",  isRemote);
-
-    if (localBackend) {
-        engine.rootContext()->setContextProperty("charger",    charger);
-        engine.rootContext()->setContextProperty("pulser",     pulser);
-        engine.rootContext()->setContextProperty("sequencer",  sequencer);
-        engine.rootContext()->setContextProperty("seqStore",   seqStore);
-        engine.rootContext()->setContextProperty("remoteServer", remoteServer);
-        engine.rootContext()->setContextProperty("mqttClient",   mqttClient);
-    } else {
-        // Provide null-safe stubs so QML bindings don't crash
-        engine.rootContext()->setContextProperty("charger",      QVariant());
-        engine.rootContext()->setContextProperty("pulser",       QVariant());
-        engine.rootContext()->setContextProperty("sequencer",    QVariant());
-        engine.rootContext()->setContextProperty("seqStore",     QVariant());
-        engine.rootContext()->setContextProperty("remoteServer", QVariant());
-        engine.rootContext()->setContextProperty("mqttClient",   QVariant());
-    }
+    // Engines always registered (in remote mode they're idle dummies — QML tabs stay functional)
+    engine.rootContext()->setContextProperty("charger",    charger);
+    engine.rootContext()->setContextProperty("pulser",     pulser);
+    engine.rootContext()->setContextProperty("sequencer",  sequencer);
+    engine.rootContext()->setContextProperty("seqStore",   seqStore);
+    // REST / MQTT only available in primary mode
+    engine.rootContext()->setContextProperty("remoteServer", remoteServer ? static_cast<QObject*>(remoteServer) : nullptr);
+    engine.rootContext()->setContextProperty("mqttClient",   mqttClient   ? static_cast<QObject*>(mqttClient)   : nullptr);
 
     // Give the tray manager the root window once QML loads
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

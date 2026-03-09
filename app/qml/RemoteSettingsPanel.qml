@@ -11,8 +11,8 @@ ColumnLayout {
     id: root
     spacing: 0
 
-    required property var remoteServer
-    required property var mqttClient
+    // remoteServer and mqttClient are accessed directly from QML context properties
+    // (no required property — using same name would cause a binding loop)
 
     // ── Persistent settings ─────────────────────────────────────────────
     Settings {

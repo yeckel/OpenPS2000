@@ -1121,8 +1121,6 @@ ApplicationWindow {
 
                 RemoteSettingsPanel {
                     Layout.fillWidth: true
-                    remoteServer: isRemoteMode ? null : remoteServer
-                    mqttClient:   isRemoteMode ? null : mqttClient
                 }
             }
         }
