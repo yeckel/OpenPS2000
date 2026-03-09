@@ -117,20 +117,31 @@ int main(int argc, char* argv[])
     QString remoteUrl;
     bool    isRemote = false;
 
+    auto normalizeUrl = [](QString url) -> QString {
+        if (!url.startsWith("http://") && !url.startsWith("https://"))
+            url = "http://" + url;
+        QUrl u(url);
+        if (u.port() == -1) { u.setPort(8484); url = u.toString(); }
+        // strip trailing slash
+        if (url.endsWith('/')) url.chop(1);
+        return url;
+    };
+
     if (cli.isSet(remoteOpt)) {
-        remoteUrl = cli.value(remoteOpt);
+        remoteUrl = normalizeUrl(cli.value(remoteOpt));
         isRemote  = true;
     } else {
-        // Auto-detect: probe default localhost server with 500 ms timeout
+        // Auto-detect: probe 127.0.0.1 directly (avoids IPv6 localhost ambiguity)
+        // Give a generous 800 ms – the reply will arrive much sooner on a connection refuse
         QNetworkAccessManager probeNam;
         QNetworkReply* reply = probeNam.get(
-            QNetworkRequest(QUrl("http://localhost:8484/api/v1/info")));
+            QNetworkRequest(QUrl("http://127.0.0.1:8484/api/v1/info")));
         QEventLoop loop;
-        QTimer::singleShot(500, &loop, &QEventLoop::quit);
+        QTimer::singleShot(800, &loop, &QEventLoop::quit);
         QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
         loop.exec();
         if (reply->error() == QNetworkReply::NoError) {
-            remoteUrl = "http://localhost:8484";
+            remoteUrl = "http://127.0.0.1:8484";
             isRemote  = true;
         }
         reply->deleteLater();

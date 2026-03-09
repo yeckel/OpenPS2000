@@ -18,11 +18,11 @@ ColumnLayout {
     Settings {
         id: remoteSettings
         category: "remote"
-        property int  restPort:    8484
+        property string restPort:    "8484"
         property bool restEnabled: false
         property bool mqttEnabled: false
         property string mqttHost:   "localhost"
-        property int    mqttPort:   1883
+        property string mqttPort:   "1883"
         property string mqttPrefix: "openps2000"
         property string mqttUser:   ""
         property bool   mqttTls:    false
@@ -50,10 +50,10 @@ ColumnLayout {
                 checked: remoteSettings.restEnabled
                 onCheckedChanged: {
                     remoteSettings.restEnabled = checked
-                    if (checked && root.remoteServer)
-                        root.remoteServer.start(remoteSettings.restPort, restTokenField.text)
-                    else if (!checked && root.remoteServer)
-                        root.remoteServer.stop()
+                    if (checked && remoteServer)
+                        remoteServer.start(parseInt(restPortField.text) || 8484, restTokenField.text)
+                    else if (!checked && remoteServer)
+                        remoteServer.stop()
                 }
             }
         }
@@ -61,13 +61,16 @@ ColumnLayout {
         RowLayout {
             spacing: 8
             Label { text: qsTr("Port"); color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 60 }
-            SpinBox {
-                id: restPortSpin
-                from: 1024; to: 65535
-                value: remoteSettings.restPort
-                enabled: !(root.remoteServer && root.remoteServer.running)
-                onValueChanged: remoteSettings.restPort = value
-                implicitWidth: 110
+            TextField {
+                id: restPortField
+                text: remoteSettings.restPort
+                onTextChanged: remoteSettings.restPort = text
+                enabled: !(remoteServer && remoteServer.running)
+                implicitWidth: 80
+                color: "#aabbcc"
+                placeholderText: "8484"
+                inputMethodHints: Qt.ImhDigitsOnly
+                background: Rectangle { color: "#0a1525"; border.color: "#2a4060"; radius: 4 }
             }
         }
 
@@ -90,11 +93,11 @@ ColumnLayout {
             spacing: 6
             Rectangle {
                 width: 8; height: 8; radius: 4
-                color: (root.remoteServer && root.remoteServer.running) ? "#44cc66" : "#cc4444"
+                color: (remoteServer && remoteServer.running) ? "#44cc66" : "#cc4444"
             }
             Label {
-                text: (root.remoteServer && root.remoteServer.running)
-                      ? qsTr("Running on port %1").arg(root.remoteServer.port)
+                text: (remoteServer && remoteServer.running)
+                      ? qsTr("Running on port %1").arg(remoteServer.port)
                       : qsTr("Stopped")
                 color: "#7799bb"; font.pixelSize: 11
             }
@@ -145,11 +148,15 @@ ColumnLayout {
             spacing: 8
             enabled: mqttSwitch.checked
             Label { text: qsTr("Port"); color: "#556677"; font.pixelSize: 12; Layout.preferredWidth: 60 }
-            SpinBox {
-                from: 1; to: 65535
-                value: remoteSettings.mqttPort
-                onValueChanged: remoteSettings.mqttPort = value
-                implicitWidth: 110
+            TextField {
+                id: mqttPortField
+                text: remoteSettings.mqttPort
+                onTextChanged: remoteSettings.mqttPort = text
+                implicitWidth: 80
+                color: "#aabbcc"
+                placeholderText: "1883"
+                inputMethodHints: Qt.ImhDigitsOnly
+                background: Rectangle { color: "#0a1525"; border.color: "#2a4060"; radius: 4 }
             }
         }
 
@@ -210,22 +217,22 @@ ColumnLayout {
             spacing: 8
             enabled: mqttSwitch.checked
             Button {
-                text: (root.mqttClient && root.mqttClient.connected) ? qsTr("Disconnect") : qsTr("Connect")
-                highlighted: !(root.mqttClient && root.mqttClient.connected)
+                text: (mqttClient && mqttClient.connected) ? qsTr("Disconnect") : qsTr("Connect")
+                highlighted: !(mqttClient && mqttClient.connected)
                 onClicked: {
-                    if (!root.mqttClient) return
-                    if (root.mqttClient.connected) {
-                        root.mqttClient.disconnectFromBroker()
+                    if (!mqttClient) return
+                    if (mqttClient.connected) {
+                        mqttClient.disconnectFromBroker()
                     } else {
-                        root.mqttClient.configure(
+                        mqttClient.configure(
                             mqttHostField.text,
-                            remoteSettings.mqttPort,
+                            parseInt(mqttPortField.text) || 1883,
                             mqttPrefixField.text,
                             mqttUserField.text,
                             mqttPassField.text,
                             mqttTlsBox.checked
                         )
-                        root.mqttClient.connectToBroker()
+                        mqttClient.connectToBroker()
                     }
                 }
             }
@@ -233,10 +240,10 @@ ColumnLayout {
             // Status indicator
             Rectangle {
                 width: 8; height: 8; radius: 4
-                color: (root.mqttClient && root.mqttClient.connected) ? "#44cc66" : "#cc4444"
+                color: (mqttClient && mqttClient.connected) ? "#44cc66" : "#cc4444"
             }
             Label {
-                text: root.mqttClient ? root.mqttClient.status : qsTr("N/A")
+                text: mqttClient ? mqttClient.status : qsTr("N/A")
                 color: "#7799bb"; font.pixelSize: 11
                 Layout.fillWidth: true
                 elide: Text.ElideRight

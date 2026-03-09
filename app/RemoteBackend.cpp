@@ -22,7 +22,13 @@ RemoteBackend::RemoteBackend(const QString& url, QObject* parent)
     m_pollTimer->setInterval(500);
     connect(m_pollTimer, &QTimer::timeout, this, &RemoteBackend::poll);
 
+    // Auto-connect: fetch device info then start polling immediately.
+    // The user doesn't need to click "Connect" in remote mode.
     fetchInfo();
+    m_pollTimer->start();
+    m_connected = true;
+    // Defer signal until event loop is running
+    QTimer::singleShot(0, this, [this]() { emit connectedChanged(true); });
 }
 
 RemoteBackend::~RemoteBackend() = default;

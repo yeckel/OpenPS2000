@@ -814,6 +814,22 @@ ApplicationWindow {
                     color: backend.connected ? "#4eff90" : "#556677"
                     font.pixelSize: 12
                 }
+
+                // REST API status
+                Label {
+                    visible: remoteServer !== null && remoteServer !== undefined
+                    text: (remoteServer && remoteServer.running) ? "⬡ REST:" + remoteServer.port : ""
+                    color: "#4dc8ff"
+                    font.pixelSize: 11
+                }
+
+                // MQTT status
+                Label {
+                    visible: mqttClient !== null && mqttClient !== undefined
+                    text: (mqttClient && mqttClient.connected) ? "⬡ MQTT" : ""
+                    color: "#b068ff"
+                    font.pixelSize: 11
+                }
             }
         }
     }
