@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 env:
-  QT_VERSION: '6.8.3'
+  QT_VERSION: '6.9.2'
 
 jobs:
   # ── Linux ─────────────────────────────────────────────────────────────────
@@ -30,7 +30,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          modules: 'qtserialport qtmqtt'
+          modules: 'qtserialport'
 
       - name: Build
         run: |
@@ -79,7 +79,7 @@ jobs:
         with:
           version: ${{ env.QT_VERSION }}
           arch: win64_msvc2022_64
-          modules: 'qtserialport qtmqtt'
+          modules: 'qtserialport'
 
       - uses: ilammy/msvc-dev-cmd@v1
 
@@ -117,7 +117,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          modules: 'qtserialport qtmqtt'
+          modules: 'qtserialport'
 
       - name: Build
         run: |
