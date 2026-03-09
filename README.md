@@ -1,7 +1,8 @@
 # ⚡ OpenPS2000
 
 Open-source **Qt 6 / QML / C++** desktop application for controlling
-**EA Elektro-Automatik PS 2000 B** laboratory power supplies over USB.
+**EA Elektro-Automatik PS 2000 B** laboratory power supplies over USB or **remotely**
+over a REST API and MQTT.
 
 **Author:** Libor Tomsik, OK1CHP  
 **License:** [GNU GPL v3](LICENSE)
@@ -31,7 +32,7 @@ Open-source **Qt 6 / QML / C++** desktop application for controlling
 - **Energy counter** — cumulative energy integration with per-session reset
 - **CSV & Excel export** — one-click export of the full session log
 
-### Full Remote Control
+### Full Device Control
 - Set **voltage** and **current** setpoints with mouse-wheel-enabled spinboxes
 - Set **OVP** (over-voltage) and **OCP** (over-current) protection limits
 - **Output ON/OFF** toggle with keyboard shortcut
@@ -75,6 +76,54 @@ Program a multi-step voltage/current profile and execute it on the PSU.
 - **Named profiles** — save and reload multiple sequences by name;
   importing a file replaces any existing profile with the same name
 - **Live execution** — real-time progress display; stops automatically on disconnect
+
+### Remote Control
+OpenPS2000 can act as a **server** (PSU connected locally) or as a **remote client**
+(controlling a server instance over the network). A second app instance on the same
+machine is detected automatically.
+
+#### REST API Server
+Enable in **Settings → Remote → REST API**. Default port: **8484**.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/api/v1/info` | Device name, serial, firmware, nominal V/I/P |
+| `GET`  | `/api/v1/status` | All measurements, setpoints, output state |
+| `GET`  | `/api/v1/history` | Last N samples as JSON array |
+| `GET`  | `/api/v1/limits` | OVP / OCP protection limits |
+| `PUT`  | `/api/v1/setpoint` | `{"voltage":12.0,"current":2.0}` |
+| `PUT`  | `/api/v1/output` | `{"enabled":true}` |
+| `PUT`  | `/api/v1/limits` | `{"ovp":15.0,"ocp":5.0}` |
+
+Optional Bearer token authentication — set in Settings, pass as
+`Authorization: Bearer <token>` header.
+
+#### MQTT Client *(requires Qt6::Mqtt)*
+Enable in **Settings → Remote → MQTT**. Requires an external broker (e.g. Mosquitto).
+
+| Direction | Topic | Payload |
+|-----------|-------|---------|
+| Publish | `{prefix}/measurement` | `{"v":12.3,"i":0.5,"p":6.15,"t":42.0}` |
+| Publish | `{prefix}/status` | `{"output":true,"setV":12.0,"setI":2.0}` |
+| Subscribe | `{prefix}/cmd/setpoint` | `{"voltage":12.0,"current":2.0}` |
+| Subscribe | `{prefix}/cmd/output` | `{"enabled":true}` |
+| Subscribe | `{prefix}/cmd/limits` | `{"ovp":15.0,"ocp":5.0}` |
+
+#### Remote Client Mode
+Connect to a server instance (GUI is fully functional — all tabs work remotely,
+including Pulse/Cycle and Sequence):
+
+```bash
+# Explicit server URL (port 8484 added automatically if omitted)
+./openps2000app --remote 192.168.1.10
+
+# Auto-detected: if port 8484 responds on localhost, runs as client automatically
+./openps2000app
+```
+
+#### System Tray
+When **Minimize to tray** is enabled in Settings, closing the main window hides
+the app to the system tray. Right-click the tray icon to show/quit.
 
 ### User Interface
 - **Dark Material theme** throughout
@@ -198,26 +247,35 @@ OpenPS2000/
 ├── screenshots/                  Application screenshots
 ├── app/
 │   ├── CMakeLists.txt
-│   ├── main.cpp                  App entry point, engine setup, i18n, wiring
+│   ├── main.cpp                  App entry point, engine/backend setup, i18n, wiring
 │   ├── PS2000Protocol.h/cpp      Binary telegram encoder/decoder
 │   ├── SerialTransport.h/cpp     QThread serial worker (4 Hz polling, disconnect detection)
-│   ├── DeviceBackend.h/cpp       QML-exposed device control + alarm detection
+│   ├── DeviceBackend.h/cpp       QML-exposed device control + alarm detection (local)
+│   ├── RemoteBackend.h/cpp       DeviceBackend-compatible REST polling client (remote mode)
+│   ├── RemoteServer.h/cpp        QTcpServer-based HTTP/1.1 REST API server
+│   ├── MqttClient.h/cpp          Qt6::Mqtt client wrapper (optional, #ifdef HAVE_QT_MQTT)
+│   ├── TrayManager.h/cpp         System tray icon + minimize-to-tray
 │   ├── DataRecord.h              Measurement sample struct
 │   ├── BatteryProfile.h/cpp      Charging profile definitions + JSON storage
 │   ├── ChargerEngine.h/cpp       CC/CV/Float/−ΔV charging state machine
+│   ├── PulseEngine.h/cpp         Software-timed pulse/cycle generator state machine
 │   ├── SequenceProfile.h/cpp     Sequence profile storage + CSV/XLSX/ODS import/export
-│   ├── SequencerEngine.h/cpp     Step-by-step voltage/current sequence executor
+│   ├── SequenceEngine.h/cpp      Step-by-step voltage/current sequence executor
 │   ├── XlsxWriter.h/cpp          OOXML .xlsx writer (zero external dependencies)
 │   ├── OdsWriter.h/cpp           ODF Spreadsheet .ods writer
 │   ├── ZipWriter.h/cpp           STORE-only ZIP (used by XlsxWriter + OdsWriter)
 │   ├── ZipReader.h/cpp           ZIP reader (stored + deflate; reads LibreOffice/Excel files)
 │   └── qml/
-│       ├── Main.qml              Main window, toolbar, controls, alarm popup
+│       ├── Main.qml              Main window, toolbar, controls, alarm popup, status bar
 │       ├── LiveChart.qml         Canvas scrolling dual-axis chart
 │       ├── ChargerTab.qml        Battery charger UI tab
 │       ├── ChargingChart.qml     Charging curve canvas chart
+│       ├── PulseTab.qml          Pulse/cycle generator UI tab
+│       ├── PulseChart.qml        Pulse waveform canvas chart
 │       ├── SequenceTab.qml       Sequence management panel
-│       └── SequenceEditorDialog.qml  Popup table editor with import/export
+│       ├── SequenceChart.qml     Sequence execution chart
+│       ├── SequenceEditorDialog.qml  Popup table editor with import/export
+│       └── RemoteSettingsPanel.qml   REST + MQTT configuration panel
 └── .github/workflows/
     └── build.yml                 CI: Linux AppImage · Windows zip · macOS dmg
 ```
