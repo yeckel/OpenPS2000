@@ -15,7 +15,10 @@ foreach(_qt_ver 6.9.2 6.9.1 6.9.0 6.8.3 6.8.2 6.8.1 6.8.0 6.7.3 6.7.2 6.7.0)
 endforeach()
 
 find_package(Qt6 6.7 REQUIRED COMPONENTS
-    Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort LabsPlatform)
+    Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort LabsPlatform Network)
+
+# Optional modules: HttpServer and Mqtt — installed via CI; gracefully absent locally
+find_package(Qt6 OPTIONAL_COMPONENTS HttpServer Mqtt)
 
 # Prefer system zlib; fall back to Qt's bundled copy (always present on all platforms)
 find_package(ZLIB QUIET)
@@ -47,6 +50,10 @@ qt_add_executable(openps2000app
     PulseEngine.h       PulseEngine.cpp
     SequenceProfile.h   SequenceProfile.cpp
     SequenceEngine.h    SequenceEngine.cpp
+    TrayManager.h       TrayManager.cpp
+    RemoteServer.h      RemoteServer.cpp
+    MqttClient.h        MqttClient.cpp
+    RemoteBackend.h     RemoteBackend.cpp
 )
 
 qt_add_qml_module(openps2000app
@@ -62,6 +69,7 @@ qt_add_qml_module(openps2000app
         qml/SequenceTab.qml
         qml/SequenceChart.qml
         qml/SequenceEditorDialog.qml
+        qml/RemoteSettingsPanel.qml
 )
 
 target_link_libraries(openps2000app PRIVATE
@@ -74,8 +82,20 @@ target_link_libraries(openps2000app PRIVATE
     Qt6::Widgets
     Qt6::SerialPort
     Qt6::LabsPlatform
+    Qt6::Network
     ${_zlib_target}
 )
+
+# Optional remote control modules
+if(Qt6HttpServer_FOUND)
+    target_link_libraries(openps2000app PRIVATE Qt6::HttpServer)
+    target_compile_definitions(openps2000app PRIVATE HAVE_QT_HTTPSERVER)
+endif()
+
+if(Qt6Mqtt_FOUND)
+    target_link_libraries(openps2000app PRIVATE Qt6::Mqtt)
+    target_compile_definitions(openps2000app PRIVATE HAVE_QT_MQTT)
+endif()
 
 # ── DBus on Linux (Qt serial port may need it transitively) ───────────────
 if(UNIX AND NOT APPLE)

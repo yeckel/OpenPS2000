@@ -22,6 +22,18 @@ ApplicationWindow {
     Material.accent:  Material.Cyan
     Material.primary: "#1a2030"
 
+    onClosing: (close) => {
+        if (trayManager.minimizeToTray) {
+            close.accepted = false
+            trayManager.hideToTray()
+        }
+    }
+
+    Connections {
+        target: trayManager
+        function onShowRequested() { trayManager.showWindow() }
+    }
+
     // ── Shared chart state ─────────────────────────────────────────────────
     property real sharedWindowSecs: 60
     property real sharedViewLeft:   0
@@ -95,6 +107,23 @@ ApplicationWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: aboutPopup.open()
                     }
+                }
+
+                // Remote mode badge
+                Rectangle {
+                    visible: isRemoteMode
+                    color: "#1a3a5a"; border.color: "#4488bb"; border.width: 1; radius: 4
+                    width: remoteLabel.implicitWidth + 12; height: 22
+                    Label {
+                        id: remoteLabel
+                        anchors.centerIn: parent
+                        text: qsTr("REMOTE")
+                        font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
+                        color: "#88ccff"
+                    }
+                    ToolTip.text: backend.remoteUrl ?? ""
+                    ToolTip.visible: remoteBadgeHover.containsMouse
+                    MouseArea { id: remoteBadgeHover; anchors.fill: parent; hoverEnabled: true }
                 }
 
                 // Port selector
@@ -1079,6 +1108,21 @@ ApplicationWindow {
                         Label { text: modelData[0] + ":"; color: "#556677"; font.pixelSize: 12 }
                         Label { text: modelData[1]; color: "#aabbcc"; font.pixelSize: 12 }
                     }
+                }
+            }
+
+            // Remote control section (local mode only)
+            ColumnLayout {
+                visible: !isRemoteMode
+                spacing: 0
+                Layout.fillWidth: true
+
+                Rectangle { height: 1; Layout.fillWidth: true; color: "#1e4070" }
+
+                RemoteSettingsPanel {
+                    Layout.fillWidth: true
+                    remoteServer: isRemoteMode ? null : remoteServer
+                    mqttClient:   isRemoteMode ? null : mqttClient
                 }
             }
         }

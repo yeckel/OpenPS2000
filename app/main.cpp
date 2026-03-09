@@ -8,11 +8,23 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QSettings>
+#include <QSystemTrayIcon>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QEventLoop>
+#include <QTimer>
+#include <QCommandLineParser>
+#include <QWindow>
 #include "DeviceBackend.h"
 #include "ChargerEngine.h"
 #include "PulseEngine.h"
 #include "SequenceEngine.h"
 #include "SequenceProfile.h"
+#include "RemoteServer.h"
+#include "MqttClient.h"
+#include "RemoteBackend.h"
+#include "TrayManager.h"
 
 class LanguageChanger : public QObject
 {
@@ -93,6 +105,46 @@ int main(int argc, char* argv[])
     app.setOrganizationDomain("openps2000.app");
     app.setApplicationVersion("1.0");
 
+    // ── CLI parsing ────────────────────────────────────────────────────────
+    QCommandLineParser cli;
+    cli.addHelpOption();
+    cli.addVersionOption();
+    QCommandLineOption remoteOpt("remote", "Connect to a remote OpenPS2000 REST server", "url");
+    cli.addOption(remoteOpt);
+    cli.process(app);
+
+    // ── Determine backend ──────────────────────────────────────────────────
+    QString remoteUrl;
+    bool    isRemote = false;
+
+    if (cli.isSet(remoteOpt)) {
+        remoteUrl = cli.value(remoteOpt);
+        isRemote  = true;
+    } else {
+        // Auto-detect: probe default localhost server with 500 ms timeout
+        QNetworkAccessManager probeNam;
+        QNetworkReply* reply = probeNam.get(
+            QNetworkRequest(QUrl("http://localhost:8484/api/v1/info")));
+        QEventLoop loop;
+        QTimer::singleShot(500, &loop, &QEventLoop::quit);
+        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+        loop.exec();
+        if (reply->error() == QNetworkReply::NoError) {
+            remoteUrl = "http://localhost:8484";
+            isRemote  = true;
+        }
+        reply->deleteLater();
+    }
+
+    DeviceBackend*  localBackend  = nullptr;
+    RemoteBackend*  remoteBackend = nullptr;
+
+    if (isRemote) {
+        remoteBackend = new RemoteBackend(remoteUrl);
+    } else {
+        localBackend = new DeviceBackend();
+    }
+
     LanguageChanger langChanger;
 
     // Determine startup language: saved preference > system locale > English
@@ -118,73 +170,151 @@ int main(int argc, char* argv[])
                 }
             }
         }
-        // Load without saving (we're just restoring state)
         langChanger.setLanguage(chosen, /*save=*/false);
     }
 
-    DeviceBackend  backend;
-    ChargerEngine  charger;
-    PulseEngine    pulser;
-    SequenceEngine sequencer;
-    SequenceStore  seqStore;
+    // ── Engines (local only) ───────────────────────────────────────────────
+    ChargerEngine*  charger   = nullptr;
+    PulseEngine*    pulser    = nullptr;
+    SequenceEngine* sequencer = nullptr;
+    SequenceStore*  seqStore  = new SequenceStore();
 
-    // Wire charger control signals → device backend slots
-    QObject::connect(&charger, &ChargerEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
-    QObject::connect(&charger, &ChargerEngine::setCurrentRequested, &backend, &DeviceBackend::sendSetCurrent);
-    QObject::connect(&charger, &ChargerEngine::setOvpRequested,     &backend, &DeviceBackend::sendOvpVoltage);
-    QObject::connect(&charger, &ChargerEngine::setOcpRequested,     &backend, &DeviceBackend::sendOcpCurrent);
-    QObject::connect(&charger, &ChargerEngine::setOutputRequested,  &backend, &DeviceBackend::setOutputOn);
-    // Feed live measurements into charger state machine
-    QObject::connect(&backend, &DeviceBackend::newSample,
-                     &charger, &ChargerEngine::onSample);
-    // Forward charger status messages to main status bar
-    QObject::connect(&charger, &ChargerEngine::statusMessage,
-                     &backend, &DeviceBackend::statusMessage);
-    // Stop charger if device disconnects mid-charge
-    QObject::connect(&backend, &DeviceBackend::connectedChanged, &charger, [&]()
-    {
-        if(!backend.connected())
-            charger.stopCharging();
-    });
+    if (localBackend) {
+        charger   = new ChargerEngine();
+        pulser    = new PulseEngine();
+        sequencer = new SequenceEngine();
 
-    // Wire pulse engine control signals → device backend slots
-    QObject::connect(&pulser, &PulseEngine::setVoltageRequested,      &backend, &DeviceBackend::sendSetVoltage);
-    QObject::connect(&pulser, &PulseEngine::setCurrentRequested,      &backend, &DeviceBackend::sendSetCurrent);
-    QObject::connect(&pulser, &PulseEngine::setOutputRequested,       &backend, &DeviceBackend::setOutputOn);       // urgent (stop)
-    QObject::connect(&pulser, &PulseEngine::setOutputQueuedRequested, &backend, &DeviceBackend::setOutputOnQueued); // queued (cycle transitions)
-    // Feed live measurements into pulse engine
-    QObject::connect(&backend, &DeviceBackend::newSample,
-                     &pulser, &PulseEngine::onSample);
-    // Stop pulser if device disconnects
-    QObject::connect(&backend, &DeviceBackend::connectedChanged, &pulser, [&]()
-    {
-        if(!backend.connected())
-            pulser.stop();
-    });
+        // Wire charger
+        QObject::connect(charger, &ChargerEngine::setVoltageRequested, localBackend, &DeviceBackend::sendSetVoltage);
+        QObject::connect(charger, &ChargerEngine::setCurrentRequested, localBackend, &DeviceBackend::sendSetCurrent);
+        QObject::connect(charger, &ChargerEngine::setOvpRequested,     localBackend, &DeviceBackend::sendOvpVoltage);
+        QObject::connect(charger, &ChargerEngine::setOcpRequested,     localBackend, &DeviceBackend::sendOcpCurrent);
+        QObject::connect(charger, &ChargerEngine::setOutputRequested,  localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(localBackend, &DeviceBackend::newSample,      charger,      &ChargerEngine::onSample);
+        QObject::connect(charger,      &ChargerEngine::statusMessage,  localBackend, &DeviceBackend::statusMessage);
+        QObject::connect(localBackend, &DeviceBackend::connectedChanged, charger, [charger]() {
+            if (!charger->parent()) return; // guard
+            // property check done via lambda capture
+        });
+        QObject::connect(localBackend, &DeviceBackend::connectedChanged, charger, [localBackend, charger]() {
+            if (!localBackend->connected()) charger->stopCharging();
+        });
 
-    // Wire sequence engine control signals → device backend slots
-    QObject::connect(&sequencer, &SequenceEngine::setVoltageRequested, &backend, &DeviceBackend::sendSetVoltage);
-    QObject::connect(&sequencer, &SequenceEngine::setCurrentRequested, &backend, &DeviceBackend::sendSetCurrent);
-    QObject::connect(&sequencer, &SequenceEngine::setOutputRequested,  &backend, &DeviceBackend::setOutputOn);
-    // Feed live measurements into sequence engine
-    QObject::connect(&backend, &DeviceBackend::newSample, &sequencer, &SequenceEngine::onSample);
-    // Stop sequencer if device disconnects
-    QObject::connect(&backend, &DeviceBackend::connectedChanged, &sequencer, [&]()
-    {
-        if(!backend.connected())
-            sequencer.stop();
-    });
+        // Wire pulser
+        QObject::connect(pulser, &PulseEngine::setVoltageRequested,      localBackend, &DeviceBackend::sendSetVoltage);
+        QObject::connect(pulser, &PulseEngine::setCurrentRequested,      localBackend, &DeviceBackend::sendSetCurrent);
+        QObject::connect(pulser, &PulseEngine::setOutputRequested,       localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(pulser, &PulseEngine::setOutputQueuedRequested, localBackend, &DeviceBackend::setOutputOnQueued);
+        QObject::connect(localBackend, &DeviceBackend::newSample,         pulser,       &PulseEngine::onSample);
+        QObject::connect(localBackend, &DeviceBackend::connectedChanged, pulser, [localBackend, pulser]() {
+            if (!localBackend->connected()) pulser->stop();
+        });
+
+        // Wire sequencer
+        QObject::connect(sequencer, &SequenceEngine::setVoltageRequested, localBackend, &DeviceBackend::sendSetVoltage);
+        QObject::connect(sequencer, &SequenceEngine::setCurrentRequested, localBackend, &DeviceBackend::sendSetCurrent);
+        QObject::connect(sequencer, &SequenceEngine::setOutputRequested,  localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(localBackend, &DeviceBackend::newSample,          sequencer,    &SequenceEngine::onSample);
+        QObject::connect(localBackend, &DeviceBackend::connectedChanged, sequencer, [localBackend, sequencer]() {
+            if (!localBackend->connected()) sequencer->stop();
+        });
+    }
+
+    // ── Remote server + MQTT (local backend only) ──────────────────────────
+    RemoteServer* remoteServer = nullptr;
+    MqttClient*   mqttClient   = nullptr;
+
+    if (localBackend) {
+        remoteServer = new RemoteServer(localBackend);
+        mqttClient   = new MqttClient();
+
+        // Wire RemoteServer → DeviceBackend
+        QObject::connect(remoteServer, &RemoteServer::setpointReceived, localBackend, [localBackend](double v, double i) {
+            localBackend->sendSetVoltage(v);
+            localBackend->sendSetCurrent(i);
+        });
+        QObject::connect(remoteServer, &RemoteServer::outputReceived, localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(remoteServer, &RemoteServer::limitsReceived, localBackend, [localBackend](double ovp, double ocp) {
+            localBackend->sendOvpVoltage(ovp);
+            localBackend->sendOcpCurrent(ocp);
+        });
+
+        // Wire MqttClient → DeviceBackend
+        QObject::connect(mqttClient, &MqttClient::cmdSetpoint, localBackend, [localBackend](double v, double i) {
+            localBackend->sendSetVoltage(v);
+            localBackend->sendSetCurrent(i);
+        });
+        QObject::connect(mqttClient, &MqttClient::cmdOutput, localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(mqttClient, &MqttClient::cmdLimits, localBackend, [localBackend](double ovp, double ocp) {
+            localBackend->sendOvpVoltage(ovp);
+            localBackend->sendOcpCurrent(ocp);
+        });
+
+        // Wire DeviceBackend → MqttClient
+        QObject::connect(localBackend, &DeviceBackend::newSample, mqttClient, [localBackend, mqttClient](double, double v, double i, double p) {
+            mqttClient->publishMeasurement(v, i, p, localBackend->energyWh());
+        });
+        QObject::connect(localBackend, &DeviceBackend::statusFlagsChanged, mqttClient, [localBackend, mqttClient]() {
+            mqttClient->publishStatus(localBackend->outputOn(), localBackend->setVoltage(), localBackend->setCurrent());
+        });
+
+        // Restore saved remote settings
+        QSettings s;
+        if (s.value("remote/restEnabled", false).toBool())
+            remoteServer->start(s.value("remote/restPort", 8484).toInt(),
+                                s.value("remote/restToken").toString());
+        if (s.value("remote/mqttEnabled", false).toBool()) {
+            mqttClient->configure(
+                s.value("remote/mqttHost",   "localhost").toString(),
+                s.value("remote/mqttPort",   1883).toInt(),
+                s.value("remote/mqttPrefix", "openps2000").toString(),
+                s.value("remote/mqttUser",   "").toString(),
+                s.value("remote/mqttPass",   "").toString(),
+                s.value("remote/mqttTls",    false).toBool()
+            );
+            mqttClient->connectToBroker();
+        }
+    }
+
+    // ── TrayManager ────────────────────────────────────────────────────────
+    TrayManager trayMgr;
 
     QQmlApplicationEngine engine;
-    // Wire engine so setLanguage() can call retranslate() immediately
     langChanger.setEngine(&engine);
 
-    engine.rootContext()->setContextProperty("backend", &backend);
-    engine.rootContext()->setContextProperty("langChanger", &langChanger);
-    engine.rootContext()->setContextProperty("charger", &charger);
-    engine.rootContext()->setContextProperty("pulser", &pulser);
-    engine.rootContext()->setContextProperty("sequencer", &sequencer);
-    engine.rootContext()->setContextProperty("seqStore", &seqStore);
+    // Register context properties
+    QObject* backendObj = localBackend ? static_cast<QObject*>(localBackend)
+                                       : static_cast<QObject*>(remoteBackend);
+
+    engine.rootContext()->setContextProperty("backend",      backendObj);
+    engine.rootContext()->setContextProperty("langChanger",  &langChanger);
+    engine.rootContext()->setContextProperty("trayManager",  &trayMgr);
+    engine.rootContext()->setContextProperty("isRemoteMode",  isRemote);
+
+    if (localBackend) {
+        engine.rootContext()->setContextProperty("charger",    charger);
+        engine.rootContext()->setContextProperty("pulser",     pulser);
+        engine.rootContext()->setContextProperty("sequencer",  sequencer);
+        engine.rootContext()->setContextProperty("seqStore",   seqStore);
+        engine.rootContext()->setContextProperty("remoteServer", remoteServer);
+        engine.rootContext()->setContextProperty("mqttClient",   mqttClient);
+    } else {
+        // Provide null-safe stubs so QML bindings don't crash
+        engine.rootContext()->setContextProperty("charger",      QVariant());
+        engine.rootContext()->setContextProperty("pulser",       QVariant());
+        engine.rootContext()->setContextProperty("sequencer",    QVariant());
+        engine.rootContext()->setContextProperty("seqStore",     QVariant());
+        engine.rootContext()->setContextProperty("remoteServer", QVariant());
+        engine.rootContext()->setContextProperty("mqttClient",   QVariant());
+    }
+
+    // Give the tray manager the root window once QML loads
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                     &trayMgr, [&trayMgr](QObject* obj, const QUrl&) {
+        if (obj)
+            trayMgr.setWindow(qobject_cast<QWindow*>(obj));
+    });
+    trayMgr.setup(":/qt/qml/openps2000app/openps2000.png");
 
     engine.loadFromModule("openps2000app", "Main");
 

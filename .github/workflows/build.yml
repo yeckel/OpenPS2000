@@ -30,7 +30,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          modules: 'qtserialport'
+          modules: 'qtserialport qtmqtt qthttpserver'
 
       - name: Build
         run: |
@@ -79,7 +79,7 @@ jobs:
         with:
           version: ${{ env.QT_VERSION }}
           arch: win64_msvc2022_64
-          modules: 'qtserialport'
+          modules: 'qtserialport qtmqtt qthttpserver'
 
       - uses: ilammy/msvc-dev-cmd@v1
 
@@ -117,7 +117,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
-          modules: 'qtserialport'
+          modules: 'qtserialport qtmqtt qthttpserver'
 
       - name: Build
         run: |
