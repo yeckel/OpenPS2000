@@ -239,6 +239,12 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release \
 
 ---
 
+## Architecture
+
+See [doc/architecture.md](doc/architecture.md) for UML component, class, sequence, and state machine diagrams.
+
+---
+
 ## Project Structure
 
 ```
