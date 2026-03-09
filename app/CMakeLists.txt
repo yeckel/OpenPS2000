@@ -17,8 +17,9 @@ endforeach()
 find_package(Qt6 6.7 REQUIRED COMPONENTS
     Core Gui Quick QuickControls2 Qml QuickDialogs2 Widgets SerialPort LabsPlatform Network)
 
-# Optional modules: HttpServer and Mqtt — installed via CI; gracefully absent locally
-find_package(Qt6 OPTIONAL_COMPONENTS HttpServer Mqtt)
+# Optional modules: Mqtt — installed via CI; gracefully absent locally
+# (REST server uses QTcpServer which is always available via Qt6::Network)
+find_package(Qt6 OPTIONAL_COMPONENTS Mqtt)
 
 # Prefer system zlib; fall back to Qt's bundled copy (always present on all platforms)
 find_package(ZLIB QUIET)
@@ -87,11 +88,6 @@ target_link_libraries(openps2000app PRIVATE
 )
 
 # Optional remote control modules
-if(Qt6HttpServer_FOUND)
-    target_link_libraries(openps2000app PRIVATE Qt6::HttpServer)
-    target_compile_definitions(openps2000app PRIVATE HAVE_QT_HTTPSERVER)
-endif()
-
 if(Qt6Mqtt_FOUND)
     target_link_libraries(openps2000app PRIVATE Qt6::Mqtt)
     target_compile_definitions(openps2000app PRIVATE HAVE_QT_MQTT)
