@@ -149,11 +149,35 @@ the app to the system tray. Right-click the tray icon to show/quit.
 Pre-built binaries are attached to each
 [GitHub Release](https://github.com/yeckel/OpenPS2000/releases).
 
+### Desktop app (USB direct)
+
 | Platform | File |
 |----------|------|
 | Linux    | `OpenPS2000-linux-x86_64.AppImage` — `chmod +x`, then run |
 | Windows  | `OpenPS2000-windows-x86_64.zip` — unzip, run `openps2000app.exe` |
-| macOS    | `OpenPS2000-macos.dmg` — drag to Applications |
+| macOS    | `OpenPS2000-macos.zip` — unzip, double-click the `.app` bundle |
+
+> On Linux: add yourself to the `dialout` group and re-login so the app can
+> access `/dev/ttyACM0`:
+> ```bash
+> sudo usermod -aG dialout $USER
+> ```
+
+### Android companion app (REST or USB OTG)
+
+| File | Minimum Android |
+|------|-----------------|
+| `OpenPS2000-android-arm64.apk` | Android 9 (API 28) |
+
+**Install (sideload):**
+1. Enable **Settings → Security → Install unknown apps** for your browser/file manager
+2. Download the APK and open it — Android will prompt to install
+
+The Android app can connect in two ways:
+- **USB OTG** — plug the EA-PS directly into your phone with a USB-A ↔ USB-C OTG
+  adapter; tap **USB (Direct)** → Scan → Connect
+- **REST (Network)** — start the desktop app, enable **Settings → Remote → REST API**,
+  enter the PC's IP address in the Android app, tap **REST** → Connect
 
 ---
 
