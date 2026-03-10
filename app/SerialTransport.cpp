@@ -9,7 +9,7 @@
 
 // ── Constructor ───────────────────────────────────────────────────────────
 SerialTransport::SerialTransport(const QString& portName, QObject* parent)
-    : QThread(parent), m_portName(portName)
+    : AbstractTransport(portName, parent)
 {}
 
 void SerialTransport::requestStop()

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- USB device filter — auto-attach intent for EA Elektro-Automatik PS 2000 B series.
+     VID 0x0AAD = EA Elektro-Automatik. PIDs cover the common B-series models.
+     The app also does a VID-only scan at runtime for unknown PIDs. -->
+<resources>
+    <!-- EA-PS 2084-05 B and similar B-series devices -->
+    <usb-device vendor-id="2733" />
+    <!-- vendor-id is decimal: 0x0AAD = 2733 -->
+</resources>

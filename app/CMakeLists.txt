@@ -39,6 +39,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 qt_add_executable(openps2000app
     main.cpp
     PS2000Protocol.h    PS2000Protocol.cpp
+    AbstractTransport.h
     SerialTransport.h   SerialTransport.cpp
     DeviceBackend.h     DeviceBackend.cpp
     DataRecord.h

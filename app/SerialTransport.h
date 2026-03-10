@@ -5,8 +5,7 @@
 // Communicates at 115200 baud, odd parity, 8 data bits, 1 stop bit.
 #pragma once
 
-#include "PS2000Protocol.h"
-#include <QThread>
+#include "AbstractTransport.h"
 #include <QMutex>
 #include <QQueue>
 #include <QMap>
@@ -14,41 +13,16 @@
 #include <QByteArray>
 #include <QString>
 
-class SerialTransport : public QThread
+class SerialTransport : public AbstractTransport
 {
     Q_OBJECT
 
 public:
     explicit SerialTransport(const QString& portName, QObject* parent = nullptr);
 
-    // Thread-safe. Enqueues a command with coalescing: if a pending command
-    // for the same object already exists it is replaced by the newer one.
-    void enqueueCommand(const QByteArray& telegram);
-
-    // Thread-safe. Clears all queued commands and prepends this one at the
-    // front of the queue. Used for emergency stop so it is never delayed.
-    void enqueueUrgent(const QByteArray& telegram);
-
-    // Request graceful stop (thread-safe).
-    void requestStop();
-
-    const PS2000::DeviceInfo& deviceInfo() const { return m_deviceInfo; }
-
-signals:
-    // Emitted after successful device info read on connection.
-    void deviceInfoReady(const PS2000::DeviceInfo& info);
-
-    // Emitted at each polling cycle (~4 Hz).
-    void statusUpdated(const PS2000::DeviceStatus& status);
-
-    // Current OVP/OCP limits (polled less frequently).
-    void limitsUpdated(double ovpV, double ocpA);
-
-    // Set values from device (polled after sending commands).
-    void setValuesUpdated(double setV, double setI);
-
-    void error(const QString& msg);
-    void statusMessage(const QString& msg);
+    void enqueueCommand(const QByteArray& telegram) override;
+    void enqueueUrgent(const QByteArray& telegram) override;
+    void requestStop() override;
 
 protected:
     void run() override;
@@ -59,7 +33,6 @@ private:
     QByteArray queryObject(void* port, uint8_t obj, int dataLen) const;
     void readDeviceInfo(void* port);
 
-    QString            m_portName;
     QAtomicInt         m_stopFlag{0};
     mutable QMutex     m_cmdMutex;
 
@@ -69,6 +42,4 @@ private:
 
     // Urgent slot — always dequeued before m_cmdMap entries.
     QByteArray m_urgentCmd;
-
-    PS2000::DeviceInfo m_deviceInfo;
 };

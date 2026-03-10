@@ -6,7 +6,7 @@
 
 #include "DataRecord.h"
 #include "PS2000Protocol.h"
-#include "SerialTransport.h"
+#include "AbstractTransport.h"
 
 #include <QObject>
 #include <QString>
@@ -153,7 +153,7 @@ private:
     void cleanupTransport();
     void sendCommand(const QByteArray& telegram);
 
-    SerialTransport* m_transport = nullptr;
+    AbstractTransport* m_transport = nullptr;
     QTimer*          m_durationTimer = nullptr;
     bool             m_connected  = false;
     QString          m_portName;

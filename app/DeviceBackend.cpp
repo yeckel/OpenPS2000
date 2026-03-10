@@ -3,10 +3,19 @@
 #include "DeviceBackend.h"
 #include "XlsxWriter.h"
 
+// On Android, use the JNI-based transport; on desktop use QSerialPort transport.
+#ifdef ANDROID_BUILD
+#  include "AndroidSerialTransport.h"
+#else
+#  include "SerialTransport.h"
+#endif
+
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
-#include <QSerialPortInfo>
+#ifndef ANDROID_BUILD
+#  include <QSerialPortInfo>
+#endif
 #include <QTextStream>
 #include <QUrl>
 #include <limits>
@@ -55,10 +64,12 @@ DeviceBackend::~DeviceBackend()
 QStringList DeviceBackend::availablePorts() const
 {
     QStringList result;
+#ifdef ANDROID_BUILD
+    result = AndroidSerialTransport::listDevices();
+#else
     for(const auto& info : QSerialPortInfo::availablePorts())
-    {
         result << info.portName();
-    }
+#endif
     return result;
 }
 
@@ -79,19 +90,23 @@ void DeviceBackend::connectDevice(const QString& portName)
     m_lastPower  = 0.0;
     m_portName   = portName;
 
+#ifdef ANDROID_BUILD
+    m_transport = new AndroidSerialTransport(portName, this);
+#else
     m_transport = new SerialTransport(portName, this);
+#endif
 
-    connect(m_transport, &SerialTransport::deviceInfoReady,
+    connect(m_transport, &AbstractTransport::deviceInfoReady,
             this, &DeviceBackend::onDeviceInfoReady, Qt::QueuedConnection);
-    connect(m_transport, &SerialTransport::statusUpdated,
+    connect(m_transport, &AbstractTransport::statusUpdated,
             this, &DeviceBackend::onStatusUpdated, Qt::QueuedConnection);
-    connect(m_transport, &SerialTransport::limitsUpdated,
+    connect(m_transport, &AbstractTransport::limitsUpdated,
             this, &DeviceBackend::onLimitsUpdated, Qt::QueuedConnection);
-    connect(m_transport, &SerialTransport::setValuesUpdated,
+    connect(m_transport, &AbstractTransport::setValuesUpdated,
             this, &DeviceBackend::onSetValuesUpdated, Qt::QueuedConnection);
-    connect(m_transport, &SerialTransport::error,
+    connect(m_transport, &AbstractTransport::error,
             this, &DeviceBackend::onTransportError, Qt::QueuedConnection);
-    connect(m_transport, &SerialTransport::statusMessage,
+    connect(m_transport, &AbstractTransport::statusMessage,
             this, &DeviceBackend::onTransportMessage, Qt::QueuedConnection);
 
     m_transport->start();
