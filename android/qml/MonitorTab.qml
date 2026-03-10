@@ -242,28 +242,41 @@ Rectangle {
         // ── Full alarm banner (shown until user dismisses) ────────────────
         Rectangle {
             Layout.fillWidth: true
-            height: 60; radius: 8
+            implicitHeight: bannerCol.implicitHeight + 16
+            radius: 8
             visible: backend.connected && backend.anyAlarm && !alarmAcknowledged
             color: "#3a0d0d"; border.color: "#f44336"; border.width: 2
-            RowLayout {
-                anchors { fill: parent; leftMargin: 12; rightMargin: 8 }
-                spacing: 8
-                Label { text: "🔴"; font.pixelSize: 22 }
-                Label {
-                    text: backend.ovpActive ? qsTr("Over Voltage (OVP)") :
-                          backend.ocpActive ? qsTr("Over Current (OCP)") :
-                          backend.oppActive ? qsTr("Over Power (OPP)")   :
-                          backend.otpActive ? qsTr("Over Temperature (OTP)") : qsTr("Alarm")
-                    font.pixelSize: 13; font.bold: true; color: "#ff6b6b"
+
+            ColumnLayout {
+                id: bannerCol
+                anchors { fill: parent; margins: 10 }
+                spacing: 6
+
+                // Alarm title row
+                RowLayout {
                     Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
+                    spacing: 8
+                    Label { text: "🔴"; font.pixelSize: 20 }
+                    Label {
+                        text: qsTr("PROTECTION ALARM: ") + (
+                              backend.ovpActive ? qsTr("Over Voltage (OVP)") :
+                              backend.ocpActive ? qsTr("Over Current (OCP)") :
+                              backend.oppActive ? qsTr("Over Power (OPP)")   :
+                              backend.otpActive ? qsTr("Over Temperature (OTP)") : qsTr("Triggered"))
+                        font.pixelSize: 13; font.bold: true; color: "#ff6b6b"
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
                 }
-                ColumnLayout {
-                    spacing: 4
-                    // Acknowledges alarm AND restores output once PSU confirms clear
+
+                // Action buttons in a row
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    // Acknowledges on PSU + restores output once alarm clears
                     Button {
                         text: qsTr("Ack & Resume")
-                        font.pixelSize: 11
+                        Layout.fillWidth: true
                         Material.theme: Material.Dark
                         Material.accent: "#4caf50"
                         onClicked: {
@@ -273,11 +286,11 @@ Rectangle {
                             alarmNotifier.cancelAlarm()
                         }
                     }
-                    // Acknowledges alarm only — output stays OFF
+
+                    // Acknowledges on PSU, output stays OFF
                     Button {
                         text: qsTr("Acknowledge")
-                        flat: false
-                        font.pixelSize: 11
+                        Layout.fillWidth: true
                         Material.theme: Material.Dark
                         Material.accent: "#f44336"
                         onClicked: {
@@ -287,11 +300,11 @@ Rectangle {
                             alarmNotifier.cancelAlarm()
                         }
                     }
-                    // UI-only: hides banner, PSU still in alarm
+
+                    // UI dismiss only — no PSU command
                     Button {
                         text: qsTr("Dismiss")
                         flat: true
-                        font.pixelSize: 11
                         Material.theme: Material.Dark
                         Material.foreground: "#ef9a9a"
                         onClicked: alarmAcknowledged = true
