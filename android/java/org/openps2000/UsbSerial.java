@@ -4,7 +4,7 @@
 // UsbSerial.java — Android USB Host CDC-ACM serial port implementation.
 // Called from C++ (AndroidSerialTransport) via QJniObject.
 //
-// EA-PS 2084-05 B presents as a USB CDC-ACM device (VID 0x0AAD).
+// EA-PS 2084-05 B presents as a USB CDC-ACM device (VID 0x232E PID 0x0010).
 // This class opens the USB device, sets line coding (115200/8/O/1),
 // and provides synchronous read/write via bulk transfers.
 //
@@ -31,8 +31,8 @@ import java.util.List;
 public class UsbSerial {
     private static final String TAG = "UsbSerial";
 
-    // EA Elektro-Automatik vendor ID
-    private static final int EA_VID = 0x0AAD;
+    // EA Elektro-Automatik vendor ID (USB ID 232e:0010)
+    private static final int EA_VID = 0x232E;
 
     private static final String ACTION_USB_PERMISSION = "org.openps2000.USB_PERMISSION";
 

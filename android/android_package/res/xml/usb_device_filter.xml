@@ -3,7 +3,7 @@
      VID 0x0AAD = EA Elektro-Automatik. PIDs cover the common B-series models.
      The app also does a VID-only scan at runtime for unknown PIDs. -->
 <resources>
-    <!-- EA-PS 2084-05 B and similar B-series devices -->
-    <usb-device vendor-id="2733" />
-    <!-- vendor-id is decimal: 0x0AAD = 2733 -->
+    <!-- EA-PS 2000 B series: VID 0x232E = 9006, PID 0x0010 = 16 -->
+    <usb-device vendor-id="9006" product-id="16" />
+    <!-- vendor-id is decimal: 0x232E = 9006, product-id: 0x0010 = 16 -->
 </resources>
