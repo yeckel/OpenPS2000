@@ -184,17 +184,10 @@ jobs:
             -DQT_HOST_PATH=$QT_HOST_PATH \
             android/
           cmake --build build-android --parallel
-          cd build-android
-          androiddeployqt \
-            --input android-openps2000android-deployment-settings.json \
-            --output android-build \
-            --android-platform android-34 \
-            --jdk $JAVA_HOME \
-            --gradle
 
       - name: Rename APK
         run: |
-          cp build-android/android-build/build/outputs/apk/debug/android-build-debug.apk \
+          cp build-android/android-build/build/outputs/apk/release/android-build-release-unsigned.apk \
              OpenPS2000-android-arm64.apk
 
       - name: Upload artifact
