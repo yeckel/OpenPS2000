@@ -4,8 +4,7 @@
 
 #include <QJniObject>
 #include <QJniEnvironment>
-#include <QNativeInterface>
-#include <QtCore/private/qandroidextras_p.h>
+#include <QCoreApplication>
 #include <QMutexLocker>
 #include <QThread>
 #include <QDebug>

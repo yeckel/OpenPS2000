@@ -11,7 +11,7 @@
 #include <QTimer>
 #include <QJniObject>
 #include <QJniEnvironment>
-#include <QtCore/private/qandroidextras_p.h>
+#include <QCoreApplication>
 
 #include "../app/DeviceBackend.h"
 #include "../app/RemoteBackend.h"
