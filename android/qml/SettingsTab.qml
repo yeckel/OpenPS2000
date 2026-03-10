@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls.Material
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtCore
 
 // ── Settings / Connection Tab ─────────────────────────────────────────────
 // USB device picker, REST URL entry, connect/disconnect.
