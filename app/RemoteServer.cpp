@@ -15,6 +15,10 @@
 #include <QDateTime>
 #include <QVariantMap>
 
+// ── Limits ────────────────────────────────────────────────────────────────────
+static constexpr int MAX_HEADER_BYTES = 16 * 1024;   // 16 KB — protects against infinite header DoS
+static constexpr int MAX_BODY_BYTES   = 4  * 1024;   // 4 KB — all our request bodies are tiny JSON
+
 // ── HTTP helpers ─────────────────────────────────────────────────────────────
 
 QByteArray RemoteServer::httpResponse(int code, const QByteArray& body,
@@ -104,6 +108,9 @@ QByteArray RemoteServer::handleRequest(const QString& method, const QString& pat
         if (doc.isNull()) { int c=400; return httpResponse(c, jsonErr("invalid JSON",c)); }
         double v = doc.object().value("voltage").toDouble(m_backend->setVoltage());
         double i = doc.object().value("current").toDouble(m_backend->setCurrent());
+        // Clamp to hardware nominals — never send out-of-range values to the PSU
+        v = qBound(0.0, v, m_backend->nomVoltage());
+        i = qBound(0.0, i, m_backend->nomCurrent());
         emit setpointReceived(v, i);
         return httpResponse(200, jsonOk());
     }
@@ -130,6 +137,9 @@ QByteArray RemoteServer::handleRequest(const QString& method, const QString& pat
         if (doc.isNull()) { int c=400; return httpResponse(c, jsonErr("invalid JSON",c)); }
         double ovp = doc.object().value("ovp").toDouble(m_backend->ovpVoltage());
         double ocp = doc.object().value("ocp").toDouble(m_backend->ocpCurrent());
+        // Clamp to hardware nominals
+        ovp = qBound(0.0, ovp, m_backend->nomVoltage());
+        ocp = qBound(0.0, ocp, m_backend->nomCurrent());
         emit limitsReceived(ovp, ocp);
         return httpResponse(200, jsonOk());
     }
@@ -139,9 +149,14 @@ QByteArray RemoteServer::handleRequest(const QString& method, const QString& pat
         double minutes = 5.0;
         const QString qs = path.section('?', 1);
         for (const QString& kv : qs.split('&')) {
-            if (kv.startsWith("minutes="))
-                minutes = kv.mid(8).toDouble();
+            if (kv.startsWith("minutes=")) {
+                bool ok = false;
+                double m = kv.mid(8).toDouble(&ok);
+                if (ok) minutes = m;
+            }
         }
+        // Clamp: minimum 1 second, maximum 24 hours — prevents underflow and huge range scans
+        minutes = qBound(1.0 / 60.0, minutes, 1440.0);
         double tNow   = QDateTime::currentMSecsSinceEpoch() / 1000.0;
         QVariantMap stats = m_backend->measureRange(tNow - minutes * 60.0, tNow);
         QJsonObject statsObj;
@@ -249,6 +264,11 @@ void RemoteServer::onReadyRead(QTcpSocket* sock)
     while (true) {
         // ── Parse headers ────────────────────────────────────────────────
         if (!conn.headersComplete) {
+            // Guard: disconnect if headers are unreasonably large
+            if (conn.buf.size() > MAX_HEADER_BYTES) {
+                sock->disconnectFromHost();
+                return;
+            }
             int sep = conn.buf.indexOf("\r\n\r\n");
             if (sep < 0) return; // Need more data
 
@@ -270,7 +290,14 @@ void RemoteServer::onReadyRead(QTcpSocket* sock)
                 conn.headers[QString::fromUtf8(line.left(colon)).trimmed().toLower()] =
                     QString::fromUtf8(line.mid(colon + 1)).trimmed();
             }
-            conn.contentLength  = conn.headers.value("content-length", "0").toInt();
+            // Validate content-length: must be a non-negative integer within our body size limit
+            bool clOk = false;
+            int cl = conn.headers.value("content-length", "0").toInt(&clOk);
+            if (!clOk || cl < 0 || cl > MAX_BODY_BYTES) {
+                sock->disconnectFromHost();
+                return;
+            }
+            conn.contentLength   = cl;
             conn.headersComplete = true;
         }
 
