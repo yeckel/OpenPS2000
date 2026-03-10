@@ -109,6 +109,16 @@ void AndroidSerialTransport::run()
         return;
     }
 
+    if (m_deviceInfo.nomVoltage <= 0.0f || m_deviceInfo.nomCurrent <= 0.0f) {
+        qWarning() << "[AndroidSerial] readDeviceInfo returned zero nominals — "
+                      "deviceType=" << m_deviceInfo.deviceType
+                   << "nomV=" << m_deviceInfo.nomVoltage
+                   << "nomI=" << m_deviceInfo.nomCurrent;
+        emit error("Device info read failed — check USB connection and retry");
+        jniClose();
+        return;
+    }
+
     emit deviceInfoReady(m_deviceInfo);
     emit statusMessage(QString("Device: %1 — %2 V / %3 A / %4 W")
                        .arg(m_deviceInfo.deviceType)
@@ -252,15 +262,16 @@ QByteArray AndroidSerialTransport::readBytes(int expected, int timeoutMs)
 {
     QByteArray buf;
     buf.reserve(expected);
-    const int stepMs = 20;
+    const int callMs  = 200;  // per-bulkTransfer timeout — must be long enough for device to respond
+    const int stepMs  = 10;   // how much to add to elapsed per iteration (loop pacing)
     int elapsed = 0;
     while (buf.size() < expected && elapsed < timeoutMs) {
-        QByteArray chunk = jniRead(expected - buf.size(), stepMs);
+        QByteArray chunk = jniRead(expected - buf.size(), callMs);
         if (!chunk.isEmpty())
             buf += chunk;
         else
             QThread::msleep(stepMs);
-        elapsed += stepMs;
+        elapsed += callMs + stepMs;  // conservative: count the full call duration
     }
     return buf;
 }
@@ -285,7 +296,7 @@ QByteArray AndroidSerialTransport::queryObject(uint8_t obj, int dataLen)
     if (jniWrite(query) < 0) return {};
 
     int totalLen = 3 + dataLen + 2;
-    QByteArray raw = readBytes(totalLen, 300);
+    QByteArray raw = readBytes(totalLen, 800);  // 800ms: generous for USB round-trip
     if (raw.size() < totalLen) return {};
 
     uint8_t respObj;
