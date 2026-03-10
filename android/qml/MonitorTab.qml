@@ -10,10 +10,12 @@ import QtQuick.Layouts
 Rectangle {
     color: "#0d1117"
 
-    // Alarm acknowledgment: user hides the full banner until alarm clears.
+    // Alarm acknowledgment state
     property bool alarmAcknowledged: false
+    // When true: turn output back on as soon as the PSU clears the alarm
+    property bool resumeOutputAfterAck: false
 
-    // Send/cancel system notification on alarm state changes.
+    // Send/cancel system notification and handle resume-after-ack.
     Connections {
         target: backend
         function onAnyAlarmChanged() {
@@ -30,13 +32,21 @@ Rectangle {
             } else {
                 alarmNotifier.cancelAlarm()
                 alarmAcknowledged = false
+                // Alarm cleared — restore output if user chose "Ack & Resume"
+                if (resumeOutputAfterAck) {
+                    resumeOutputAfterAck = false
+                    backend.setOutputOn(true)
+                }
             }
         }
     }
-    // Reset acknowledgment when backend switches (new connection).
+    // Reset state when backend switches (new connection).
     Connections {
         target: backendFactory
-        function onModeChanged() { alarmAcknowledged = false }
+        function onModeChanged() {
+            alarmAcknowledged = false
+            resumeOutputAfterAck = false
+        }
     }
 
     ColumnLayout {
@@ -250,7 +260,20 @@ Rectangle {
                 }
                 ColumnLayout {
                     spacing: 4
-                    // Sends PSU acknowledge command and cancels the notification
+                    // Acknowledges alarm AND restores output once PSU confirms clear
+                    Button {
+                        text: qsTr("Ack & Resume")
+                        font.pixelSize: 11
+                        Material.theme: Material.Dark
+                        Material.accent: "#4caf50"
+                        onClicked: {
+                            resumeOutputAfterAck = true
+                            backend.acknowledgeAlarms()
+                            alarmAcknowledged = true
+                            alarmNotifier.cancelAlarm()
+                        }
+                    }
+                    // Acknowledges alarm only — output stays OFF
                     Button {
                         text: qsTr("Acknowledge")
                         flat: false
@@ -258,12 +281,13 @@ Rectangle {
                         Material.theme: Material.Dark
                         Material.accent: "#f44336"
                         onClicked: {
+                            resumeOutputAfterAck = false
                             backend.acknowledgeAlarms()
                             alarmAcknowledged = true
                             alarmNotifier.cancelAlarm()
                         }
                     }
-                    // UI-only dismiss (keeps notification, keeps PSU in alarm)
+                    // UI-only: hides banner, PSU still in alarm
                     Button {
                         text: qsTr("Dismiss")
                         flat: true
