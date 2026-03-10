@@ -70,6 +70,12 @@ ApplicationWindow {
             alarmPopup.opp = opp; alarmPopup.otp = otp
             alarmPopup.open()
         }
+        // Auto-close the popup when the alarm is cleared remotely
+        // (e.g. acknowledged from the Android app or another REST client).
+        function onAnyAlarmChanged() {
+            if (!backend.anyAlarm && alarmPopup.visible)
+                alarmPopup.close()
+        }
     }
 
     Timer { id: statusTimer; interval: 5000; onTriggered: lastStatus = "" }
