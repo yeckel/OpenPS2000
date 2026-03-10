@@ -49,6 +49,7 @@ signals:
     void setpointReceived(double v, double i);
     void outputReceived(bool on);
     void limitsReceived(double ovp, double ocp);
+    void alarmAcknowledgeRequested();
     void sequenceStopRequested();
     void pulseStopRequested();
 

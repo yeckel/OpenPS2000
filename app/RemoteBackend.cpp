@@ -232,7 +232,9 @@ void RemoteBackend::sendOcpCurrent(double current)
 
 void RemoteBackend::acknowledgeAlarms()
 {
-    // No REST endpoint defined; best-effort no-op
+    QNetworkRequest req(QUrl(m_url + "/api/v1/alarm/acknowledge"));
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    m_nam->post(req, QByteArray("{}"));
 }
 
 void RemoteBackend::resetEnergy()

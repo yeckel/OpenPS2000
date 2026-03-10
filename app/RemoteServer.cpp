@@ -153,6 +153,12 @@ QByteArray RemoteServer::handleRequest(const QString& method, const QString& pat
         return httpResponse(200, jsonOk(result));
     }
 
+    // POST /api/v1/alarm/acknowledge
+    if (method == "POST" && route == "/api/v1/alarm/acknowledge") {
+        emit alarmAcknowledgeRequested();
+        return httpResponse(200, jsonOk());
+    }
+
     // POST /api/v1/sequence/stop
     if (method == "POST" && route == "/api/v1/sequence/stop") {
         emit sequenceStopRequested();

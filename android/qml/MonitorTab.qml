@@ -232,7 +232,7 @@ Rectangle {
         // ── Full alarm banner (shown until user dismisses) ────────────────
         Rectangle {
             Layout.fillWidth: true
-            height: 52; radius: 8
+            height: 60; radius: 8
             visible: backend.connected && backend.anyAlarm && !alarmAcknowledged
             color: "#3a0d0d"; border.color: "#f44336"; border.width: 2
             RowLayout {
@@ -240,22 +240,38 @@ Rectangle {
                 spacing: 8
                 Label { text: "🔴"; font.pixelSize: 22 }
                 Label {
-                    text: qsTr("PROTECTION ALARM: ") +
-                          (backend.ovpActive ? qsTr("Over Voltage (OVP)") :
-                           backend.ocpActive ? qsTr("Over Current (OCP)") :
-                           backend.oppActive ? qsTr("Over Power (OPP)")   :
-                           backend.otpActive ? qsTr("Over Temperature (OTP)") : qsTr("Triggered"))
+                    text: backend.ovpActive ? qsTr("Over Voltage (OVP)") :
+                          backend.ocpActive ? qsTr("Over Current (OCP)") :
+                          backend.oppActive ? qsTr("Over Power (OPP)")   :
+                          backend.otpActive ? qsTr("Over Temperature (OTP)") : qsTr("Alarm")
                     font.pixelSize: 13; font.bold: true; color: "#ff6b6b"
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                 }
-                Button {
-                    text: qsTr("Dismiss")
-                    flat: true
-                    font.pixelSize: 12
-                    Material.theme: Material.Dark
-                    Material.foreground: "#ef9a9a"
-                    onClicked: alarmAcknowledged = true
+                ColumnLayout {
+                    spacing: 4
+                    // Sends PSU acknowledge command and cancels the notification
+                    Button {
+                        text: qsTr("Acknowledge")
+                        flat: false
+                        font.pixelSize: 11
+                        Material.theme: Material.Dark
+                        Material.accent: "#f44336"
+                        onClicked: {
+                            backend.acknowledgeAlarms()
+                            alarmAcknowledged = true
+                            alarmNotifier.cancelAlarm()
+                        }
+                    }
+                    // UI-only dismiss (keeps notification, keeps PSU in alarm)
+                    Button {
+                        text: qsTr("Dismiss")
+                        flat: true
+                        font.pixelSize: 11
+                        Material.theme: Material.Dark
+                        Material.foreground: "#ef9a9a"
+                        onClicked: alarmAcknowledged = true
+                    }
                 }
             }
         }

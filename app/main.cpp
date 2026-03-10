@@ -275,6 +275,7 @@ int main(int argc, char* argv[])
             localBackend->sendSetCurrent(i);
         });
         QObject::connect(remoteServer, &RemoteServer::outputReceived, localBackend, &DeviceBackend::setOutputOn);
+        QObject::connect(remoteServer, &RemoteServer::alarmAcknowledgeRequested, localBackend, &DeviceBackend::acknowledgeAlarms);
         QObject::connect(remoteServer, &RemoteServer::limitsReceived, localBackend, [localBackend](double ovp, double ocp) {
             localBackend->sendOvpVoltage(ovp);
             localBackend->sendOcpCurrent(ocp);

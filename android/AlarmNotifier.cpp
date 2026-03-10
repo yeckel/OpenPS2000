@@ -103,6 +103,34 @@ void AlarmNotifier::showAlarm(const QString &title, const QString &text)
 
     if (!builder.isValid()) return;
 
+    // Tap on the notification → bring the app to the foreground
+    {
+        QJniObject packageName = context.callObjectMethod(
+            "getPackageName", "()Ljava/lang/String;");
+        QJniObject pm = context.callObjectMethod(
+            "getPackageManager", "()Landroid/content/pm/PackageManager;");
+        QJniObject launchIntent = pm.callObjectMethod(
+            "getLaunchIntentForPackage",
+            "(Ljava/lang/String;)Landroid/content/Intent;",
+            packageName.object<jstring>());
+        if (launchIntent.isValid()) {
+            // FLAG_ACTIVITY_SINGLE_TOP: reuse existing task instead of spawning new
+            launchIntent.callObjectMethod("addFlags", "(I)Landroid/content/Intent;",
+                                          jint(0x20000000));
+            // FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE
+            QJniObject pi = QJniObject::callStaticObjectMethod(
+                "android/app/PendingIntent",
+                "getActivity",
+                "(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;",
+                context.object(), jint(0), launchIntent.object(),
+                jint(0x08000000 | 0x04000000));
+            if (pi.isValid())
+                builder.callObjectMethod("setContentIntent",
+                    "(Landroid/app/PendingIntent;)Landroid/app/Notification$Builder;",
+                    pi.object());
+        }
+    }
+
     builder.callObjectMethod("setSmallIcon",
         "(I)Landroid/app/Notification$Builder;", iconId);
     builder.callObjectMethod("setContentTitle",

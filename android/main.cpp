@@ -91,6 +91,7 @@ public:
     Q_INVOKABLE void sendOcpCurrent(double)  {}
     Q_INVOKABLE void setOutputOn(bool)       {}
     Q_INVOKABLE void setRemoteMode(bool)     {}
+    Q_INVOKABLE void acknowledgeAlarms()     {}
 };
 
 // ── BackendFactory ────────────────────────────────────────────────────────
