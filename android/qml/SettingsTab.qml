@@ -149,36 +149,34 @@ Rectangle {
                 }
 
                 Label { text: qsTr("Server address"); font.pixelSize: 12; color: "#8899aa" }
-                Rectangle {
-                    Layout.fillWidth: true; height: 48; radius: 8
-                    color: "#111820"; border.color: "#1e4060"; border.width: 1
-                    TextInput {
-                        id: restUrlField
-                        anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
-                        text:        restSettings.restUrl
-                        font.pixelSize: 15; color: "#e0e8f0"
-                        inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
-                        verticalAlignment: Text.AlignVCenter
-                        placeholderText: "192.168.1.x or hostname"
-
-                        onTextChanged: restSettings.restUrl = text
+                TextField {
+                    id: restUrlField
+                    Layout.fillWidth: true
+                    text:             restSettings.restUrl
+                    placeholderText:  "192.168.1.x or hostname"
+                    font.pixelSize:   15; color: "#e0e8f0"
+                    inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+                    background: Rectangle {
+                        color: "#111820"; radius: 8
+                        border.color: "#1e4060"; border.width: 1
                     }
+                    onTextChanged: restSettings.restUrl = text
                 }
 
                 Label { text: qsTr("Bearer token (optional)"); font.pixelSize: 12; color: "#8899aa" }
-                Rectangle {
-                    Layout.fillWidth: true; height: 48; radius: 8
-                    color: "#111820"; border.color: "#1e2d3d"; border.width: 1
-                    TextInput {
-                        id: tokenField
-                        anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
-                        text:             restSettings.restToken
-                        font.pixelSize:   14; color: "#e0e8f0"
-                        inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-                        verticalAlignment: Text.AlignVCenter
-                        echoMode:         TextInput.PasswordEchoOnEdit
-                        onTextChanged:    restSettings.restToken = text
+                TextField {
+                    id: tokenField
+                    Layout.fillWidth: true
+                    text:             restSettings.restToken
+                    placeholderText:  qsTr("Leave empty for no auth")
+                    font.pixelSize:   14; color: "#e0e8f0"
+                    inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                    echoMode:         TextInput.PasswordEchoOnEdit
+                    background: Rectangle {
+                        color: "#111820"; radius: 8
+                        border.color: "#1e2d3d"; border.width: 1
                     }
+                    onTextChanged: restSettings.restToken = text
                 }
 
                 Button {
