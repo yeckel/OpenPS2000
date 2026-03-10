@@ -178,9 +178,10 @@ Rectangle {
                 Label {
                     id: alarmLabel
                     anchors.centerIn: parent
-                    text: backend.ovpActive ? "OVP" :
-                          backend.ocpActive ? "OCP" :
-                          backend.oppActive ? "OPP" : "ALARM"
+                    text: backend.ovpActive ? "⚠ OVP" :
+                          backend.ocpActive ? "⚠ OCP" :
+                          backend.oppActive ? "⚠ OPP" :
+                          backend.otpActive ? "⚠ OTP" : "⚠ ALARM"
                     font.pixelSize: 11; font.bold: true; color: "#ef9a9a"
                 }
             }
@@ -191,6 +192,31 @@ Rectangle {
                 visible: backend.connected
                 text: backend.duration
                 font.pixelSize: 11; color: "#607d8b"
+            }
+        }
+
+        // ── Alarm banner (prominent, full-width) ──────────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            height: 44; radius: 8
+            visible: backend.connected && backend.anyAlarm
+            color: "#3a0d0d"; border.color: "#f44336"; border.width: 2
+            RowLayout {
+                anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
+                Label {
+                    text: "🔴"
+                    font.pixelSize: 20
+                }
+                Label {
+                    text: qsTr("PROTECTION ALARM: ") +
+                          (backend.ovpActive ? qsTr("Over Voltage (OVP)") :
+                           backend.ocpActive ? qsTr("Over Current (OCP)") :
+                           backend.oppActive ? qsTr("Over Power (OPP)")   :
+                           backend.otpActive ? qsTr("Over Temperature (OTP)") : qsTr("Triggered"))
+                    font.pixelSize: 13; font.bold: true; color: "#ff6b6b"
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
             }
         }
 
@@ -205,13 +231,20 @@ Rectangle {
             LiveChart {
                 id: liveChart
                 anchors { fill: parent; margins: 4 }
+                leftUnit:  "V"
+                rightUnit: "A"
+                seriesList: [
+                    { name: "Voltage", color: "#4dc8ff", yAxis: "left",  data: [], fillArea: false },
+                    { name: "Current", color: "#ff9940", yAxis: "right", data: [], fillArea: false }
+                ]
             }
 
             // Wire new samples
             Connections {
                 target: backend
                 function onNewSample(t, v, i, p) {
-                    liveChart.addPoint(t, v, i)
+                    liveChart.appendTo(0, t, v)
+                    liveChart.appendTo(1, t, i)
                 }
             }
         }

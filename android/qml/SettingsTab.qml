@@ -184,7 +184,7 @@ Rectangle {
                     text: qsTr("🌐 Connect via REST")
                     highlighted: true
                     Material.theme: Material.Dark; Material.accent: "#64b5f6"
-                    enabled: !backend.connected && restUrlField.text.length > 0
+                    enabled: !backend.connected && restSettings.restUrl.length > 0
                     onClicked: backendFactory.switchToRest(restUrlField.text)
                 }
             }
