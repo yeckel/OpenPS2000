@@ -118,6 +118,36 @@ public:
         return AndroidSerialTransport::listDevices();
     }
 
+    /** True if the first found EA USB device already has permission. */
+    Q_INVOKABLE bool hasUsbPermission()
+    {
+        QJniObject ctx = QNativeInterface::QAndroidApplication::context();
+        if (!ctx.isValid()) return false;
+        return QJniObject::callStaticMethod<jboolean>(
+            "org/openps2000/UsbSerial", "hasPermission",
+            "(Landroid/content/Context;)Z", ctx.object<jobject>());
+    }
+
+    /** Show the Android system USB permission dialog for the EA device. */
+    Q_INVOKABLE void requestUsbPermission()
+    {
+        QJniObject ctx = QNativeInterface::QAndroidApplication::context();
+        if (!ctx.isValid()) return;
+        QJniObject::callStaticMethod<void>(
+            "org/openps2000/UsbSerial", "requestPermissionAsync",
+            "(Landroid/content/Context;)V", ctx.object<jobject>());
+    }
+
+    /**
+     * Poll the Java-side flag set by the BroadcastReceiver.
+     * Returns true once the user has granted permission.
+     */
+    Q_INVOKABLE bool isUsbPermissionGranted()
+    {
+        return QJniObject::callStaticMethod<jboolean>(
+            "org/openps2000/UsbSerial", "isPermissionGranted", "()Z");
+    }
+
     Q_INVOKABLE void switchToUsb(const QString& deviceName = QString())
     {
         clearBackend();

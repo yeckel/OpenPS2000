@@ -53,6 +53,29 @@ Rectangle {
                 spacing: 8
                 visible: connectionTabs.currentIndex === 0
 
+                // Poll for USB permission grant after requesting it
+                Timer {
+                    id: permissionPollTimer
+                    interval: 500; repeat: true
+                    onTriggered: {
+                        if (backendFactory.isUsbPermissionGranted()) {
+                            stop()
+                            usbStatusLabel.text = qsTr("✅ USB access granted — tap Connect")
+                            usbStatusLabel.color = "#81c784"
+                            // Re-scan so device appears in list
+                            usbDeviceModel.clear()
+                            var devs = backendFactory.listUsbDevices()
+                            for (var i = 0; i < devs.length; i++) {
+                                var parts = devs[i].split("|")
+                                usbDeviceModel.append({ "display": parts.length > 1 ? parts[1] : devs[i],
+                                                        "devName": parts[0] })
+                            }
+                            if (usbDeviceModel.count > 0)
+                                usbDeviceList.currentIndex = 0
+                        }
+                    }
+                }
+
                 Label {
                     text: qsTr("Connect via USB OTG cable")
                     font.pixelSize: 13; font.bold: true; color: "#64b5f6"
@@ -62,6 +85,30 @@ Rectangle {
                     font.pixelSize: 12; color: "#8899aa"
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
+                }
+
+                // Permission banner — shown when EA device found but no permission
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 48; radius: 8
+                    visible: usbDeviceModel.count === 0 && !backendFactory.hasUsbPermission()
+                             && permissionPollTimer.running
+                    color: "#1a1a00"; border.color: "#888800"; border.width: 1
+                    Label {
+                        anchors { fill: parent; margins: 10 }
+                        text: qsTr("⏳ Waiting for USB permission — please tap Allow in the system dialog")
+                        font.pixelSize: 12; color: "#cccc44"
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                // Status label for scan / permission feedback
+                Label {
+                    id: usbStatusLabel
+                    Layout.fillWidth: true
+                    visible: text.length > 0
+                    font.pixelSize: 12; color: "#8899aa"
+                    wrapMode: Text.WordWrap
                 }
 
                 // Device list
@@ -90,7 +137,7 @@ Rectangle {
                 }
 
                 Label {
-                    visible: usbDeviceModel.count === 0
+                    visible: usbDeviceModel.count === 0 && !permissionPollTimer.running
                     text: qsTr("No EA-PS devices found.\nPlug in via OTG cable and tap Scan.")
                     font.pixelSize: 12; color: "#607d8b"
                     wrapMode: Text.WordWrap
@@ -104,13 +151,30 @@ Rectangle {
                         text: qsTr("🔍 Scan")
                         Material.theme: Material.Dark
                         onClicked: {
+                            permissionPollTimer.stop()
+                            usbStatusLabel.text = ""
                             usbDeviceModel.clear()
-                            // backendFactory exposes listUsbDevices via QML invokable
                             var devs = backendFactory.listUsbDevices()
                             for (var i = 0; i < devs.length; i++) {
                                 var parts = devs[i].split("|")
                                 usbDeviceModel.append({ "display": parts.length > 1 ? parts[1] : devs[i],
                                                         "devName": parts[0] })
+                            }
+                            if (usbDeviceModel.count > 0) {
+                                usbDeviceList.currentIndex = 0
+                                // Check / request permission
+                                if (!backendFactory.hasUsbPermission()) {
+                                    backendFactory.requestUsbPermission()
+                                    usbStatusLabel.text = qsTr("⏳ Requesting USB access — tap Allow in the dialog…")
+                                    usbStatusLabel.color = "#cccc44"
+                                    permissionPollTimer.start()
+                                } else {
+                                    usbStatusLabel.text = qsTr("✅ USB access already granted")
+                                    usbStatusLabel.color = "#81c784"
+                                }
+                            } else {
+                                usbStatusLabel.text = qsTr("No EA-PS device found. Check OTG cable.")
+                                usbStatusLabel.color = "#ef9a9a"
                             }
                         }
                     }
@@ -119,8 +183,10 @@ Rectangle {
                         text: qsTr("🔌 Connect")
                         highlighted: true
                         Material.theme: Material.Dark; Material.accent: "#4caf50"
-                        enabled: !backend.connected
+                        enabled: !backend.connected && usbDeviceModel.count > 0
+                                 && backendFactory.hasUsbPermission()
                         onClicked: {
+                            permissionPollTimer.stop()
                             var devName = usbDeviceList.currentIndex >= 0
                                 ? usbDeviceModel.get(usbDeviceList.currentIndex).devName
                                 : ""

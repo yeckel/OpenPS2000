@@ -10,13 +10,18 @@
 //
 package org.openps2000;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -28,6 +33,12 @@ public class UsbSerial {
 
     // EA Elektro-Automatik vendor ID
     private static final int EA_VID = 0x0AAD;
+
+    private static final String ACTION_USB_PERMISSION = "org.openps2000.USB_PERMISSION";
+
+    // Set to true by the BroadcastReceiver when the user grants permission.
+    private static volatile boolean sPermissionGranted = false;
+    private static BroadcastReceiver sPermissionReceiver = null;
 
     // CDC-ACM control requests
     private static final int SET_LINE_CODING        = 0x20;
@@ -85,6 +96,85 @@ public class UsbSerial {
             if (d.getVendorId() == EA_VID) return d.getDeviceName();
         }
         return "";
+    }
+
+    // ── USB Permission helpers ─────────────────────────────────────────────
+
+    /** Returns true if the first detected EA device already has USB permission. */
+    public static boolean hasPermission(Context ctx) {
+        UsbManager mgr = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+        for (UsbDevice d : mgr.getDeviceList().values()) {
+            if (d.getVendorId() == EA_VID) return mgr.hasPermission(d);
+        }
+        return false;
+    }
+
+    /**
+     * Returns the last permission result set by the async receiver.
+     * Poll this from C++ after calling requestPermissionAsync().
+     */
+    public static boolean isPermissionGranted() {
+        return sPermissionGranted;
+    }
+
+    /**
+     * Asynchronously request USB permission for the first EA device.
+     * Shows the system "Allow OpenPS2000 to access [device]?" dialog.
+     * Call isPermissionGranted() periodically (or after ~1 s) to check.
+     */
+    public static void requestPermissionAsync(Context ctx) {
+        UsbManager mgr = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
+        for (UsbDevice d : mgr.getDeviceList().values()) {
+            if (d.getVendorId() == EA_VID) {
+                if (mgr.hasPermission(d)) {
+                    // Already granted — set flag immediately
+                    sPermissionGranted = true;
+                    return;
+                }
+
+                sPermissionGranted = false;
+
+                // Unregister any stale receiver
+                if (sPermissionReceiver != null) {
+                    try { ctx.unregisterReceiver(sPermissionReceiver); }
+                    catch (Exception ignored) {}
+                    sPermissionReceiver = null;
+                }
+
+                final BroadcastReceiver[] holder = { null };
+                holder[0] = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        if (ACTION_USB_PERMISSION.equals(intent.getAction())) {
+                            sPermissionGranted = intent.getBooleanExtra(
+                                UsbManager.EXTRA_PERMISSION_GRANTED, false);
+                            Log.i(TAG, "USB permission result: " + sPermissionGranted);
+                            try { context.unregisterReceiver(holder[0]); }
+                            catch (Exception ignored) {}
+                            sPermissionReceiver = null;
+                        }
+                    }
+                };
+                sPermissionReceiver = holder[0];
+
+                IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                if (Build.VERSION.SDK_INT >= 33) {
+                    ctx.registerReceiver(sPermissionReceiver, filter,
+                                         4 /* RECEIVER_NOT_EXPORTED */);
+                } else {
+                    ctx.registerReceiver(sPermissionReceiver, filter);
+                }
+
+                PendingIntent pi = PendingIntent.getBroadcast(
+                    ctx, 0,
+                    new Intent(ACTION_USB_PERMISSION).setPackage(ctx.getPackageName()),
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                mgr.requestPermission(d, pi);
+                Log.i(TAG, "USB permission request sent for " + d.getDeviceName());
+                return;
+            }
+        }
+        Log.w(TAG, "requestPermissionAsync: no EA device found");
     }
 
     // ── Open / Close ──────────────────────────────────────────────────────
