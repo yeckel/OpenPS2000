@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name="org.qtproject.qt.android.bindings.QtApplication"
+        android:name="org.qtproject.qt.android.QtApplication"
         android:label="OpenPS2000"
         android:icon="@drawable/icon"
         android:hardwareAccelerated="true"
@@ -26,12 +26,15 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:name="org.qtproject.qt.android.QtActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
+
+            <!-- Qt library name — androiddeployqt replaces this placeholder -->
+            <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
