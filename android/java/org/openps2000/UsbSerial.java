@@ -96,7 +96,7 @@ public class UsbSerial {
      *                or empty to auto-select the first EA device.
      * @return true on success
      */
-    public synchronized boolean open(Context ctx, String devName) {
+    public synchronized boolean openImpl(Context ctx, String devName) {
         mUsbManager = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
 
         // Find device
@@ -180,7 +180,7 @@ public class UsbSerial {
         return true;
     }
 
-    public synchronized void close() {
+    public synchronized void closeImpl() {
         if (mConnection != null) {
             if (mDataInterface  != null) mConnection.releaseInterface(mDataInterface);
             mConnection.close();
@@ -202,7 +202,7 @@ public class UsbSerial {
      * Write bytes to the device. Returns number of bytes written, or -1 on error.
      * Timeout: 500 ms.
      */
-    public synchronized int write(byte[] data) {
+    public synchronized int writeImpl(byte[] data) {
         if (!isOpen()) return -1;
         return mConnection.bulkTransfer(mEndpointOut, data, data.length, 500);
     }
@@ -212,7 +212,7 @@ public class UsbSerial {
      * 0 on timeout, -1 on error.
      * Timeout: 200 ms (must be shorter than the 250 ms poll interval).
      */
-    public synchronized int read(byte[] buf, int maxLen) {
+    public synchronized int readImpl(byte[] buf, int maxLen) {
         if (!isOpen()) return -1;
         return mConnection.bulkTransfer(mEndpointIn, buf, maxLen, 200);
     }
@@ -233,18 +233,18 @@ public class UsbSerial {
     // These delegate to the singleton so C++ can call them as static methods.
 
     public static boolean open(Context ctx, String devName) {
-        return getInstance().open(ctx, devName);
+        return getInstance().openImpl(ctx, devName);
     }
 
     public static void close() {
-        getInstance().close();
+        getInstance().closeImpl();
     }
 
     public static int write(byte[] data) {
-        return getInstance().write(data);
+        return getInstance().writeImpl(data);
     }
 
     public static int read(byte[] buf, int maxLen) {
-        return getInstance().read(buf, maxLen);
+        return getInstance().readImpl(buf, maxLen);
     }
 }
