@@ -126,14 +126,15 @@ jobs:
 
       - name: Deploy with macdeployqt
         run: |
-          macdeployqt build/bin/openps2000app.app -qmldir=app/qml -dmg
-          mv build/bin/openps2000app.dmg OpenPS2000-macos.dmg
+          macdeployqt build/bin/openps2000app.app -qmldir=app/qml
+          cd build/bin
+          zip -r ../../OpenPS2000-macos.zip openps2000app.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-dmg
-          path: OpenPS2000-macos.dmg
+          path: OpenPS2000-macos.zip
 
   # ── Android ───────────────────────────────────────────────────────────────
   build-android:
@@ -223,5 +224,5 @@ jobs:
           files: |
             OpenPS2000-linux-x86_64.AppImage
             OpenPS2000-windows-x86_64.zip
-            OpenPS2000-macos.dmg
+            OpenPS2000-macos.zip
             OpenPS2000-android-arm64.apk
