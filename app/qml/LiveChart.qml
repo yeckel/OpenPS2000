@@ -233,7 +233,7 @@ Item {
             // Hint
             ctx.fillStyle = "rgba(153,170,187,0.25)"; ctx.font = "10px sans-serif"
             ctx.textAlign = "right"; ctx.textBaseline = "bottom"
-            ctx.fillText(qsTr("scroll=zoom  RMB=pan  LMB=measure"), pX + pW - 4, pY + pH - 4)
+            ctx.fillText(qsTr("pinch=zoom  2-finger=pan  drag=measure"), pX + pW - 4, pY + pH - 4)
         }
     }
 
@@ -244,25 +244,32 @@ Item {
         root.viewChanged(newVl, newWs)
     }
 
+    // ── Mouse wheel zoom (desktop / touchpad) ─────────────────────────────
     WheelHandler {
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: (event) => {
             var factor = event.angleDelta.y > 0 ? 0.75 : 1.33
-            var ws = root.effectiveWindowSecs
-            var vl = root.currentViewLeft()
-            var frac = Math.max(0, Math.min(1,
-                (point.position.x - root.mL) / Math.max(1, root.width - root.mL - root.mR)))
+            var ws   = root.effectiveWindowSecs
+            var vl   = root.currentViewLeft()
+            var pW   = Math.max(1, root.width - root.mL - root.mR)
+            var frac = Math.max(0, Math.min(1, (point.position.x - root.mL) / pW))
             var mouseT = vl + frac * ws
-            var newWs = Math.max(2, Math.min(7200, ws * factor))
-            var newVl = Math.max(0, mouseT - frac * newWs)
+            var newWs  = Math.max(2, Math.min(7200, ws * factor))
+            var newVl  = Math.max(0, mouseT - frac * newWs)
             root._applyViewChange(newVl, newWs)
         }
     }
 
-    // ── Pinch handler: zoom (scale) + two-finger pan ───────────────────────
+    // ── Pinch: zoom + two-finger pan (touch) ──────────────────────────────
+    // grabPermissions: CanTakeOverFromAnything — essential on Android so that
+    // PinchHandler can steal touch points from DragHandler when a 2nd finger lands.
     PinchHandler {
         id: pinchHandler
         target: null
+        minimumPointCount: 2
+        maximumPointCount: 2
+        grabPermissions: PointerHandler.CanTakeOverFromAnything
+
         property real _startWs: 60
         property real _startVl: 0
         property real _startCx: 0
@@ -272,60 +279,83 @@ Item {
                 _startWs = root.effectiveWindowSecs
                 _startVl = root.currentViewLeft()
                 _startCx = centroid.position.x
+                // Cancel any in-progress selection when pinch begins
+                root.selectionStart = -1
+                root.selectionEnd   = -1
             }
         }
         onActiveScaleChanged: {
-            var ws  = root.effectiveWindowSecs
-            var vl  = root.currentViewLeft()
-            var pW  = Math.max(1, root.width - root.mL - root.mR)
+            var pW   = Math.max(1, root.width - root.mL - root.mR)
             var frac = Math.max(0, Math.min(1, (centroid.position.x - root.mL) / pW))
-            var pinchT = vl + frac * ws
-            var newWs = Math.max(2, Math.min(7200, _startWs / activeScale))
-            // pan delta from two-finger drag
-            var panDt = -(centroid.position.x - _startCx) / pW * newWs
-            var newVl = Math.max(0, pinchT - frac * newWs + panDt)
+            var pinchT = _startVl + frac * _startWs
+            var newWs  = Math.max(2, Math.min(7200, _startWs / activeScale))
+            var panDt  = -(centroid.position.x - _startCx) / pW * _startWs
+            var newVl  = Math.max(0, pinchT - frac * newWs + panDt)
             root._applyViewChange(newVl, newWs)
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        cursorShape: pressedButtons & Qt.RightButton ? Qt.ClosedHandCursor : Qt.CrossCursor
-        property real _panStartX:  0
-        property real _panStartVL: 0
+    // ── Single-finger drag: range selection (touch + LMB on desktop) ──────
+    DragHandler {
+        id: selectionDrag
+        target: null
+        acceptedButtons: Qt.LeftButton
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchScreen
+        dragThreshold: 4
+        // Allow PinchHandler to take over when a second finger arrives
+        grabPermissions: PointerHandler.CanTakeOverFromHandlersOfSameType |
+                         PointerHandler.ApprovesTakeOverByAnything
 
-        onPressed: (mouse) => {
-            if (mouse.button === Qt.RightButton) {
-                _panStartX  = mouse.x
-                _panStartVL = root.currentViewLeft()
-            } else {
-                root.selectionStart = root.pixelToTime(mouse.x)
+        onActiveChanged: {
+            if (active) {
+                root.selectionStart = root.pixelToTime(centroid.pressPosition.x)
                 root.selectionEnd   = root.selectionStart
                 canvas.requestPaint()
-            }
-        }
-        onPositionChanged: (mouse) => {
-            if (pressedButtons & Qt.RightButton) {
-                var dt = -(mouse.x - _panStartX) /
-                    Math.max(1, root.width - root.mL - root.mR) * root.effectiveWindowSecs
-                root._applyViewChange(Math.max(0, _panStartVL + dt), root.effectiveWindowSecs)
-            } else if (pressed) {
-                root.selectionEnd = root.pixelToTime(mouse.x)
-                canvas.requestPaint()
-            }
-        }
-        onReleased: (mouse) => {
-            if (mouse.button === Qt.LeftButton) {
-                root.selectionEnd = root.pixelToTime(mouse.x)
+            } else {
                 var t0 = Math.min(root.selectionStart, root.selectionEnd)
                 var t1 = Math.max(root.selectionStart, root.selectionEnd)
                 if (t1 - t0 > 0.1) root.rangeSelected(t0, t1)
                 canvas.requestPaint()
             }
         }
-        onDoubleClicked: {
-            root.selectionStart = -1; root.selectionEnd = -1
+        onCentroidChanged: {
+            if (active) {
+                root.selectionEnd = root.pixelToTime(centroid.position.x)
+                canvas.requestPaint()
+            }
+        }
+    }
+
+    // ── RMB drag: pan (desktop only) ──────────────────────────────────────
+    DragHandler {
+        id: panDrag
+        target: null
+        acceptedButtons: Qt.RightButton
+        acceptedDevices: PointerDevice.Mouse
+
+        property real _startVL: 0
+
+        onActiveChanged: {
+            if (active) _startVL = root.currentViewLeft()
+        }
+        onCentroidChanged: {
+            if (active) {
+                var pW = Math.max(1, root.width - root.mL - root.mR)
+                var dt = -(centroid.position.x - centroid.pressPosition.x) / pW * root.effectiveWindowSecs
+                root._applyViewChange(Math.max(0, _startVL + dt), root.effectiveWindowSecs)
+            }
+        }
+    }
+
+    // ── Double-tap / double-click: clear selection ────────────────────────
+    TapHandler {
+        acceptedButtons: Qt.LeftButton
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchScreen
+        gesturePolicy: TapHandler.WithinBounds
+
+        onDoubleTapped: {
+            root.selectionStart = -1
+            root.selectionEnd   = -1
             canvas.requestPaint()
             root.selectionCleared()
         }
