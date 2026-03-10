@@ -53,13 +53,14 @@ QStringList AndroidSerialTransport::listDevices()
     if (!ctx.isValid()) return {};
 
     QJniEnvironment env;
-    auto arr = static_cast<jobjectArray>(
-        QJniObject::callStaticMethod<jobject>(
-            JAVA_CLASS, "listDevices",
-            "(Landroid/content/Context;)[Ljava/lang/String;",
-            ctx.object<jobject>()));
+    QJniObject arrObj = QJniObject::callStaticObjectMethod(
+        JAVA_CLASS, "listDevices",
+        "(Landroid/content/Context;)[Ljava/lang/String;",
+        ctx.object<jobject>());
 
     QStringList result;
+    if (!arrObj.isValid()) return result;
+    jobjectArray arr = arrObj.object<jobjectArray>();
     if (!arr) return result;
     const int len = env->GetArrayLength(arr);
     for (int i = 0; i < len; ++i) {
@@ -67,7 +68,6 @@ QStringList AndroidSerialTransport::listDevices()
         result << QJniObject(s).toString();
         env->DeleteLocalRef(s);
     }
-    env->DeleteLocalRef(arr);
     return result;
 }
 
