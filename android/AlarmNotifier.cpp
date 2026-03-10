@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 #include <QJniObject>
 #include <QJniEnvironment>
-#include <QPermission>
 
 static constexpr int  NOTIF_ID    = 1001;
 static constexpr char CHANNEL_ID[] = "openps2000_alarms";
@@ -14,10 +13,34 @@ AlarmNotifier::AlarmNotifier(QObject* parent) : QObject(parent) {}
 
 void AlarmNotifier::requestPermission()
 {
-    // POST_NOTIFICATIONS was added in Android 13 (API 33).
-    // On older releases the permission is implicitly granted.
-    QNotificationPermission perm;
-    qApp->requestPermission(perm, [](const QPermission &) {});
+    // POST_NOTIFICATIONS requires explicit runtime grant on Android 13+ (API 33+).
+    // We request it via the Activity obtained from Qt's native bridge.
+    const jint sdk = QJniObject::getStaticField<jint>("android/os/Build$VERSION", "SDK_INT");
+    if (sdk < 33) return;  // auto-granted on Android ≤ 12
+
+    const QString permName = QStringLiteral("android.permission.POST_NOTIFICATIONS");
+
+    // Retrieve the current Activity via Qt's JNI bridge
+    QJniObject activity = QJniObject::callStaticObjectMethod(
+        "org/qtproject/qt/android/QtNative",
+        "activity",
+        "()Landroid/app/Activity;");
+    if (!activity.isValid()) return;
+
+    // Check if already granted (PackageManager.PERMISSION_GRANTED == 0)
+    QJniObject permStr = QJniObject::fromString(permName);
+    jint status = activity.callMethod<jint>(
+        "checkSelfPermission", "(Ljava/lang/String;)I",
+        permStr.object<jstring>());
+    if (status == 0) return;
+
+    // Build a String[] and call Activity.requestPermissions()
+    QJniEnvironment env;
+    jclass stringClass = env.findClass("java/lang/String");
+    jobjectArray arr = env->NewObjectArray(1, stringClass, nullptr);
+    env->SetObjectArrayElement(arr, 0, permStr.object<jstring>());
+    activity.callMethod<void>("requestPermissions", "([Ljava/lang/String;I)V",
+                              arr, jint(1001));
 }
 
 void AlarmNotifier::ensureChannel()
