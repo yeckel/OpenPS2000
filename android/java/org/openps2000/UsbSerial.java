@@ -302,12 +302,20 @@ public class UsbSerial {
      * 0 on timeout, -1 on error.
      * Timeout: 200 ms (must be shorter than the 250 ms poll interval).
      */
-    public synchronized int readImpl(byte[] buf, int maxLen) {
+    public synchronized int readImpl(byte[] buf, int maxLen, int timeoutMs) {
         if (!isOpen()) return -1;
-        return mConnection.bulkTransfer(mEndpointIn, buf, maxLen, 200);
+        return mConnection.bulkTransfer(mEndpointIn, buf, maxLen, timeoutMs);
     }
 
-    /** Request USB permission for the first detected EA device via system dialog. */
+    /** Backward-compatible overload used by C++ JNI wrapper. */
+    public static int read(byte[] buf, int maxLen) {
+        return getInstance().readImpl(buf, maxLen, 200);
+    }
+
+    /** Extended overload with explicit timeout (ms). */
+    public static int readTimeout(byte[] buf, int maxLen, int timeoutMs) {
+        return getInstance().readImpl(buf, maxLen, timeoutMs);
+    }
     public static void requestPermission(Context ctx,
             android.app.PendingIntent pi) {
         UsbManager mgr = (UsbManager) ctx.getSystemService(Context.USB_SERVICE);
@@ -332,9 +340,5 @@ public class UsbSerial {
 
     public static int write(byte[] data) {
         return getInstance().writeImpl(data);
-    }
-
-    public static int read(byte[] buf, int maxLen) {
-        return getInstance().readImpl(buf, maxLen);
     }
 }

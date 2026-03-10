@@ -91,6 +91,14 @@ void AndroidSerialTransport::run()
         return;
     }
 
+    // Flush stale bytes from the USB bulk IN endpoint (mirrors QSerialPort::clear()
+    // on the desktop transport).  Without this, leftover bytes from a previous
+    // connection corrupt the first protocol queries.
+    for (int i = 0; i < 8; ++i) {
+        QByteArray stale = jniRead(64, 50);
+        if (stale.isEmpty()) break;
+    }
+
     emit statusMessage(QString("Connected to %1").arg(devName));
 
     // Read device identity and nominal values.
@@ -220,12 +228,13 @@ int AndroidSerialTransport::jniWrite(const QByteArray& data)
     return written;
 }
 
-QByteArray AndroidSerialTransport::jniRead(int maxLen, int /*timeoutMs*/)
+QByteArray AndroidSerialTransport::jniRead(int maxLen, int timeoutMs)
 {
     QJniEnvironment env;
     jbyteArray jBuf = env->NewByteArray(maxLen);
     jint got = QJniObject::callStaticMethod<jint>(
-        JAVA_CLASS, "read", "([BI)I", jBuf, static_cast<jint>(maxLen));
+        JAVA_CLASS, "readTimeout", "([BII)I",
+        jBuf, static_cast<jint>(maxLen), static_cast<jint>(timeoutMs));
 
     QByteArray result;
     if (got > 0) {
