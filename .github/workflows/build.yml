@@ -185,10 +185,24 @@ jobs:
             android/
           cmake --build build-android --parallel
 
-      - name: Rename APK
+      - name: Sign APK
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          cp build-android/android-build/build/outputs/apk/release/android-build-release-unsigned.apk \
-             OpenPS2000-android-arm64.apk
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > /tmp/release.jks
+          UNSIGNED=build-android/android-build/build/outputs/apk/release/android-build-release-unsigned.apk
+          APKSIGNER=$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner
+          $APKSIGNER sign \
+            --ks /tmp/release.jks \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass "pass:$ANDROID_STORE_PASSWORD" \
+            --key-pass "pass:$ANDROID_KEY_PASSWORD" \
+            --out OpenPS2000-android-arm64.apk \
+            "$UNSIGNED"
+          $APKSIGNER verify OpenPS2000-android-arm64.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
