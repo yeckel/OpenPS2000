@@ -237,40 +237,40 @@ Rectangle {
                 columns: 4; columnSpacing: 8; rowSpacing: 8
 
                 Label { text: qsTr("OVP"); font.pixelSize: 12; color: "#8899aa" }
-                Rectangle {
-                    Layout.fillWidth: true; height: 40; radius: 6
-                    color: "#1a0d0d"; border.color: "#4a1a1a"; border.width: 1
-                    TextInput {
-                        anchors { fill: parent; margins: 8 }
-                        text: backend.ovpVoltage.toFixed(1)
-                        font.pixelSize: 14; color: "#ef9a9a"
-                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                        verticalAlignment: Text.AlignVCenter
-                        enabled: backend.connected && backend.remoteMode
-                        onEditingFinished: {
-                            var v = parseFloat(text)
-                            if (!isNaN(v)) backend.sendOvpVoltage(v)
-                        }
+                TextField {
+                    Layout.fillWidth: true
+                    implicitHeight: 40
+                    text: backend.ovpVoltage.toFixed(1)
+                    font.pixelSize: 14; color: "#ef9a9a"
+                    leftPadding: 8; rightPadding: 8
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    enabled: backend.connected && backend.remoteMode
+                    background: Rectangle {
+                        color: "#1a0d0d"; border.color: "#4a1a1a"; border.width: 1; radius: 6
+                    }
+                    onEditingFinished: {
+                        var v = parseFloat(text)
+                        if (!isNaN(v)) backend.sendOvpVoltage(v)
                     }
                 }
                 Label { text: "V"; font.pixelSize: 12; color: "#8899aa" }
                 Item  { width: 1 }
 
                 Label { text: qsTr("OCP"); font.pixelSize: 12; color: "#8899aa" }
-                Rectangle {
-                    Layout.fillWidth: true; height: 40; radius: 6
-                    color: "#1a0d0d"; border.color: "#4a1a1a"; border.width: 1
-                    TextInput {
-                        anchors { fill: parent; margins: 8 }
-                        text: backend.ocpCurrent.toFixed(3)
-                        font.pixelSize: 14; color: "#ef9a9a"
-                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                        verticalAlignment: Text.AlignVCenter
-                        enabled: backend.connected && backend.remoteMode
-                        onEditingFinished: {
-                            var i = parseFloat(text)
-                            if (!isNaN(i)) backend.sendOcpCurrent(i)
-                        }
+                TextField {
+                    Layout.fillWidth: true
+                    implicitHeight: 40
+                    text: backend.ocpCurrent.toFixed(3)
+                    font.pixelSize: 14; color: "#ef9a9a"
+                    leftPadding: 8; rightPadding: 8
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    enabled: backend.connected && backend.remoteMode
+                    background: Rectangle {
+                        color: "#1a0d0d"; border.color: "#4a1a1a"; border.width: 1; radius: 6
+                    }
+                    onEditingFinished: {
+                        var i = parseFloat(text)
+                        if (!isNaN(i)) backend.sendOcpCurrent(i)
                     }
                 }
                 Label { text: "A"; font.pixelSize: 12; color: "#8899aa" }

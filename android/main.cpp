@@ -17,6 +17,7 @@
 #include "../app/DeviceBackend.h"
 #include "../app/RemoteBackend.h"
 #include "AndroidSerialTransport.h"
+#include "AlarmNotifier.h"
 
 // ── NullBackend ───────────────────────────────────────────────────────────
 // Safe placeholder exposed to QML before the user selects a connection.
@@ -208,6 +209,11 @@ int main(int argc, char *argv[])
 
     BackendFactory factory(&engine, &app);
     engine.rootContext()->setContextProperty("backendFactory", &factory);
+
+    AlarmNotifier alarmNotifier(&app);
+    engine.rootContext()->setContextProperty("alarmNotifier", &alarmNotifier);
+    // Request notification permission on first run (Android 13+)
+    alarmNotifier.requestPermission();
 
     const QUrl url(QStringLiteral("qrc:/qt/qml/openps2000android/qml/Main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed,

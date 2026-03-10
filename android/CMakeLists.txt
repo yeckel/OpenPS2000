@@ -20,6 +20,8 @@ qt_add_executable(openps2000android
     main.cpp
     AndroidSerialTransport.h
     AndroidSerialTransport.cpp
+    AlarmNotifier.h
+    AlarmNotifier.cpp
 
     # ── Shared protocol / backend layers ──────────────────────────────────
     ${APP_SRC}/AbstractTransport.h

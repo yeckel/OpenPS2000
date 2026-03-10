@@ -10,6 +10,35 @@ import QtQuick.Layouts
 Rectangle {
     color: "#0d1117"
 
+    // Alarm acknowledgment: user hides the full banner until alarm clears.
+    property bool alarmAcknowledged: false
+
+    // Send/cancel system notification on alarm state changes.
+    Connections {
+        target: backend
+        function onAnyAlarmChanged() {
+            if (backend.anyAlarm) {
+                alarmAcknowledged = false
+                var kind = backend.ovpActive ? qsTr("Over Voltage (OVP)") :
+                           backend.ocpActive ? qsTr("Over Current (OCP)") :
+                           backend.oppActive ? qsTr("Over Power (OPP)")   :
+                           backend.otpActive ? qsTr("Over Temperature (OTP)") :
+                                              qsTr("Protection Alarm")
+                alarmNotifier.showAlarm(
+                    "⚠ " + qsTr("PSU Protection Alarm"),
+                    kind + (backend.deviceType.length > 0 ? " — " + backend.deviceType : ""))
+            } else {
+                alarmNotifier.cancelAlarm()
+                alarmAcknowledged = false
+            }
+        }
+    }
+    // Reset acknowledgment when backend switches (new connection).
+    Connections {
+        target: backendFactory
+        function onModeChanged() { alarmAcknowledged = false }
+    }
+
     ColumnLayout {
         anchors { fill: parent; margins: 12 }
         spacing: 10
@@ -171,12 +200,17 @@ Rectangle {
                 }
             }
 
+            // Small alarm badge — always visible while alarm is active
             Rectangle {
-                height: 28; width: alarmLabel.implicitWidth + 16; radius: 4
+                height: 28; width: alarmBadge.implicitWidth + 16; radius: 4
                 visible: backend.connected && backend.anyAlarm
                 color: "#3a0d0d"; border.color: "#f44336"; border.width: 1
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: alarmAcknowledged = false
+                }
                 Label {
-                    id: alarmLabel
+                    id: alarmBadge
                     anchors.centerIn: parent
                     text: backend.ovpActive ? "⚠ OVP" :
                           backend.ocpActive ? "⚠ OCP" :
@@ -195,18 +229,16 @@ Rectangle {
             }
         }
 
-        // ── Alarm banner (prominent, full-width) ──────────────────────────
+        // ── Full alarm banner (shown until user dismisses) ────────────────
         Rectangle {
             Layout.fillWidth: true
-            height: 44; radius: 8
-            visible: backend.connected && backend.anyAlarm
+            height: 52; radius: 8
+            visible: backend.connected && backend.anyAlarm && !alarmAcknowledged
             color: "#3a0d0d"; border.color: "#f44336"; border.width: 2
             RowLayout {
-                anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
-                Label {
-                    text: "🔴"
-                    font.pixelSize: 20
-                }
+                anchors { fill: parent; leftMargin: 12; rightMargin: 8 }
+                spacing: 8
+                Label { text: "🔴"; font.pixelSize: 22 }
                 Label {
                     text: qsTr("PROTECTION ALARM: ") +
                           (backend.ovpActive ? qsTr("Over Voltage (OVP)") :
@@ -216,6 +248,14 @@ Rectangle {
                     font.pixelSize: 13; font.bold: true; color: "#ff6b6b"
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
+                }
+                Button {
+                    text: qsTr("Dismiss")
+                    flat: true
+                    font.pixelSize: 12
+                    Material.theme: Material.Dark
+                    Material.foreground: "#ef9a9a"
+                    onClicked: alarmAcknowledged = true
                 }
             }
         }
