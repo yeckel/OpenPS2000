@@ -237,6 +237,13 @@ Item {
         }
     }
 
+    // ── Internal zoom/pan helper ──────────────────────────────────────────
+    // Emits viewChanged so both desktop (shared state) and Android (local state)
+    // can react. Does NOT self-assign properties — callers must handle the signal.
+    function _applyViewChange(newVl, newWs) {
+        root.viewChanged(newVl, newWs)
+    }
+
     WheelHandler {
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: (event) => {
@@ -248,7 +255,36 @@ Item {
             var mouseT = vl + frac * ws
             var newWs = Math.max(2, Math.min(7200, ws * factor))
             var newVl = Math.max(0, mouseT - frac * newWs)
-            root.viewChanged(newVl, newWs)
+            root._applyViewChange(newVl, newWs)
+        }
+    }
+
+    // ── Pinch handler: zoom (scale) + two-finger pan ───────────────────────
+    PinchHandler {
+        id: pinchHandler
+        target: null
+        property real _startWs: 60
+        property real _startVl: 0
+        property real _startCx: 0
+
+        onActiveChanged: {
+            if (active) {
+                _startWs = root.effectiveWindowSecs
+                _startVl = root.currentViewLeft()
+                _startCx = centroid.position.x
+            }
+        }
+        onActiveScaleChanged: {
+            var ws  = root.effectiveWindowSecs
+            var vl  = root.currentViewLeft()
+            var pW  = Math.max(1, root.width - root.mL - root.mR)
+            var frac = Math.max(0, Math.min(1, (centroid.position.x - root.mL) / pW))
+            var pinchT = vl + frac * ws
+            var newWs = Math.max(2, Math.min(7200, _startWs / activeScale))
+            // pan delta from two-finger drag
+            var panDt = -(centroid.position.x - _startCx) / pW * newWs
+            var newVl = Math.max(0, pinchT - frac * newWs + panDt)
+            root._applyViewChange(newVl, newWs)
         }
     }
 
@@ -273,7 +309,7 @@ Item {
             if (pressedButtons & Qt.RightButton) {
                 var dt = -(mouse.x - _panStartX) /
                     Math.max(1, root.width - root.mL - root.mR) * root.effectiveWindowSecs
-                root.viewChanged(Math.max(0, _panStartVL + dt), root.effectiveWindowSecs)
+                root._applyViewChange(Math.max(0, _panStartVL + dt), root.effectiveWindowSecs)
             } else if (pressed) {
                 root.selectionEnd = root.pixelToTime(mouse.x)
                 canvas.requestPaint()

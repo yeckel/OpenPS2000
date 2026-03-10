@@ -15,6 +15,19 @@ Rectangle {
     // When true: turn output back on as soon as the PSU clears the alarm
     property bool resumeOutputAfterAck: false
 
+    // ── Chart view state ──────────────────────────────────────────────────
+    property real chartWindowSecs: 60
+    property real chartViewLeft:   0
+    property bool chartFollow:     true
+
+    // ── Selection statistics ──────────────────────────────────────────────
+    property bool   hasStats:    false
+    property string statDt:      ""
+    property string statV:       ""
+    property string statI:       ""
+    property string statP:       ""
+    property string statEnergy:  ""
+
     // Send/cancel system notification and handle resume-after-ack.
     Connections {
         target: backend
@@ -326,10 +339,43 @@ Rectangle {
                 anchors { fill: parent; margins: 4 }
                 leftUnit:  "V"
                 rightUnit: "A"
+                followMode: chartFollow
+                effectiveWindowSecs: chartWindowSecs
+                viewLeft: chartViewLeft
                 seriesList: [
                     { name: "Voltage", color: "#4dc8ff", yAxis: "left",  data: [], fillArea: false },
                     { name: "Current", color: "#ff9940", yAxis: "right", data: [], fillArea: false }
                 ]
+                onViewChanged: (vl, ws) => {
+                    chartViewLeft   = vl
+                    chartWindowSecs = ws
+                    chartFollow     = false
+                }
+                onRangeSelected: (t0, t1) => {
+                    var r = backend.measureRange(t0, t1)
+                    if (!r || (r.sampleCount || 0) <= 0) {
+                        hasStats = false
+                        return
+                    }
+                    hasStats   = true
+                    statDt     = qsTr("Δt %1 s  n=%2").arg((r.duration || 0).toFixed(1)).arg(r.sampleCount)
+                    statV      = qsTr("V  %1 / %2 / %3 V")
+                                    .arg((r.minVoltage  || 0).toFixed(2))
+                                    .arg((r.meanVoltage || 0).toFixed(2))
+                                    .arg((r.peakVoltage || 0).toFixed(2))
+                    statI      = qsTr("I  %1 / %2 / %3 mA")
+                                    .arg(((r.minCurrent  || 0)*1000).toFixed(0))
+                                    .arg(((r.meanCurrent || 0)*1000).toFixed(0))
+                                    .arg(((r.peakCurrent || 0)*1000).toFixed(0))
+                    statP      = qsTr("P  %1 / %2 / %3 W")
+                                    .arg((r.minPower  || 0).toFixed(2))
+                                    .arg((r.meanPower || 0).toFixed(2))
+                                    .arg((r.peakPower || 0).toFixed(2))
+                    statEnergy = qsTr("%1 mWh  /  %2 mAh")
+                                    .arg(((r.energyWh  || 0)*1000).toFixed(2))
+                                    .arg(((r.energyMAh || 0)*1000).toFixed(1))
+                }
+                onSelectionCleared: { hasStats = false }
             }
 
             // Wire new samples
@@ -339,6 +385,69 @@ Rectangle {
                     liveChart.appendTo(0, t, v)
                     liveChart.appendTo(1, t, i)
                 }
+            }
+
+            // Follow button — re-enables live scrolling after manual pan/zoom
+            Rectangle {
+                anchors { right: parent.right; bottom: parent.bottom; margins: 8 }
+                width: followLabel.implicitWidth + 20; height: 28; radius: 14
+                visible: !chartFollow
+                color: "#1a3060"; border.color: "#3a60a0"; border.width: 1
+                Label {
+                    id: followLabel
+                    anchors.centerIn: parent
+                    text: "▶ Follow"
+                    font.pixelSize: 11; color: "#90caf9"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        chartFollow     = true
+                        chartWindowSecs = 60
+                    }
+                }
+            }
+        }
+
+        // ── Selection statistics panel ────────────────────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: statsCol.implicitHeight + 12
+            visible: hasStats
+            radius: 6; color: "#0d1a2a"
+            border.color: "#1e3a5a"; border.width: 1
+
+            ColumnLayout {
+                id: statsCol
+                anchors { fill: parent; margins: 6 }
+                spacing: 2
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Label {
+                        text: statDt
+                        font.pixelSize: 10; color: "#6699bb"
+                        Layout.fillWidth: true
+                    }
+                    // Tap × to dismiss
+                    Label {
+                        text: "✕"
+                        font.pixelSize: 12; color: "#446688"
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                hasStats = false
+                                liveChart.selectionStart = -1
+                                liveChart.selectionEnd   = -1
+                                liveChart.repaint()
+                            }
+                        }
+                    }
+                }
+                Label { text: statV;      font.pixelSize: 10; color: "#4dc8ff"; font.family: "monospace" }
+                Label { text: statI;      font.pixelSize: 10; color: "#ff9940"; font.family: "monospace" }
+                Label { text: statP;      font.pixelSize: 10; color: "#81c784"; font.family: "monospace" }
+                Label { text: statEnergy; font.pixelSize: 10; color: "#ce93d8"; font.family: "monospace" }
             }
         }
 
