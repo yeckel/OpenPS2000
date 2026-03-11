@@ -1,8 +1,10 @@
 # ⚡ OpenPS2000
 
-Open-source **Qt 6 / QML / C++** desktop application for controlling
-**EA Elektro-Automatik PS 2000 B** laboratory power supplies over USB or **remotely**
-over a REST API and MQTT.
+Open-source **Qt 6 / QML / C++** application for controlling
+**EA Elektro-Automatik PS 2000 B** laboratory power supplies, available as:
+
+- **Desktop app** (Linux / Windows / macOS) — direct USB connection
+- **Android companion app** — USB OTG direct or remote control via REST API
 
 **Author:** Libor Tomsik, OK1CHP  
 **License:** [GNU GPL v3](LICENSE)
@@ -10,6 +12,8 @@ over a REST API and MQTT.
 [![Build](https://github.com/yeckel/OpenPS2000/actions/workflows/build.yml/badge.svg)](https://github.com/yeckel/OpenPS2000/actions/workflows/build.yml)
 
 ---
+
+## Desktop
 
 | Monitor | Battery Charger |
 |---------|----------------|
@@ -19,27 +23,36 @@ over a REST API and MQTT.
 |----------------|----------------|
 | ![Pulse tab](screenshots/03_pulse.png) | ![Sequence tab](screenshots/04_sequence.png) |
 
+## Android Companion App
+
+| Monitor & Chart | Control | Settings |
+|----------------|---------|----------|
+| ![Android Monitor](screenshots/android_01_monitor.jpg) | ![Android Control](screenshots/android_02_control.jpg) | ![Android Settings](screenshots/android_03_settings.jpg) |
+
 ---
 
 ## Features
 
 ### Live Monitor Tab
 - **Real-time measurements** — voltage, current, power at 4 Hz over USB
-- **Live charts** — dual-axis V/I chart and power area chart with smooth scrolling
-- **Zoom & pan** — scroll wheel to zoom the time axis, right-click drag to pan
-- **Range statistics** — drag to select a time window; popup shows min/max/mean V/I/P,
+- **Live charts** — dual-axis V/I chart with smooth scrolling
+- **Zoom & pan** — scroll wheel (desktop) or `−`/`+` buttons (Android) to zoom;
+  right-click drag (desktop) or `◀`/`▶` buttons (Android) to pan;
+  `▶ Live` button re-engages live follow mode
+- **Range statistics** — drag to select a time window; panel shows min/mean/max V/I/P,
   energy in Wh and charge in mAh for the selected interval
 - **Energy counter** — cumulative energy integration with per-session reset
 - **CSV & Excel export** — one-click export of the full session log
 
 ### Full Device Control
-- Set **voltage** and **current** setpoints with mouse-wheel-enabled spinboxes
+- Set **voltage** and **current** setpoints with mouse-wheel-enabled spinboxes (desktop)
+  or touch sliders (Android)
 - Set **OVP** (over-voltage) and **OCP** (over-current) protection limits
 - **Output ON/OFF** toggle with keyboard shortcut
 - **Remote / Manual** mode switch
 - **Emergency stop** — large red button + `Space` key instantly cuts the output
-- **Protection alarm popup** — OVP / OCP / OPP / OTP alarms detected automatically,
-  shown in a modal dialog with clear descriptions and one-click acknowledgement
+- **Protection alarm** — OVP / OCP / OPP / OTP alarms detected and shown with
+  **Ack & Resume** (restores output) or **Acknowledge** (output stays off)
 
 ### Battery Charger Tab *(experimental)*
 - **5 chemistries:** LiPo, LiFe, Pb, NiCd, NiMH
@@ -88,15 +101,17 @@ Enable in **Settings → Remote → REST API**. Default port: **8484**.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET`  | `/api/v1/info` | Device name, serial, firmware, nominal V/I/P |
-| `GET`  | `/api/v1/status` | All measurements, setpoints, output state |
-| `GET`  | `/api/v1/history` | Last N samples as JSON array |
+| `GET`  | `/api/v1/status` | All measurements, setpoints, output state, alarms |
+| `GET`  | `/api/v1/history?minutes=5` | Measurement statistics for the last N minutes |
 | `GET`  | `/api/v1/limits` | OVP / OCP protection limits |
 | `PUT`  | `/api/v1/setpoint` | `{"voltage":12.0,"current":2.0}` |
 | `PUT`  | `/api/v1/output` | `{"enabled":true}` |
 | `PUT`  | `/api/v1/limits` | `{"ovp":15.0,"ocp":5.0}` |
+| `POST` | `/api/v1/alarm/acknowledge` | Acknowledge active protection alarm |
 
 Optional Bearer token authentication — set in Settings, pass as
-`Authorization: Bearer <token>` header.
+`Authorization: Bearer <token>` header. All numeric inputs are clamped to the
+device's nominal ratings before forwarding to hardware.
 
 #### MQTT Client *(requires Qt6::Mqtt)*
 Enable in **Settings → Remote → MQTT**. Requires an external broker (e.g. Mosquitto).
@@ -127,7 +142,7 @@ the app to the system tray. Right-click the tray icon to show/quit.
 
 ### User Interface
 - **Dark Material theme** throughout
-- **Keyboard shortcuts:**
+- **Keyboard shortcuts** (desktop):
 
   | Action | Shortcut |
   |--------|----------|
@@ -157,7 +172,7 @@ Pre-built binaries are attached to each
 | Windows  | `OpenPS2000-windows-x86_64.zip` — unzip, run `openps2000app.exe` |
 | macOS    | `OpenPS2000-macos.zip` — unzip, double-click the `.app` bundle |
 
-> On Linux: add yourself to the `dialout` group and re-login so the app can
+> **Linux:** add yourself to the `dialout` group and re-login so the app can
 > access `/dev/ttyACM0`:
 > ```bash
 > sudo usermod -aG dialout $USER
@@ -167,17 +182,18 @@ Pre-built binaries are attached to each
 
 | File | Minimum Android |
 |------|-----------------|
-| `OpenPS2000-android-arm64.apk` | Android 9 (API 28) |
+| `OpenPS2000-android-arm64.apk` | Android 9 (API 28), arm64 |
 
 **Install (sideload):**
-1. Enable **Settings → Security → Install unknown apps** for your browser/file manager
+1. Enable **Settings → Security → Install unknown apps** for your browser or file manager
 2. Download the APK and open it — Android will prompt to install
 
-The Android app can connect in two ways:
-- **USB OTG** — plug the EA-PS directly into your phone with a USB-A ↔ USB-C OTG
-  adapter; tap **USB (Direct)** → Scan → Connect
-- **REST (Network)** — start the desktop app, enable **Settings → Remote → REST API**,
-  enter the PC's IP address in the Android app, tap **REST** → Connect
+**Connection options:**
+
+| Mode | How to use |
+|------|-----------|
+| **USB OTG (direct)** | Connect the EA-PS to your phone with a USB-A ↔ USB-C OTG adapter. In the app go to **Settings → USB (Direct)** → Scan → Connect. Grant USB permission when prompted. |
+| **REST (network)** | Start the desktop app on the PC with REST enabled (**Settings → Remote → REST API**). In the Android app enter the PC's IP address under **Settings → REST (Network)** and tap **Connect via REST**. |
 
 ---
 
@@ -187,11 +203,12 @@ The Android app can connect in two ways:
 |----------|-------|
 | Series   | EA Elektro-Automatik PS 2000 B |
 | Tested   | EA-PS 2084-05 B (84 V / 5 A / 160 W) |
-| Interface | USB → virtual COM port (VCP) |
-| Baud rate | 115 200 bps, odd parity, 8 data bits |
+| Interface | USB → virtual COM port (VCP) — CDC-ACM class |
+| Baud rate | 115 200 bps, odd parity, 8 data bits, 1 stop bit |
 | Linux port | `/dev/ttyACM0` |
 | Windows port | `COMx` (check Device Manager) |
 | macOS port | `/dev/tty.usbmodem*` |
+| Android USB VID/PID | `0x232E` / `0x0010` |
 
 > **Linux:** add your user to the `dialout` group, then re-login:
 > ```bash
@@ -229,10 +246,7 @@ Values are encoded as a fraction of the nominal rating:
 
 On Debian/Ubuntu: `sudo apt install zlib1g-dev`
 
-Install Qt from the [Qt online installer](https://www.qt.io/download) or your
-distribution's package manager.
-
-### Clone and build
+### Desktop (Linux / Windows / macOS)
 
 ```bash
 git clone https://github.com/yeckel/OpenPS2000.git
@@ -248,6 +262,11 @@ If Qt is installed in a non-standard location (e.g. `/opt/Qt`):
 cmake -B build -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_PREFIX_PATH=/opt/Qt/6.9.2/gcc_64 app
 ```
+
+### Android
+
+Requires Qt 6.7+ for Android (arm64-v8a) and Android NDK 26+.
+See `.github/workflows/build.yml` for the exact CI build commands.
 
 ---
 
@@ -297,7 +316,7 @@ OpenPS2000/
 │   ├── ZipReader.h/cpp           ZIP reader (stored + deflate; reads LibreOffice/Excel files)
 │   └── qml/
 │       ├── Main.qml              Main window, toolbar, controls, alarm popup, status bar
-│       ├── LiveChart.qml         Canvas scrolling dual-axis chart
+│       ├── LiveChart.qml         Canvas scrolling dual-axis chart (shared desktop+Android)
 │       ├── ChargerTab.qml        Battery charger UI tab
 │       ├── ChargingChart.qml     Charging curve canvas chart
 │       ├── PulseTab.qml          Pulse/cycle generator UI tab
@@ -306,8 +325,21 @@ OpenPS2000/
 │       ├── SequenceChart.qml     Sequence execution chart
 │       ├── SequenceEditorDialog.qml  Popup table editor with import/export
 │       └── RemoteSettingsPanel.qml   REST + MQTT configuration panel
+├── android/
+│   ├── CMakeLists.txt
+│   ├── main.cpp                  Android entry point; NullBackend, BackendFactory
+│   ├── AndroidSerialTransport.cpp  USB OTG CDC-ACM transport (JNI → UsbSerial.java)
+│   ├── RemoteBackend.h/cpp       REST polling client (shared with desktop)
+│   ├── java/org/openps2000/
+│   │   ├── UsbSerial.java        Android USB Host CDC-ACM driver
+│   │   └── AlarmNotification.java  Android system notification helper
+│   └── qml/
+│       ├── Main.qml              Android main window, top bar, tab bar
+│       ├── MonitorTab.qml        Live V/I/P readings, scrolling chart, zoom controls
+│       ├── ControlTab.qml        Output toggle, setpoint sliders, protection limits
+│       └── SettingsTab.qml       USB / REST connection settings
 └── .github/workflows/
-    └── build.yml                 CI: Linux AppImage · Windows zip · macOS dmg
+    └── build.yml                 CI: Linux AppImage · Windows zip · macOS dmg · Android APK
 ```
 
 ---
