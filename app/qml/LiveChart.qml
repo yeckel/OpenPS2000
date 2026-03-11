@@ -238,10 +238,12 @@ Item {
     }
 
     // ── Internal zoom/pan helper ──────────────────────────────────────────
-    // Emits viewChanged so both desktop (shared state) and Android (local state)
-    // can react. Does NOT self-assign properties — callers must handle the signal.
+    // Emits viewChanged (for external consumers to sync their state) and then
+    // immediately repaints — without requestPaint() the canvas won't redraw
+    // until the next data sample arrives, making zoom/pan feel broken.
     function _applyViewChange(newVl, newWs) {
         root.viewChanged(newVl, newWs)
+        canvas.requestPaint()
     }
 
     // ── Mouse wheel zoom (desktop / touchpad) ─────────────────────────────
