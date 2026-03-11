@@ -20,6 +20,24 @@ Rectangle {
     property real chartViewLeft:   0
     property bool chartFollow:     true
 
+    // Discrete zoom steps in seconds: 15s, 30s, 1m, 2m, 5m, 10m, 30m, 1h
+    readonly property var windowSteps: [15, 30, 60, 120, 300, 600, 1800, 3600]
+
+    function windowStepIdx(ws) {
+        var best = 0
+        var bestDist = Math.abs(windowSteps[0] - ws)
+        for (var i = 1; i < windowSteps.length; i++) {
+            var d = Math.abs(windowSteps[i] - ws)
+            if (d < bestDist) { bestDist = d; best = i }
+        }
+        return best
+    }
+    function formatWindow(ws) {
+        if (ws < 60)   return ws.toFixed(0) + "s"
+        if (ws < 3600) return (ws / 60).toFixed(0) + "m"
+        return (ws / 3600).toFixed(0) + "h"
+    }
+
     // ── Selection statistics ──────────────────────────────────────────────
     property bool   hasStats:    false
     property string statDt:      ""
@@ -386,26 +404,95 @@ Rectangle {
                     liveChart.appendTo(1, t, i)
                 }
             }
+        }
 
-            // Follow button — re-enables live scrolling after manual pan/zoom
-            Rectangle {
-                anchors { right: parent.right; bottom: parent.bottom; margins: 8 }
-                width: followLabel.implicitWidth + 20; height: 28; radius: 14
-                visible: !chartFollow
-                color: "#1a3060"; border.color: "#3a60a0"; border.width: 1
-                Label {
-                    id: followLabel
-                    anchors.centerIn: parent
-                    text: "▶ Follow"
-                    font.pixelSize: 11; color: "#90caf9"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        chartFollow     = true
-                        chartWindowSecs = 60
+        // ── Chart zoom / pan controls ─────────────────────────────────────
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 4
+            visible: backend.connected
+
+            // Zoom out
+            RoundButton {
+                text: "−"; font.pixelSize: 16
+                Layout.preferredWidth: 40; Layout.preferredHeight: 40
+                flat: true; Material.foreground: "#90caf9"
+                onClicked: {
+                    var idx = windowStepIdx(chartWindowSecs)
+                    if (idx > 0) {
+                        var curLeft = liveChart.currentViewLeft()
+                        chartWindowSecs = windowSteps[idx - 1]
+                        chartViewLeft   = curLeft
+                        chartFollow     = false
                     }
                 }
+            }
+
+            // Current window size label — tap to reset to 1 min live
+            Label {
+                text: formatWindow(chartWindowSecs)
+                font.pixelSize: 12; color: "#90caf9"
+                Layout.minimumWidth: 32
+                horizontalAlignment: Text.AlignHCenter
+                MouseArea { anchors.fill: parent; onClicked: { chartFollow = true; chartWindowSecs = 60 } }
+            }
+
+            // Zoom in
+            RoundButton {
+                text: "+"; font.pixelSize: 16
+                Layout.preferredWidth: 40; Layout.preferredHeight: 40
+                flat: true; Material.foreground: "#90caf9"
+                onClicked: {
+                    var idx = windowStepIdx(chartWindowSecs)
+                    if (idx < windowSteps.length - 1) {
+                        var curLeft = liveChart.currentViewLeft()
+                        chartWindowSecs = windowSteps[idx + 1]
+                        chartViewLeft   = curLeft
+                        chartFollow     = false
+                    }
+                }
+            }
+
+            Item { Layout.fillWidth: true }
+
+            // Pan ← (half-window step)
+            RoundButton {
+                text: "◀"; font.pixelSize: 13
+                Layout.preferredWidth: 40; Layout.preferredHeight: 40
+                flat: true; Material.foreground: "#607d8b"
+                onClicked: {
+                    var curLeft = liveChart.currentViewLeft()
+                    chartViewLeft = Math.max(0, curLeft - chartWindowSecs * 0.5)
+                    chartFollow   = false
+                }
+            }
+
+            // Pan → (half-window step)
+            RoundButton {
+                text: "▶"; font.pixelSize: 13
+                Layout.preferredWidth: 40; Layout.preferredHeight: 40
+                flat: true; Material.foreground: "#607d8b"
+                onClicked: {
+                    var curLeft  = liveChart.currentViewLeft()
+                    var newLeft  = curLeft + chartWindowSecs * 0.5
+                    // If we've panned past the live edge, re-engage follow mode
+                    if (newLeft + chartWindowSecs >= liveChart.xHead) {
+                        chartFollow = true
+                    } else {
+                        chartViewLeft = newLeft
+                        chartFollow   = false
+                    }
+                }
+            }
+
+            // Live / Follow button
+            Button {
+                text: chartFollow ? "● Live" : "▶ Live"
+                font.pixelSize: 11
+                flat: chartFollow
+                highlighted: !chartFollow
+                Material.accent: chartFollow ? "#4caf50" : "#2196f3"
+                onClicked: { chartFollow = true; chartWindowSecs = 60 }
             }
         }
 
